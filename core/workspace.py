@@ -48,7 +48,7 @@ def render_workspace(
         )
 
     # ==================================================
-    # AVAILABLE DIMENSIONS
+    # DIMENSIONS
     # ==================================================
 
     dimensions = (
@@ -62,6 +62,7 @@ def render_workspace(
         st.warning(
             "At least two dimensions are required."
         )
+
         return
 
     # ==================================================
@@ -70,22 +71,17 @@ def render_workspace(
 
     if "maps" not in st.session_state:
 
-        z_default = (
-            dimensions[2]
-            if len(dimensions) > 2
-            else dimensions[1]
-        )
-
         st.session_state.maps = [
 
             {
                 "x": dimensions[0],
                 "y": dimensions[1],
-                "z": z_default,
+                "z": None,
                 "color": None,
             }
 
         ]
+
     # ==================================================
     # VISUAL WORKSPACE
     # ==================================================
@@ -102,22 +98,16 @@ def render_workspace(
         with col_reset:
 
             if st.button(
-                "Reset",
+                "Reset Maps",
                 use_container_width=True
             ):
-
-                z_default = (
-                    dimensions[2]
-                    if len(dimensions) > 2
-                    else dimensions[1]
-                )
 
                 st.session_state.maps = [
 
                     {
                         "x": dimensions[0],
                         "y": dimensions[1],
-                        "z": z_default,
+                        "z": None,
                         "color": None,
                     }
 
@@ -128,22 +118,16 @@ def render_workspace(
         with col_add:
 
             if st.button(
-                "Add Map",
+                "New Decision Map",
                 use_container_width=True
             ):
-
-                z_default = (
-                    dimensions[2]
-                    if len(dimensions) > 2
-                    else dimensions[1]
-                )
 
                 st.session_state.maps.append(
 
                     {
                         "x": dimensions[0],
                         "y": dimensions[1],
-                        "z": z_default,
+                        "z": None,
                         "color": None,
                     }
 
@@ -154,7 +138,8 @@ def render_workspace(
         st.caption(
             f"Active maps: {len(st.session_state.maps)}"
         )
-        show_ids = st.sidebar.checkbox(    
+
+        show_ids = st.checkbox(
             "Show IDs on plots",
             value=False
         )
@@ -162,7 +147,7 @@ def render_workspace(
     # ==================================================
     # MAPS
     # ==================================================
-  
+
     for idx in range(
         len(st.session_state.maps)
     ):
@@ -192,7 +177,9 @@ def render_workspace(
             x = st.selectbox(
                 "X Axis",
                 dimensions,
-                index=dimensions.index(current_x),
+                index=dimensions.index(
+                    current_x
+                ),
                 key=f"x_{idx}"
             )
 
@@ -213,16 +200,22 @@ def render_workspace(
             y = st.selectbox(
                 "Y Axis",
                 y_options,
-                index=y_options.index(current_y),
+                index=y_options.index(
+                    current_y
+                ),
                 key=f"y_{idx}"
             )
 
         with c3:
 
             z_options = [None] + [
+
                 d
+
                 for d in dimensions
+
                 if d not in [x, y]
+
             ]
 
             current_z = (
@@ -234,13 +227,18 @@ def render_workspace(
             z = st.selectbox(
                 "Third Dimension",
                 z_options,
-                index=z_options.index(current_z),
+                index=z_options.index(
+                    current_z
+                ),
                 key=f"z_{idx}"
             )
 
         with c4:
 
-            color_options = [None] + dimensions
+            color_options = (
+                [None]
+                + dimensions
+            )
 
             current_color = (
                 current_map["color"]
@@ -251,7 +249,9 @@ def render_workspace(
             color = st.selectbox(
                 "Color",
                 color_options,
-                index=color_options.index(current_color),
+                index=color_options.index(
+                    current_color
+                ),
                 key=f"color_{idx}"
             )
 
@@ -259,12 +259,10 @@ def render_workspace(
         # Tabs
         # --------------------------------------
 
-        tab1, tab2 = st.tabs(
-            [
-                "📊 Coordinated Maps",
-                "🫧 Bubble Map"
-            ]
-        )
+        tab1, tab2 = st.tabs([
+            "📊 Coordinated Maps",
+            "🫧 Bubble Map"
+        ])
 
         # =====================================
         # COORDINATED MAPS
@@ -279,7 +277,7 @@ def render_workspace(
                     x=x,
                     y=y,
                     color=color,
-                    show_ids=False,
+                    show_ids=show_ids,
                     key=f"single_{idx}"
                 )
 
@@ -290,7 +288,8 @@ def render_workspace(
                     x=x,
                     y=y,
                     z=z,
-                    key_prefix=f"coord_{idx}"
+                    key_prefix=f"coord_{idx}",
+                    show_ids=show_ids
                 )
 
         # =====================================
@@ -305,8 +304,21 @@ def render_workspace(
                 y=y,
                 size=z if z is not None else None,
                 color=color,
+                show_ids=show_ids,
                 key=f"bubble_{idx}"
             )
+
+        # --------------------------------------
+        # Save state
+        # --------------------------------------
+
+        st.session_state.maps[idx] = {
+
+            "x": x,
+            "y": y,
+            "z": z,
+            "color": color,
+        }
 
     # ==================================================
     # EXPORT
