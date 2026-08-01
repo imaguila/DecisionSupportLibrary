@@ -1,15 +1,16 @@
 import streamlit as st
 
 
-def render_lenses(
-    dataset
-):
+def render_lenses(dataset):
 
     dimensions = (
         dataset["metrics"]
         +
         dataset["selected_indicators"]
     )
+
+    active_lens = "None"
+    params = {}
 
     with st.sidebar.expander(
         "🧭 Analytical Lenses",
@@ -27,26 +28,24 @@ def render_lenses(
             ]
         )
 
-        params = {}
-
-        # ======================================
+        # =====================================
         # Preference Lens
-        # ======================================
+        # =====================================
 
         if active_lens == "Preference":
 
             params["maximize"] = st.multiselect(
-                "Maximize",
+                "Metrics to Maximize",
                 dimensions
             )
 
             params["minimize"] = st.multiselect(
-                "Minimize",
+                "Metrics to Minimize",
                 dimensions
             )
 
             params["method"] = st.selectbox(
-                "Method",
+                "Scoring Method",
                 [
                     "Weighted Sum",
                     "TOPSIS"
@@ -54,36 +53,36 @@ def render_lenses(
             )
 
             params["top_n"] = st.slider(
-                "Top N",
+                "Top N Solutions",
                 1,
                 100,
                 20
             )
 
-        # ======================================
+        # =====================================
         # Diversity Lens
-        # ======================================
+        # =====================================
 
         elif active_lens == "Diversity":
 
             params["method"] = st.selectbox(
-                "Clustering",
+                "Clustering Method",
                 [
                     "K-Medoids",
                     "HDBSCAN"
                 ]
             )
 
-            params["top_n"] = st.slider(
-                "Target Size",
+            params["target_size"] = st.slider(
+                "Target Subset Size",
                 1,
                 100,
                 20
             )
 
-        # ======================================
+        # =====================================
         # Efficiency Lens
-        # ======================================
+        # =====================================
 
         elif active_lens == "Efficiency":
 
@@ -98,27 +97,25 @@ def render_lenses(
             )
 
             params["top_n"] = st.slider(
-                "Top N",
+                "Top N Solutions",
                 1,
                 100,
                 20
             )
 
-        # ======================================
+        # =====================================
         # Domain Lens
-        # ======================================
+        # =====================================
 
         elif active_lens == "Domain-Specific":
 
             params["indicators"] = st.multiselect(
                 "Indicators",
-                dataset[
-                    "selected_indicators"
-                ]
+                dataset["selected_indicators"]
             )
 
             params["top_n"] = st.slider(
-                "Top N",
+                "Top N Solutions",
                 1,
                 100,
                 20
