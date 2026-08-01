@@ -249,6 +249,14 @@ def render_input_panel():
                 cfg["path_sol"]
             )
 
+            df.reset_index(
+                drop=True,
+                inplace=True
+            )
+
+            df["id"] = range(
+                len(df)
+            )
             return build_dataset(
                 df,
                 cfg
@@ -281,7 +289,14 @@ def render_input_panel():
             df = pd.read_csv(
                 uploaded_file
             )
+            df.reset_index(
+                drop=True,
+                inplace=True
+            )
 
+            df["id"] = range(
+                len(df)
+            )
             cfg = {
 
                 "plugin": None,
