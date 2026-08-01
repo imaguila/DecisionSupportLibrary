@@ -10,6 +10,10 @@ def render_workspace(
     dataset
 ):
 
+    # ==================================================
+    # SUMMARY
+    # ==================================================
+
     st.subheader(
         "Dataset Summary"
     )
@@ -35,23 +39,22 @@ def render_workspace(
         st.metric(
             "Decision Variables",
             len(
-                dataset[
-                    "decision_variables"
-                ]
+                dataset["decision_variables"]
             )
         )
 
     st.caption(
-        "Decision-variable prefix: "
-        f"{dataset['config'].get('var_prefix')}"
+        f"Decision-variable prefix: "
+        f"`{dataset['config'].get('var_prefix')}`"
     )
 
+    # ==================================================
+    # WORKSPACE STATE
+    # ==================================================
+
     dimensions = (
-
         dataset["metrics"]
-
         +
-
         dataset["selected_indicators"]
     )
 
@@ -63,58 +66,170 @@ def render_workspace(
 
         return
 
-    st.subheader(
-        "Decision Space Map"
-    )
+    if "maps" not in st.session_state:
 
-    col1, col2, col3 = st.columns(3)
+        st.session_state.maps = [
 
-    with col1:
+            {
+                "x": dimensions[0],
+                "y": dimensions[1],
+                "size": None,
+                "color": None,
+            }
 
-        x = st.selectbox(
-            "X axis",
-            dimensions,
-            index=0
-        )
-
-    with col2:
-
-        y_options = [
-
-            d
-
-            for d in dimensions
-
-            if d != x
         ]
 
-        y = st.selectbox(
-            "Y axis",
-            y_options,
-            index=0
+    # ==================================================
+    # VISUAL WORKSPACE
+    # ==================================================
+
+    st.sidebar.markdown(
+        "## Visual Workspace"
+    )
+
+    c1, c2 = st.sidebar.columns(2)
+
+    with c1:
+
+        if st.button(
+            "Add Map",
+            use_container_width=True
+        ):
+
+            st.session_state.maps.append(
+
+                {
+                    "x": dimensions[0],
+                    "y": dimensions[1],
+                    "size": None,
+                    "color": None,
+                }
+
+            )
+
+            st.rerun()
+
+    with c2:
+
+        if st.button(
+            "Reset",
+            use_container_width=True
+        ):
+
+            st.session_state.maps = [
+
+                {
+                    "x": dimensions[0],
+                    "y": dimensions[1],
+                    "size": None,
+                    "color": None,
+                }
+
+            ]
+
+            st.rerun()
+
+    # ==================================================
+    # RENDER MAPS
+    # ==================================================
+
+    for idx, current_map in enumerate(
+        st.session_state.maps
+    ):
+
+        st.subheader(
+            f"Decision-Space Map {idx+1}"
         )
 
-    with col3:
-
-        size = st.selectbox(
-            "Bubble size",
-            [None] + dimensions,
-            index=0
+        col_x, col_y, col_s, col_c = (
+            st.columns(4)
         )
 
-    render_scatter(
-        df,
-        x,
-        y,
-        size=size
-    )
+        with col_x:
 
-    st.subheader(
-        "Current Dataset"
-    )
+            x = st.selectbox(
+                "X Axis",
+                dimensions,
+                index=max(
+                    0,
+                    dimensions.index(
+                        current_map["x"]
+                    )
+                ),
+                key=f"x_{idx}"
+            )
 
-    st.dataframe(
-        df,
-        use_container_width=True,
-        height=500
-    )
+        with col_y:
+
+            y_options = [
+                d
+                for d in dimensions
+                if d != x
+            ]
+
+            current_y = (
+                current_map["y"]
+                if current_map["y"]
+                in y_options
+                else y_options[0]
+            )
+
+            y = st.selectbox(
+                "Y Axis",
+                y_options,
+                index=y_options.index(
+                    current_y
+                ),
+                key=f"y_{idx}"
+            )
+
+        with col_s:
+
+            size = st.selectbox(
+                "Bubble Size",
+                [None] + dimensions,
+                key=f"size_{idx}"
+            )
+
+        with col_c:
+
+            color = st.selectbox(
+                "Color",
+                [None] + dimensions,
+                key=f"color_{idx}"
+            )
+
+        # --------------------------------------
+        # save state
+        # --------------------------------------
+
+        st.session_state.maps[idx] = {
+
+            "x": x,
+            "y": y,
+            "size": size,
+            "color": color,
+        }
+
+        render_scatter(
+            df,
+            x=x,
+            y=y,
+            size=size,
+            color=color
+        )
+
+    # ==================================================
+    # DATA TABLE
+    # ==================================================
+
+    with st.expander(
+        "📋 Current Dataset",
+        expanded=False
+    ):
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            height=500
+        )
