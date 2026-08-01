@@ -53,7 +53,10 @@ def render_scatter_plot(df, x, y, size, color_col, show_ids, key):
             text="label" if show_ids else None,
             hover_data=hover_data
         )
-
+        fig.update_traces(
+            textposition="top right"
+        )
+        
         # ✅ aplicar opacidad si hay selección
         if "highlight" in df.columns and df["highlight"].any():
             opacity_vals = np.where(df["highlight"], 1.0, 0.25)

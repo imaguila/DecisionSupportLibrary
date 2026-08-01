@@ -15,28 +15,36 @@ def render_workspace(
     # SUMMARY
     # ==================================================
 
-    st.subheader("Dataset Summary")
+    with st.expander(
+        "📊 Dataset Summary",
+        expanded=False
+    ):
 
-    c1, c2, c3 = st.columns(3)
+        c1, c2, c3 = st.columns(3)
 
-    with c1:
-        st.metric(
-            "Solutions",
-            len(df)
-        )
-
-    with c2:
-        st.metric(
-            "Attributes",
-            len(df.columns)
-        )
-
-    with c3:
-        st.metric(
-            "Decision Variables",
-            len(
-                dataset["decision_variables"]
+        with c1:
+            st.metric(
+                "Solutions",
+                len(df)
             )
+
+        with c2:
+            st.metric(
+                "Attributes",
+                len(df.columns)
+            )
+
+        with c3:
+            st.metric(
+                "Decision Variables",
+                len(
+                    dataset["decision_variables"]
+                )
+            )
+
+        st.caption(
+            f"Decision-variable prefix: "
+            f"{dataset['config'].get('var_prefix')}"
         )
 
     # ==================================================
@@ -146,6 +154,10 @@ def render_workspace(
     # ==================================================
     # MAPS
     # ==================================================
+    show_ids = st.sidebar.checkbox(    
+        "Show IDs on plots",
+        value=False
+    )
 
     for idx in range(
         len(st.session_state.maps)
@@ -263,6 +275,7 @@ def render_workspace(
                     x=x,
                     y=y,
                     color=color,
+                    show_ids=False,
                     key=f"single_{idx}"
                 )
 

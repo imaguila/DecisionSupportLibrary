@@ -3,6 +3,7 @@ import pandas as pd
 
 from config import CASES
 from plugins import PLUGIN_REGISTRY
+
 from core.enrichment import (
     detect_available_indicators,
     apply_enrichment
@@ -13,7 +14,10 @@ from core.enrichment import (
 # HELPERS
 # =====================================================
 
-def detect_decision_variables(df, prefix):
+def detect_decision_variables(
+    df,
+    prefix
+):
 
     return [
         c
@@ -22,16 +26,23 @@ def detect_decision_variables(df, prefix):
     ]
 
 
-def build_dataset(df, cfg):
+def build_dataset(
+    df,
+    cfg
+):
 
     plugin = None
 
-    plugin_name = cfg.get("plugin")
+    plugin_name = cfg.get(
+        "plugin"
+    )
 
     if plugin_name:
 
-        plugin_class = PLUGIN_REGISTRY.get(
-            plugin_name
+        plugin_class = (
+            PLUGIN_REGISTRY.get(
+                plugin_name
+            )
         )
 
         if plugin_class:
@@ -51,10 +62,8 @@ def build_dataset(df, cfg):
         "metrics",
         []
     )
-    # ----------------------------------
-    # Automatic objective detection
-    # for uploaded datasets
-    # ----------------------------------
+
+    # Auto-detect objectives for uploaded CSVs
 
     if not all_metrics:
 
@@ -63,19 +72,31 @@ def build_dataset(df, cfg):
             "x_"
         )
 
+        excluded = set(
+            cfg.get(
+                "exclude_cols",
+                []
+            )
+        )
+
         all_metrics = []
 
         for col in df.columns:
 
-            if col.startswith(var_prefix):
+            if col.startswith(
+                var_prefix
+            ):
+                continue
+
+            if col in excluded:
                 continue
 
             if col in [
                 "id",
                 "highlight",
                 "label",
-                "score",
-                "cluster"
+                "cluster",
+                "score"
             ]:
                 continue
 
@@ -83,17 +104,19 @@ def build_dataset(df, cfg):
                 df[col]
             ):
                 all_metrics.append(col)
-        st.sidebar.markdown(
-            "### Optimization Objectives"
-        )
 
-    selected_metrics = (
-        st.sidebar.multiselect(
-            "Active objectives",
-            all_metrics,
-            default=all_metrics
+    with st.sidebar.expander(
+        "Optimization Objectives",
+        expanded=False
+    ):
+
+        selected_metrics = (
+            st.multiselect(
+                "Active objectives",
+                all_metrics,
+                default=all_metrics
+            )
         )
-    )
 
     # =================================================
     # ENRICHMENT
@@ -120,26 +143,27 @@ def build_dataset(df, cfg):
                     indicator
                 )
 
-        st.sidebar.markdown(
-            "### Data Enrichment"
-        )
+        with st.sidebar.expander(
+            "Data Enrichment",
+            expanded=False
+        ):
 
-        selected_indicators = (
-            st.sidebar.multiselect(
-                "Indicators",
-                sorted(
-                    available_indicators
-                ),
-                default=[
-                    i
-                    for i in cfg.get(
-                        "default_indicators",
-                        []
-                    )
-                    if i in available_indicators
-                ]
+            selected_indicators = (
+                st.multiselect(
+                    "Indicators",
+                    sorted(
+                        available_indicators
+                    ),
+                    default=[
+                        i
+                        for i in cfg.get(
+                            "default_indicators",
+                            []
+                        )
+                        if i in available_indicators
+                    ]
+                )
             )
-        )
 
         df = apply_enrichment(
             df,
@@ -184,98 +208,101 @@ def build_dataset(df, cfg):
 
 def render_input_panel():
 
-    st.sidebar.markdown(
-        "## Input Data"
-    )
+    with st.sidebar.expander(
+        "Input Data",
+        expanded=True
+    ):
 
-    mode = st.sidebar.radio(
-        "Source",
-        [
-            "Example Dataset",
-            "Upload Enriched CSV"
-        ]
-    )
-
-    # =================================================
-    # BUILT-IN DATASETS
-    # =================================================
-
-    if mode == "Example Dataset":
-
-        dataset_names = list(
-            CASES.keys()
+        mode = st.radio(
+            "Source",
+            [
+                "Example Dataset",
+                "Upload Enriched CSV"
+            ]
         )
 
-        dataset_name = (
-            st.sidebar.selectbox(
-                "Dataset",
-                dataset_names,
-                help=CASES[
-                    dataset_names[0]
-                ].get(
-                    "help",
-                    "No information available."
+        # ==========================================
+        # BUILT-IN DATASETS
+        # ==========================================
+
+        if mode == "Example Dataset":
+
+            dataset_names = list(
+                CASES.keys()
+            )
+
+            dataset_name = (
+                st.selectbox(
+                    "Dataset",
+                    dataset_names,
+                    help=CASES[
+                        dataset_names[0]
+                    ].get(
+                        "help",
+                        "No information available."
+                    )
                 )
             )
-        )
 
-        cfg = CASES[dataset_name]
+            cfg = CASES[
+                dataset_name
+            ]
 
-        df = pd.read_csv(
-            cfg["path_sol"]
-        )
+            df = pd.read_csv(
+                cfg["path_sol"]
+            )
 
-        return build_dataset(
-            df,
-            cfg
-        )
+            return build_dataset(
+                df,
+                cfg
+            )
 
-    # =================================================
-    # UPLOAD ENRICHED CSV
-    # =================================================
+        # ==========================================
+        # UPLOAD CSV
+        # ==========================================
 
-    uploaded_file = (
-        st.sidebar.file_uploader(
+        uploaded_file = st.file_uploader(
             "Upload CSV",
             type=["csv"]
         )
-    )
 
-    if uploaded_file:
+        if uploaded_file:
 
-        var_prefix = (
-            st.sidebar.text_input(
-                "Decision-variable prefix",
-                value="var_",
-                help=(
-                    "Prefix used to identify "
-                    "decision variables "
-                    "(e.g. req_, var_, x_, "
-                    "feature_)."
+            var_prefix = (
+                st.text_input(
+                    "Decision-variable prefix",
+                    value="var_",
+                    help=(
+                        "Prefix used to identify "
+                        "decision variables "
+                        "(e.g. req_, var_, x_, "
+                        "feature_, design_)."
+                    )
                 )
             )
-        )
 
-        df = pd.read_csv(
-            uploaded_file
-        )
+            df = pd.read_csv(
+                uploaded_file
+            )
 
-        cfg = {
+            cfg = {
 
-            "plugin": None,
+                "plugin": None,
 
-            "metrics": [],
+                "metrics": [],
 
-            "var_prefix":
-                var_prefix,
+                "var_prefix":
+                    var_prefix,
 
-            "default_indicators":
-                []
-        }
+                "exclude_cols": [],
 
-        return build_dataset(
-            df,
-            cfg
-        )
+                "default_indicators":
+                    []
+            }
+
+            return build_dataset(
+                df,
+                cfg
+            )
 
     return None
