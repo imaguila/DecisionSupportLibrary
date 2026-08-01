@@ -1,27 +1,40 @@
-EXCLUDE_EXACT = {
-    "id",
-    "highlight",
-    "label",
-    "highlight_label"
-}
+import pandas as pd
 
-EXCLUDE_PREFIXES = (
-    "req_",
-    "stcov_"
-)
+class ColumnClassifier:
+    """
+    Handles dynamic column classification and exclusions based on problem configuration.
+    Categorizes dataset attributes into Decision Variables, Base Metrics, and Derived Indicators.
+    """
+    
+    def __init__(self, config: dict):
+        self.metrics = set(config.get("metrics", []))
+        self.var_prefix = config.get("var_prefix", "x_")
+        self.user_excludes = set(config.get("exclude_cols", []))
+        
+        # Internal system-level columns generated dynamically by the framework
+        self.system_excludes = {"highlight", "label", "highlight_label", "score", "cluster", "selected"}
 
+    def get_decision_variables(self, df: pd.DataFrame) -> list:
+        """Extracts decision variable columns (X) using the configured prefix."""
+        return [col for col in df.columns if col.startswith(self.var_prefix)]
 
-def is_excluded_column(col_name, extra_exact=None, extra_prefixes=None):
-    extra_exact = set(extra_exact or [])
-    extra_prefixes = tuple(extra_prefixes or [])
+    def get_metrics(self, df: pd.DataFrame) -> list:
+        """Extracts base optimization metrics (M) defined in the configuration."""
+        return [col for col in df.columns if col in self.metrics]
 
-    if col_name in EXCLUDE_EXACT or col_name in extra_exact:
-        return True
-
-    if any(col_name.startswith(p) for p in EXCLUDE_PREFIXES):
-        return True
-
-    if any(col_name.startswith(p) for p in extra_prefixes):
-        return True
-
-    return False
+    def get_derived_indicators(self, df: pd.DataFrame) -> list:
+        """
+        Extracts derived/enrichment indicators (I).
+        Identifies numeric columns that are neither base metrics, decision variables, nor excluded attributes.
+        """
+        all_excluded = self.system_excludes | self.user_excludes | self.metrics
+        
+        indicators = []
+        for col in df.columns:
+            if col in all_excluded or col.startswith(self.var_prefix):
+                continue
+            # If the column is numeric and passed all exclusion filters, treat it as a derived lens/indicator
+            if pd.api.types.is_numeric_dtype(df[col]):
+                indicators.append(col)
+                
+        return indicators

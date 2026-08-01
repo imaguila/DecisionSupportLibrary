@@ -1,6 +1,6 @@
 # 🚀 ANRP Decision Space Explorer
 
-[Streamlit App](https://anrpdecision.streamlit.app/)
+[Streamlit App](awerqwer)
 
 ##  Overview
 The **Assisted Next Release Problem (ANRP) Decision Space Explorer** is an interactive decision-support dashboard designed to help software engineers, product managers, and stakeholders explore, analyze, and compare candidate solutions for software release planning. 

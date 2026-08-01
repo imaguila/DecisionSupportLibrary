@@ -1,25 +1,26 @@
+# input_panel.py
 import streamlit as st
 import pandas as pd
-from config import PROBLEMAS
+from config import CASES
 from problem import run_pipeline, leer_soluciones
 from enrichment import detectar_indicadores_posibles, aplicar_enrichment
 
 
 def render_input_panel():
-    """Render the input/preparation sidebar and return the active dataframe."""
+    """Render the input and preparation sidebar panel."""
 
     st.sidebar.markdown(
-        "## 🏷️  Input and Preparation",
-        help="Load precomputed Pareto fronts, including requirements and objetive functions values."
-        )
+        "## 🏷️ Input and Preparation",
+        help="Load precomputed Pareto fronts or run internal benchmark cases."
+    )
 
-    # Reset button aligned with title
+    # Title and reset button layout
     col_texto, col_btn = st.sidebar.columns([2, 1.5], vertical_alignment="center")
 
     with col_texto:
         st.markdown(
-            "Select data source",        
-            help="• Build from NRP instance: Parses a raw literature benchmark dataset and prepares it for custom indicator generation.\n\n• Load enriched solution set: Directly loads an already processed and structured CSV file containing pre-calculated metrics."
+            "Select data source",
+            help="• Load custom dataset: Upload any external CSV file containing Pareto solutions.\n\n• Benchmark cases: Select pre-configured domain case studies."
         )
 
     with col_btn:
@@ -31,105 +32,90 @@ def render_input_panel():
     data_mode = st.sidebar.radio(
         "Select data source",
         [
-            "📥 Build from NRP instance",
-            "📂 Load enriched solution set"
+            "📂 Load custom dataset",
+            "📥 Benchmark cases"
         ],
         label_visibility="collapsed",
-        )
+    )
 
     # ============================================
-    # 1) CSV MODE
+    # 1) CUSTOM DATASET UPLOAD MODE
     # ============================================
-    if data_mode == "📂 Load enriched solution set":
-        uploaded_file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
+    if data_mode == "📂 Load custom dataset":
+        uploaded_file = st.sidebar.file_uploader("Upload dataset (CSV)", type=["csv"])
 
         if uploaded_file is None:
-            st.warning("Please upload a dataset with indicators.")
+            st.warning("Please upload a CSV file containing solutions and decision variables.")
             st.stop()
 
         df = pd.read_csv(uploaded_file)
-        st.sidebar.success(f"{len(df)} solutions loaded from CSV")
 
-        # Enrichment for uploaded datasets
+        if "id" not in df.columns:
+            df["id"] = range(1, len(df) + 1)
+
+        st.sidebar.success(f"{len(df)} solutions loaded")
+
+        # Dynamic indicator enrichment for uploaded data
         possible_indicators = detectar_indicadores_posibles(df)
 
         if possible_indicators:
             st.sidebar.markdown("## 🎨 Semantic enrichment")
-
             selected_indicators = st.sidebar.multiselect(
                 "Indicators",
                 possible_indicators,
                 default=[],
-                help="Select the attributes to include; only those with a recognized calculation method based on the loaded data are displayed."
+                help="Select domain indicators to compute based on uploaded base metrics."
             )
-
             df = aplicar_enrichment(df, selected_indicators)
-        else:
-            st.sidebar.info("No derived indicators can be computed from the uploaded data.")
 
-        # No hay un dataset "problema" (path_prob) asociado a un CSV externo,
-        # así que no existe matriz de solicitud real disponible en este modo.
         st.session_state["matriz_solicitud"] = None
-
         return df
 
     # ============================================
-    # 2) PIPELINE MODE
+    # 2) BENCHMARK CASES MODE (PRE-CONFIGURED DATA)
     # ============================================
     st.sidebar.markdown(
         "## 🎨 Semantic Enrichment",
-        help="Allows adding computed metrics dynamically to the current dataset."
+        help="Dynamically compute domain indicators for the selected benchmark case."
     )
 
-    # 1. Obtenemos la lista de llaves de los problemas  
-    lista_problemas = list(PROBLEMAS.keys())
+    lista_casos = list(CASES.keys())
 
-    # 2. Averiguamos de forma segura qué problema está seleccionado actualmente
-    if "problem_selector" in st.session_state:
-        problema_actual = st.session_state["problem_selector"]
-    else:
-        problema_actual = lista_problemas[0] # El primero por defecto (BAGNALL)
+    # Get selected case study
+    case_actual = st.session_state.get("case_selector", lista_casos[0])
+    texto_ayuda = CASES[case_actual].get("help", "No bibliographic reference available.")
 
-    # 3. Extraemos el paper correspondiente de forma segura
-    texto_ayuda = PROBLEMAS[problema_actual].get("paper", "No bibliographic reference available.")
-
-    # 4. Renderizamos el selectbox usando la ayuda dinámica corregida
-    problem_name = st.sidebar.selectbox(
-        "NRP dataset from literature",
-        lista_problemas,
-        key="problem_selector",
+    case_name = st.sidebar.selectbox(
+        "Benchmark Case Study",
+        lista_casos,
+        key="case_selector",
         help=texto_ayuda
     )
 
-   
-
-    config = PROBLEMAS[problem_name]
+    config = CASES[case_name]
     df_base = leer_soluciones(config)
 
     available_indicators = detectar_indicadores_posibles(df_base)
-
-    default_indicators = config.get("indicadores_default", [])
+    default_indicators = config.get("default_indicators", [])
 
     selected_indicators = st.sidebar.multiselect(
         "Indicators",
         available_indicators,
         default=[i for i in default_indicators if i in available_indicators],
         key="indicators_selector",
-        help="Select the attributes to include; only those with a recognized calculation method based on the loaded data are displayed."
+        help="Select derived domain indicators to compute dynamically."
     )
 
     @st.cache_data
-    def build_df(problem_name, selected_indicators):
-        return run_pipeline(problem_name, selected_indicators)
+    def build_case_df(name, selected_inds):
+        return run_pipeline(name, selected_inds)
 
-    df, matriz_solicitud = build_df(problem_name, selected_indicators)
+    df, matriz_solicitud = build_case_df(case_name, selected_indicators)
 
-    # Guardamos la matriz real stakeholder-requisito para que la pestaña
-    # "Stakeholder–Requirement Alignment" (ui_plots.py) pueda usarla en vez
-    # de un mapeo simulado.
+    # Store prefix and request matrix in session state for downstream visualizations
     st.session_state["matriz_solicitud"] = matriz_solicitud
-    st.session_state["matriz_solicitud_prefix"] = config["stakeholders_prefix"]
+    st.session_state["var_prefix"] = config.get("var_prefix", "req_")
 
-    st.sidebar.success(f"{len(df)} solutions enriched")
+    st.sidebar.success(f"{len(df)} benchmark solutions enriched")
 
     return df

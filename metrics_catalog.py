@@ -1,48 +1,40 @@
-import os
+# metrics_catalog.py
 import pandas as pd
-import streamlit as st
+from config import CASES
 from column_rules import is_excluded_column
 
 
-@st.cache_data
-def load_csv(path):
-    return pd.read_csv(path)
-
-
-def get_metric_sets(df, data_path):
+def get_metric_sets(df, case_name=None):
     """
+    Categorizes DataFrame columns into base optimization metrics and 
+    derived quality indicators based on the active case configuration or 
+    dynamic dataset inference.
+
     Returns:
-        - available_opt: optimization objectives present in df
-        - available_qual: quality attributes present in df
-        - available_metrics: union of both
+        - available_opt: base optimization objectives (e.g. satisfaction, effort, drag, weight)
+        - available_qual: derived quality/domain indicators (e.g. productivity, lift_to_drag_ratio)
+        - available_metrics: union of optimization and quality metrics
     """
+    # 1. Identify base optimization metrics from active case config (if available)
+    base_opt_metrics = []
+    if case_name and case_name in CASES:
+        base_opt_metrics = CASES[case_name].get("metrics", [])
 
-    opt_df = load_csv(os.path.join(data_path, "optimization_metrics.csv"))
-    qual_df = load_csv(os.path.join(data_path, "quality_metrics.csv"))
-
-    opt_catalog = list(opt_df.columns)
-    qual_catalog = list(qual_df.columns)
-
-    # Keep only numeric, non-structural columns
+    # 2. Select valid numeric columns (ignoring IDs, timestamps, and decision variables)
     analysis_cols = [
-        c for c in df.columns
-        if pd.api.types.is_numeric_dtype(df[c]) and not is_excluded_column(c)
+        col for col in df.columns
+        if pd.api.types.is_numeric_dtype(df[col]) and not is_excluded_column(col)
     ]
 
-    # Optimization objectives explicitly listed in the catalog
-    available_opt = [c for c in analysis_cols if c in opt_catalog]
+    # 3. Separate into base optimization objectives vs quality/domain indicators
+    if base_opt_metrics:
+        available_opt = [c for c in analysis_cols if c in base_opt_metrics]
+        available_qual = [c for c in analysis_cols if c not in base_opt_metrics]
+    else:
+        # Fallback for custom uploaded files: treat all numeric cols as analysis metrics
+        available_opt = analysis_cols
+        available_qual = []
 
-    # Known quality attributes from the catalog
-    available_qual_catalog = [c for c in analysis_cols if c in qual_catalog]
-
-    # Extra uploaded numeric attributes not in any catalog:
-    # treat them as custom quality attributes
-    available_qual_extra = [
-        c for c in analysis_cols
-        if c not in opt_catalog and c not in qual_catalog
-    ]
-
-    available_qual = available_qual_catalog + available_qual_extra
     available_metrics = available_opt + available_qual
 
     return available_opt, available_qual, available_metrics
