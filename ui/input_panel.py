@@ -105,19 +105,16 @@ def build_dataset(
             ):
                 all_metrics.append(col)
 
-    with st.sidebar.expander(
+    # =================================================
+    # OBJECTIVES
+    # =================================================
+
+    selected_metrics = st.multiselect(
         "Optimization Objectives",
-        expanded=False
-    ):
-
-        selected_metrics = (
-            st.multiselect(
-                "Active objectives",
-                all_metrics,
-                default=all_metrics
-            )
-        )
-
+        all_metrics,
+        default=all_metrics
+    )
+    
     # =================================================
     # ENRICHMENT
     # =================================================

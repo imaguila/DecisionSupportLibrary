@@ -12,58 +12,59 @@ def apply_framing(dataset):
         dataset["selected_indicators"]
     )
 
-    st.sidebar.markdown(
-        "## Context Framing"
-    )
-
     filtered_df = df.copy()
 
-    for metric in dimensions:
+    with st.sidebar.expander(
+        "Context Framing",
+        expanded=False
+    ):
 
-        if metric not in filtered_df.columns:
-            continue
+        for metric in dimensions:
 
-        if not pd.api.types.is_numeric_dtype(
-            filtered_df[metric]
-        ):
-            continue
+            if metric not in filtered_df.columns:
+                continue
 
-        min_v = float(
-            filtered_df[metric].min()
-        )
-
-        max_v = float(
-            filtered_df[metric].max()
-        )
-
-        if min_v == max_v:
-            continue
-
-        selected_range = st.sidebar.slider(
-            metric,
-            min_v,
-            max_v,
-            (min_v, max_v)
-        )
-
-        filtered_df = filtered_df[
-
-            (
+            if not pd.api.types.is_numeric_dtype(
                 filtered_df[metric]
-                >= selected_range[0]
+            ):
+                continue
+
+            min_v = float(
+                filtered_df[metric].min()
             )
 
-            &
-
-            (
-                filtered_df[metric]
-                <= selected_range[1]
+            max_v = float(
+                filtered_df[metric].max()
             )
-        ]
 
-    st.sidebar.metric(
-        "Remaining Solutions",
-        len(filtered_df)
-    )
+            if min_v == max_v:
+                continue
+
+            selected_range = st.slider(
+                metric,
+                min_v,
+                max_v,
+                (min_v, max_v)
+            )
+
+            filtered_df = filtered_df[
+
+                (
+                    filtered_df[metric]
+                    >= selected_range[0]
+                )
+
+                &
+
+                (
+                    filtered_df[metric]
+                    <= selected_range[1]
+                )
+            ]
+
+        st.metric(
+            "Remaining Solutions",
+            len(filtered_df)
+        )
 
     return filtered_df
