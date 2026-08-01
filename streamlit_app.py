@@ -26,6 +26,13 @@ st.title("Decision Space Explorer")
 
 dataset = render_input_panel()
 
+from core.lenses import (
+    render_lenses
+)
+active_lens, lens_params = (
+    render_lenses(dataset)
+)
+
 if dataset is None:
 
     st.info(
