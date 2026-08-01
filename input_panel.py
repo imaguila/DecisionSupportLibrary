@@ -2,19 +2,14 @@ import streamlit as st
 import pandas as pd
 
 from config import CASES
-
 from plugins import PLUGIN_REGISTRY
-
 from enrichment import (
     detect_available_indicators,
-    apply_enrichment
+    apply_enrichment,
 )
 
 
-def detect_decision_variables(
-    df,
-    prefix
-):
+def detect_decision_variables(df, prefix):
 
     return [
         c
@@ -23,24 +18,15 @@ def detect_decision_variables(
     ]
 
 
-def build_dataset(
-    df,
-    cfg
-):
+def build_dataset(df, cfg):
 
     plugin = None
 
-    plugin_name = cfg.get(
-        "plugin"
-    )
+    plugin_name = cfg.get("plugin")
 
     if plugin_name:
 
-        plugin_class = (
-            PLUGIN_REGISTRY.get(
-                plugin_name
-            )
-        )
+        plugin_class = PLUGIN_REGISTRY.get(plugin_name)
 
         if plugin_class:
 
@@ -51,28 +37,24 @@ def build_dataset(
                 )
             )
 
-    # ----------------------------------
-    # ENRICHMENT SIDEBAR
-    # ----------------------------------
-
     selected_indicators = []
 
     if plugin:
 
-        available = (
+        available_indicators = (
             detect_available_indicators(
                 plugin
             )
         )
 
         st.sidebar.markdown(
-            "## Enrichment"
+            "### Data Enrichment"
         )
 
         selected_indicators = (
             st.sidebar.multiselect(
-                "Available Indicators",
-                available,
+                "Indicators",
+                available_indicators,
                 default=cfg.get(
                     "default_indicators",
                     []
@@ -86,20 +68,13 @@ def build_dataset(
             selected_indicators
         )
 
-    # ----------------------------------
-
-    dataset = {
+    return {
 
         "df": df,
 
         "config": cfg,
 
         "plugin": plugin,
-
-        "metrics": cfg.get(
-            "metrics",
-            []
-        ),
 
         "selected_indicators":
             selected_indicators,
@@ -114,92 +89,84 @@ def build_dataset(
             )
     }
 
-    return dataset
-
 
 def render_input_panel():
 
-    st.sidebar.header(
-        "Input Data"
+    st.sidebar.markdown(
+        "## Input Data"
     )
 
     mode = st.sidebar.radio(
-        "Input Mode",
+        "Source",
         [
             "Example Dataset",
             "Upload Enriched CSV"
         ]
     )
 
-    # ==================================
-    # EXAMPLES
-    # ==================================
+    # ==========================================
+    # Example datasets
+    # ==========================================
 
     if mode == "Example Dataset":
 
-        case_name = (
-            st.sidebar.selectbox(
-                "Dataset",
-                list(CASES.keys())
+        dataset_names = list(
+            CASES.keys()
+        )
+
+        dataset_name = st.sidebar.selectbox(
+            "Dataset",
+            dataset_names,
+            help=CASES[
+                dataset_names[0]
+            ].get(
+                "help",
+                "No information available."
             )
         )
 
-        cfg = CASES[case_name]
+        cfg = CASES[dataset_name]
 
-        with st.sidebar.expander(
-            "ℹ Dataset Information",
-            expanded=False
-        ):
-            st.write(
-                cfg["help"]
-            )
-
-        if st.sidebar.button(
-            "Load Dataset"
-        ):
-
-            df = pd.read_csv(
-                cfg["path_sol"]
-            )
-
-            return build_dataset(
-                df,
-                cfg
-            )
-
-    # ==================================
-    # ENRICHED CSV
-    # ==================================
-
-    else:
-
-        uploaded_file = (
-            st.sidebar.file_uploader(
-                "Upload CSV",
-                type=["csv"]
-            )
+        df = pd.read_csv(
+            cfg["path_sol"]
         )
 
-        if uploaded_file:
+        return build_dataset(
+            df,
+            cfg
+        )
 
-            df = pd.read_csv(
-                uploaded_file
-            )
+    # ==========================================
+    # External CSV
+    # ==========================================
 
-            cfg = {
+    uploaded_file = (
+        st.sidebar.file_uploader(
+            "Upload CSV",
+            type=["csv"]
+        )
+    )
 
-                "plugin": None,
+    if uploaded_file:
 
-                "metrics": [],
+        df = pd.read_csv(
+            uploaded_file
+        )
 
-                "var_prefix": "var_",
+        cfg = {
 
-                "default_indicators": []
-            }
+            "plugin": None,
 
-            return build_dataset(
-                df,
-                cfg
-            )
+            "metrics": [],
+
+            "var_prefix": "var_",
+
+            "default_indicators": []
+        }
+
+        return build_dataset(
+            df,
+            cfg
+        )
 
     return None
