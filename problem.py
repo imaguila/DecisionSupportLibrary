@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from config import PROBLEMAS
+from config import CASES
 
 EPS = 1e-9
 
