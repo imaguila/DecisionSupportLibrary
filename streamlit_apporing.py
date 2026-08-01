@@ -7,9 +7,9 @@ from sklearn_extra.cluster import KMedoids
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import HDBSCAN
 
-from input_panel import render_input_panel
+from ui.input_panel import render_input_panel
 from metrics_catalog import get_metric_sets
-from ui_plots import render_scatter_plot, plot_radar
+from ui.ui_plots import render_scatter_plot, plot_radar
 
 # --------------------------------------------
 # CONFIGURACIÓN

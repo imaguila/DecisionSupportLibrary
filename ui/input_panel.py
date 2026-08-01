@@ -3,7 +3,7 @@ import pandas as pd
 
 from config import CASES
 from plugins import PLUGIN_REGISTRY
-from enrichment import (
+from core.enrichment import (
     detect_available_indicators,
     apply_enrichment
 )

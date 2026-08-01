@@ -1,17 +1,15 @@
 import streamlit as st
 
-from input_panel import (
-    render_input_panel
-)
+from ui.input_panel import render_input_panel
+from core.framing import apply_framing
+from core.workspace import render_workspace
 
 st.set_page_config(
     page_title="Decision Space Explorer",
     layout="wide"
 )
 
-st.title(
-    "Decision Space Explorer"
-)
+st.title("Decision Space Explorer")
 
 dataset = render_input_panel()
 
@@ -23,60 +21,9 @@ if dataset is None:
 
     st.stop()
 
-df = dataset["df"]
+filtered_df = apply_framing(dataset)
 
-cfg = dataset["config"]
-
-# ==================================================
-# SUMMARY
-# ==================================================
-
-st.subheader(
-    "Dataset Summary"
-)
-
-c1, c2, c3 = st.columns(3)
-
-with c1:
-
-    st.metric(
-        "Solutions",
-        len(df)
-    )
-
-with c2:
-
-    st.metric(
-        "Attributes",
-        len(df.columns)
-    )
-
-with c3:
-
-    st.metric(
-        "Decision Variables",
-        len(
-            dataset[
-                "decision_variables"
-            ]
-        )
-    )
-
-st.caption(
-    f"Decision-variable prefix: "
-    f"`{cfg.get('var_prefix', 'N/A')}`"
-)
-
-# ==================================================
-# PREVIEW
-# ==================================================
-
-st.subheader(
-    "Current Dataset"
-)
-
-st.dataframe(
-    df,
-    use_container_width=True,
-    height=600
+render_workspace(
+    filtered_df,
+    dataset
 )
