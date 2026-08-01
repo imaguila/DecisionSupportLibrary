@@ -229,7 +229,7 @@ def render_workspace(
                 df,
                 x=x,
                 y=y,
-                z=z
+                z=z,
                 key_prefix=f"coord_{idx}"
             )
 
@@ -240,7 +240,7 @@ def render_workspace(
                 x=x,
                 y=y,
                 size=z,
-                color=color
+                color=color,
                 key=f"bubble_{idx}"
             )
 
