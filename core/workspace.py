@@ -1,7 +1,8 @@
 import streamlit as st
 
 from core.visualization import (
-    render_scatter
+    render_scatter,
+    render_coordinated_maps
 )
 
 
@@ -49,13 +50,17 @@ def render_workspace(
     )
 
     # ==================================================
-    # WORKSPACE STATE
+    # DIMENSIONS
     # ==================================================
 
     dimensions = (
+
         dataset["metrics"]
+
         +
+
         dataset["selected_indicators"]
+
     )
 
     if len(dimensions) < 2:
@@ -66,15 +71,25 @@ def render_workspace(
 
         return
 
+    # ==================================================
+    # SESSION STATE
+    # ==================================================
+
     if "maps" not in st.session_state:
+
+        z_default = (
+            dimensions[2]
+            if len(dimensions) > 2
+            else dimensions[1]
+        )
 
         st.session_state.maps = [
 
             {
                 "x": dimensions[0],
                 "y": dimensions[1],
-                "size": None,
-                "color": None,
+                "z": z_default,
+                "color": None
             }
 
         ]
@@ -87,42 +102,54 @@ def render_workspace(
         "## Visual Workspace"
     )
 
-    c1, c2 = st.sidebar.columns(2)
+    cA, cB = st.sidebar.columns(2)
 
-    with c1:
+    with cA:
 
         if st.button(
             "Add Map",
             use_container_width=True
         ):
 
+            z_default = (
+                dimensions[2]
+                if len(dimensions) > 2
+                else dimensions[1]
+            )
+
             st.session_state.maps.append(
 
                 {
                     "x": dimensions[0],
                     "y": dimensions[1],
-                    "size": None,
-                    "color": None,
+                    "z": z_default,
+                    "color": None
                 }
 
             )
 
             st.rerun()
 
-    with c2:
+    with cB:
 
         if st.button(
             "Reset",
             use_container_width=True
         ):
 
+            z_default = (
+                dimensions[2]
+                if len(dimensions) > 2
+                else dimensions[1]
+            )
+
             st.session_state.maps = [
 
                 {
                     "x": dimensions[0],
                     "y": dimensions[1],
-                    "size": None,
-                    "color": None,
+                    "z": z_default,
+                    "color": None
                 }
 
             ]
@@ -130,7 +157,7 @@ def render_workspace(
             st.rerun()
 
     # ==================================================
-    # RENDER MAPS
+    # MAPS
     # ==================================================
 
     for idx, current_map in enumerate(
@@ -141,57 +168,38 @@ def render_workspace(
             f"Decision-Space Map {idx+1}"
         )
 
-        col_x, col_y, col_s, col_c = (
-            st.columns(4)
-        )
+        mode_tab1, mode_tab2 = st.tabs([
+            "📊 Coordinated Maps",
+            "🫧 Bubble Map"
+        ])
 
-        with col_x:
+        c1, c2, c3, c4 = st.columns(4)
+
+        with c1:
 
             x = st.selectbox(
                 "X Axis",
                 dimensions,
-                index=max(
-                    0,
-                    dimensions.index(
-                        current_map["x"]
-                    )
-                ),
                 key=f"x_{idx}"
             )
 
-        with col_y:
-
-            y_options = [
-                d
-                for d in dimensions
-                if d != x
-            ]
-
-            current_y = (
-                current_map["y"]
-                if current_map["y"]
-                in y_options
-                else y_options[0]
-            )
+        with c2:
 
             y = st.selectbox(
                 "Y Axis",
-                y_options,
-                index=y_options.index(
-                    current_y
-                ),
+                dimensions,
                 key=f"y_{idx}"
             )
 
-        with col_s:
+        with c3:
 
-            size = st.selectbox(
-                "Bubble Size",
-                [None] + dimensions,
-                key=f"size_{idx}"
+            z = st.selectbox(
+                "Third Dimension",
+                dimensions,
+                key=f"z_{idx}"
             )
 
-        with col_c:
+        with c4:
 
             color = st.selectbox(
                 "Color",
@@ -199,28 +207,45 @@ def render_workspace(
                 key=f"color_{idx}"
             )
 
-        # --------------------------------------
-        # save state
-        # --------------------------------------
+        # =====================================
+        # COORDINATED MAPS
+        # =====================================
+
+        with mode_tab1:
+
+            render_coordinated_maps(
+                df,
+                x,
+                y,
+                z,
+                key_prefix=f"coord_{idx}"
+            )
+
+        # =====================================
+        # BUBBLE MAP
+        # =====================================
+
+        with mode_tab2:
+
+            render_scatter(
+                df,
+                x=x,
+                y=y,
+                size=z,
+                color=color,
+                key=f"bubble_{idx}"
+            )
 
         st.session_state.maps[idx] = {
 
             "x": x,
             "y": y,
-            "size": size,
-            "color": color,
+            "z": z,
+            "color": color
         }
 
-        render_scatter(
-            df,
-            x=x,
-            y=y,
-            size=size,
-            color=color
-        )
-
     # ==================================================
-    # DATA TABLE
+    # DATA PREVIEW
     # ==================================================
 
     with st.expander(
