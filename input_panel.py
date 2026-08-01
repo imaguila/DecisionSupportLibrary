@@ -5,9 +5,13 @@ from config import CASES
 from plugins import PLUGIN_REGISTRY
 from enrichment import (
     detect_available_indicators,
-    apply_enrichment,
+    apply_enrichment
 )
 
+
+# =====================================================
+# HELPERS
+# =====================================================
 
 def detect_decision_variables(df, prefix):
 
@@ -26,7 +30,9 @@ def build_dataset(df, cfg):
 
     if plugin_name:
 
-        plugin_class = PLUGIN_REGISTRY.get(plugin_name)
+        plugin_class = PLUGIN_REGISTRY.get(
+            plugin_name
+        )
 
         if plugin_class:
 
@@ -37,15 +43,51 @@ def build_dataset(df, cfg):
                 )
             )
 
+    # =================================================
+    # OBJECTIVES
+    # =================================================
+
+    all_metrics = cfg.get(
+        "metrics",
+        []
+    )
+
+    st.sidebar.markdown(
+        "### Optimization Objectives"
+    )
+
+    selected_metrics = (
+        st.sidebar.multiselect(
+            "Active objectives",
+            all_metrics,
+            default=all_metrics
+        )
+    )
+
+    # =================================================
+    # ENRICHMENT
+    # =================================================
+
     selected_indicators = []
 
     if plugin:
 
-        available_indicators = (
-            detect_available_indicators(
-                plugin
-            )
+        available_indicators = []
+
+        requirements = (
+            plugin.requirements()
         )
+
+        for indicator, reqs in requirements.items():
+
+            if all(
+                metric in selected_metrics
+                for metric in reqs
+            ):
+
+                available_indicators.append(
+                    indicator
+                )
 
         st.sidebar.markdown(
             "### Data Enrichment"
@@ -54,11 +96,17 @@ def build_dataset(df, cfg):
         selected_indicators = (
             st.sidebar.multiselect(
                 "Indicators",
-                available_indicators,
-                default=cfg.get(
-                    "default_indicators",
-                    []
-                )
+                sorted(
+                    available_indicators
+                ),
+                default=[
+                    i
+                    for i in cfg.get(
+                        "default_indicators",
+                        []
+                    )
+                    if i in available_indicators
+                ]
             )
         )
 
@@ -68,13 +116,20 @@ def build_dataset(df, cfg):
             selected_indicators
         )
 
-    return {
+    # =================================================
+    # DATASET OBJECT
+    # =================================================
+
+    dataset = {
 
         "df": df,
 
         "config": cfg,
 
         "plugin": plugin,
+
+        "metrics":
+            selected_metrics,
 
         "selected_indicators":
             selected_indicators,
@@ -89,6 +144,12 @@ def build_dataset(df, cfg):
             )
     }
 
+    return dataset
+
+
+# =====================================================
+# MAIN PANEL
+# =====================================================
 
 def render_input_panel():
 
@@ -104,9 +165,9 @@ def render_input_panel():
         ]
     )
 
-    # ==========================================
-    # Example datasets
-    # ==========================================
+    # =================================================
+    # BUILT-IN DATASETS
+    # =================================================
 
     if mode == "Example Dataset":
 
@@ -114,14 +175,16 @@ def render_input_panel():
             CASES.keys()
         )
 
-        dataset_name = st.sidebar.selectbox(
-            "Dataset",
-            dataset_names,
-            help=CASES[
-                dataset_names[0]
-            ].get(
-                "help",
-                "No information available."
+        dataset_name = (
+            st.sidebar.selectbox(
+                "Dataset",
+                dataset_names,
+                help=CASES[
+                    dataset_names[0]
+                ].get(
+                    "help",
+                    "No information available."
+                )
             )
         )
 
@@ -136,9 +199,9 @@ def render_input_panel():
             cfg
         )
 
-    # ==========================================
-    # External CSV
-    # ==========================================
+    # =================================================
+    # UPLOAD ENRICHED CSV
+    # =================================================
 
     uploaded_file = (
         st.sidebar.file_uploader(
@@ -148,6 +211,19 @@ def render_input_panel():
     )
 
     if uploaded_file:
+
+        var_prefix = (
+            st.sidebar.text_input(
+                "Decision-variable prefix",
+                value="var_",
+                help=(
+                    "Prefix used to identify "
+                    "decision variables "
+                    "(e.g. req_, var_, x_, "
+                    "feature_)."
+                )
+            )
+        )
 
         df = pd.read_csv(
             uploaded_file
@@ -159,9 +235,11 @@ def render_input_panel():
 
             "metrics": [],
 
-            "var_prefix": "var_",
+            "var_prefix":
+                var_prefix,
 
-            "default_indicators": []
+            "default_indicators":
+                []
         }
 
         return build_dataset(

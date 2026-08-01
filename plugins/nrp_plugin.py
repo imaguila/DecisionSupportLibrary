@@ -71,6 +71,39 @@ class NRPPlugin:
             for c in df.columns
             if c.startswith(self.var_prefix)
         ]
+    # --------------------------------------------------
+    # Dependencies between indicators 
+    # --------------------------------------------------
+
+
+    def requirements(self):
+
+        return {
+
+            "scope": [],
+
+            "productivity": [
+                "satisfaction",
+                "effort"
+            ],
+
+            "squandering": [
+                "effort"
+            ],
+
+            "annoyance": [
+                "dissatisfaction",
+                "satisfaction"
+            ],
+
+            "dirtiness": [
+                "dissatisfaction",
+                "effort"
+            ]
+        }
+
+
+
 
     # --------------------------------------------------
     # Indicator computation
