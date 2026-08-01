@@ -8,8 +8,19 @@ def render_scatter(
     y,
     size=None,
     color=None,
+    show_ids=False,
     key=None
 ):
+
+    text_column = None
+
+    if show_ids:
+
+        if "id" in df.columns:
+            text_column = "id"
+
+        elif "ID" in df.columns:
+            text_column = "ID"
 
     fig = px.scatter(
         df,
@@ -17,7 +28,12 @@ def render_scatter(
         y=y,
         size=size,
         color=color,
+        text=text_column,
         hover_data=list(df.columns)
+    )
+
+    fig.update_traces(
+        textposition="top center"
     )
 
     fig.update_layout(
@@ -36,29 +52,36 @@ def render_coordinated_maps(
     x,
     y,
     z,
-    key_prefix
+    key_prefix,
+    show_ids=False
 ):
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        st.caption(f"{x} vs {y}")
+        st.caption(
+            f"{x} vs {y}"
+        )
 
         render_scatter(
             df,
             x=x,
             y=y,
+            show_ids=show_ids,
             key=f"{key_prefix}_left"
         )
 
     with col2:
 
-        st.caption(f"{x} vs {z}")
+        st.caption(
+            f"{x} vs {z}"
+        )
 
         render_scatter(
             df,
             x=x,
             y=z,
+            show_ids=show_ids,
             key=f"{key_prefix}_right"
         )

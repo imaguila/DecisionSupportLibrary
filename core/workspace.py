@@ -154,14 +154,15 @@ def render_workspace(
         st.caption(
             f"Active maps: {len(st.session_state.maps)}"
         )
+        show_ids = st.sidebar.checkbox(    
+            "Show IDs on plots",
+            value=False
+        )
+
     # ==================================================
     # MAPS
     # ==================================================
-    show_ids = st.sidebar.checkbox(    
-        "Show IDs on plots",
-        value=False
-    )
-
+  
     for idx in range(
         len(st.session_state.maps)
     ):
