@@ -15,28 +15,23 @@ def render_workspace(
     # SUMMARY
     # ==================================================
 
-    st.subheader(
-        "Dataset Summary"
-    )
+    st.subheader("Dataset Summary")
 
     c1, c2, c3 = st.columns(3)
 
     with c1:
-
         st.metric(
             "Solutions",
             len(df)
         )
 
     with c2:
-
         st.metric(
             "Attributes",
             len(df.columns)
         )
 
     with c3:
-
         st.metric(
             "Decision Variables",
             len(
@@ -45,17 +40,13 @@ def render_workspace(
         )
 
     # ==================================================
-    # DIMENSIONS
+    # AVAILABLE DIMENSIONS
     # ==================================================
 
     dimensions = (
-
         dataset["metrics"]
-
         +
-
         dataset["selected_indicators"]
-
     )
 
     if len(dimensions) < 2:
@@ -63,11 +54,10 @@ def render_workspace(
         st.warning(
             "At least two dimensions are required."
         )
-
         return
 
     # ==================================================
-    # VISUAL WORKSPACE
+    # SESSION STATE
     # ==================================================
 
     if "maps" not in st.session_state:
@@ -84,10 +74,14 @@ def render_workspace(
                 "x": dimensions[0],
                 "y": dimensions[1],
                 "z": z_default,
-                "color": None
+                "color": None,
             }
 
         ]
+
+    # ==================================================
+    # VISUAL WORKSPACE
+    # ==================================================
 
     st.sidebar.markdown(
         "## Visual Workspace"
@@ -116,7 +110,7 @@ def render_workspace(
                     "x": dimensions[0],
                     "y": dimensions[1],
                     "z": z_default,
-                    "color": None
+                    "color": None,
                 }
 
             ]
@@ -142,7 +136,7 @@ def render_workspace(
                     "x": dimensions[0],
                     "y": dimensions[1],
                     "z": z_default,
-                    "color": None
+                    "color": None,
                 }
 
             )
@@ -153,74 +147,131 @@ def render_workspace(
     # MAPS
     # ==================================================
 
-    for idx, current_map in enumerate(
-        st.session_state.maps
+    for idx in range(
+        len(st.session_state.maps)
     ):
 
-        st.subheader(
-            f"Decision-Space Map {idx+1}"
+        current_map = (
+            st.session_state.maps[idx]
         )
 
-        # ------------------------------------------
-        # Axis configuration ABOVE the charts
-        # ------------------------------------------
+        st.subheader(
+            f"Decision-Space Map {idx + 1}"
+        )
+
+        # --------------------------------------
+        # Axis selectors ABOVE plots
+        # --------------------------------------
 
         c1, c2, c3, c4 = st.columns(4)
 
         with c1:
 
-            current_x = (
-                current_map["x"]
-                if current_map["x"] in dimensions
-                else dimensions[0]
-            )
-
             x = st.selectbox(
                 "X Axis",
                 dimensions,
                 index=dimensions.index(
-                    current_x
-                ),
+                    current_map["x"]
+                )
+                if current_map["x"] in dimensions
+                else 0,
                 key=f"x_{idx}"
             )
 
         with c2:
 
-            current_y = (
-                current_map["y"]
-                if current_map["y"] in dimensions
-                else dimensions[0]
-            )
-
             y = st.selectbox(
                 "Y Axis",
                 dimensions,
                 index=dimensions.index(
-                    current_y
-                ),
+                    current_map["y"]
+                )
+                if current_map["y"] in dimensions
+                else 0,
                 key=f"y_{idx}"
             )
 
         with c3:
 
-            current_z = (
-                current_map["z"]
-                if current_map["z"] in dimensions
-                else dimensions[0]
-            )
-
             z = st.selectbox(
                 "Third Dimension",
                 dimensions,
                 index=dimensions.index(
-                    current_z
-                ),
+                    current_map["z"]
+                )
+                if current_map["z"] in dimensions
+                else 0,
                 key=f"z_{idx}"
             )
 
         with c4:
 
-            color_options = (
-                [None]
-                + dimensions
+            color = st.selectbox(
+                "Color",
+                [None] + dimensions,
+                key=f"color_{idx}"
             )
+
+        # --------------------------------------
+        # Tabs
+        # --------------------------------------
+
+        tab1, tab2 = st.tabs(
+            [
+                "📊 Coordinated Maps",
+                "🫧 Bubble Map"
+            ]
+        )
+
+        with tab1:
+
+            render_coordinated_maps(
+                df,
+                x=x,
+                y=y,
+                z=z
+            )
+
+        with tab2:
+
+            render_scatter(
+                df,
+                x=x,
+                y=y,
+                size=z,
+                color=color
+            )
+
+        st.session_state.maps[idx] = {
+
+            "x": x,
+            "y": y,
+            "z": z,
+            "color": color
+        }
+
+    # ==================================================
+    # EXPORT
+    # ==================================================
+
+    st.download_button(
+        label="⬇️ Export Current Subset",
+        data=df.to_csv(index=False),
+        file_name="current_subset.csv",
+        mime="text/csv"
+    )
+
+    # ==================================================
+    # DATASET
+    # ==================================================
+
+    with st.expander(
+        f"📋 Current Dataset (prefix: {dataset['config'].get('var_prefix')})",
+        expanded=False
+    ):
+
+        st.dataframe(
+            df,
+            use_container_width=True,
+            height=500
+        )

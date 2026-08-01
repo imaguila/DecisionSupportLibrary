@@ -7,8 +7,7 @@ def render_scatter(
     x,
     y,
     size=None,
-    color=None,
-    key=None
+    color=None
 ):
 
     fig = px.scatter(
@@ -20,10 +19,13 @@ def render_scatter(
         hover_data=list(df.columns)
     )
 
+    fig.update_layout(
+        height=500
+    )
+
     st.plotly_chart(
         fig,
-        use_container_width=True,
-        key=key
+        use_container_width=True
     )
 
 
@@ -31,26 +33,27 @@ def render_coordinated_maps(
     df,
     x,
     y,
-    z,
-    key_prefix
+    z
 ):
 
     col1, col2 = st.columns(2)
 
     with col1:
 
+        st.caption(f"{x} vs {y}")
+
         render_scatter(
             df,
             x=x,
-            y=y,
-            key=f"{key_prefix}_left"
+            y=y
         )
 
     with col2:
 
+        st.caption(f"{x} vs {z}")
+
         render_scatter(
             df,
             x=x,
-            y=z,
-            key=f"{key_prefix}_right"
+            y=z
         )
