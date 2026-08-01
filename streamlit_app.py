@@ -1,73 +1,131 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
 
-# Importaciones de clustering desde scikit-learn
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans, HDBSCAN  # <-- HDBSCAN integrado
-from sklearn_extra.cluster import KMedoids
-from sklearn.metrics import silhouette_score
+from input_panel import (
+    render_input_panel
+)
 
-from input_panel import render_input_panel
-from metrics_catalog import get_metric_sets
-from ui_plots import render_scatter_plot, plot_radar
+st.set_page_config(
+    layout="wide",
+    page_title="Decision Space Explorer"
+)
 
+st.title(
+    "Decision Space Explorer"
+)
 
+dataset = render_input_panel()
 
-from input_panel import render_input_panel
-from metrics_catalog import get_metric_sets
+if dataset is None:
 
-# --------------------------------------------
-# CONFIGURACIÓN BÁSICA
-# --------------------------------------------
-st.set_page_config(layout="wide", page_title="Input Panel Test")
-st.title("🧪 Decision Space Explorer - Input Test")
+    st.info(
+        "Select a dataset to begin."
+    )
 
-DATA_PATH = "data"
+    st.stop()
 
-st.markdown("---")
+df = dataset["df"]
 
-# --------------------------------------------
-# 1. PANEL DE ENTRADA (Carga de datos)
-# --------------------------------------------
-st.subheader("1. Carga de Datos")
+# ==================================================
+# SUMMARY
+# ==================================================
 
-# Invocamos la función del panel de entrada
-df = render_input_panel()
+st.subheader(
+    "Dataset Summary"
+)
 
-# --------------------------------------------
-# 2. VALIDACIÓN Y MÉTRICAS
-# --------------------------------------------
-st.markdown("---")
-st.subheader("2. Verificación de Datos e Indicadores")
+c1, c2, c3 = st.columns(3)
 
-if df is not None and not df.empty:
-    st.success(f"✅ ¡Datos cargados correctamente! Se han obtenido **{len(df)}** filas (soluciones) y **{len(df.columns)}** columnas.")
+with c1:
+    st.metric(
+        "Solutions",
+        len(df)
+    )
 
-    # Obtenemos las métricas detectadas/disponibles
-    available_opt, available_qual, available_metrics = get_metric_sets(df, DATA_PATH)
+with c2:
+    st.metric(
+        "Columns",
+        len(df.columns)
+    )
 
-    # Mostramos resumen en métricas de Streamlit
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Objetivos Optimización", len(available_opt))
-    with col2:
-        st.metric("Indicadores de Calidad", len(available_qual))
-    with col3:
-        st.metric("Total Métricas Disponibles", len(available_metrics))
+with c3:
+    st.metric(
+        "Decision Variables",
+        len(
+            dataset[
+                "decision_variables"
+            ]
+        )
+    )
 
-    # Desplegables rápidos para inspeccionar los nombres de las métricas
-    with st.expander("🔍 Ver listado de métricas detectadas", expanded=True):
-        st.write("**Optimización:**", available_opt)
-        st.write("**Calidad:**", available_qual)
-        st.write("**Totales:**", available_metrics)
+# ==================================================
+# METRICS
+# ==================================================
 
-    # --------------------------------------------
-    # 3. PREVIEW DE LA TABLA COMPLETA
-    # --------------------------------------------
-    st.markdown("---")
-    st.subheader("3. Vista previa del DataFrame (Primeras 50 filas)")
-    st.dataframe(df.head(50), use_container_width=True)
+st.subheader(
+    "Detected Structure"
+)
 
-else:
-    st.warning("⚠️ No se ha cargado ningún DataFrame aún. Revisa la configuración en el panel de la izquierda.")
+col1, col2 = st.columns(2)
+
+with col1:
+
+    st.markdown(
+        "### Metrics"
+    )
+
+    st.write(
+        dataset["metrics"]
+    )
+
+with col2:
+
+    st.markdown(
+        "### Decision Variables"
+    )
+
+    st.write(
+        dataset[
+            "decision_variables"
+        ][:20]
+    )
+
+# ==================================================
+# ENRICHMENT
+# ==================================================
+
+plugin = dataset["plugin"]
+
+if plugin:
+
+    st.subheader(
+        "Applied Indicators"
+    )
+
+    st.write(
+        plugin.available_indicators()
+    )
+
+# ==================================================
+# PREVIEW
+# ==================================================
+
+st.subheader(
+    "Data Preview"
+)
+
+st.dataframe(
+    df.head(50),
+    use_container_width=True
+)
+
+# ==================================================
+# RAW COLUMNS
+# ==================================================
+
+with st.expander(
+    "Column Inspector"
+):
+
+    st.write(
+        list(df.columns)
+    )
