@@ -51,10 +51,41 @@ def build_dataset(df, cfg):
         "metrics",
         []
     )
+    # ----------------------------------
+    # Automatic objective detection
+    # for uploaded datasets
+    # ----------------------------------
 
-    st.sidebar.markdown(
-        "### Optimization Objectives"
-    )
+    if not all_metrics:
+
+        var_prefix = cfg.get(
+            "var_prefix",
+            "x_"
+        )
+
+        all_metrics = []
+
+        for col in df.columns:
+
+            if col.startswith(var_prefix):
+                continue
+
+            if col in [
+                "id",
+                "highlight",
+                "label",
+                "score",
+                "cluster"
+            ]:
+                continue
+
+            if pd.api.types.is_numeric_dtype(
+                df[col]
+            ):
+                all_metrics.append(col)
+        st.sidebar.markdown(
+            "### Optimization Objectives"
+        )
 
     selected_metrics = (
         st.sidebar.multiselect(
