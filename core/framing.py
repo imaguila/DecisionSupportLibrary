@@ -39,26 +39,50 @@ def apply_framing(dataset):
         if min_v == max_v:
             continue
 
+
+        st.sidebar.markdown(
+            f"**{metric}**"
+        )
+
         selected_range = st.sidebar.slider(
             metric,
             min_v,
             max_v,
-            (min_v, max_v)
+            (min_v, max_v),
+            key=f"slider_{metric}",
+            label_visibility="collapsed"
         )
+
+        col_min, col_max = st.sidebar.columns(2)
+
+        with col_min:
+
+            user_min = st.number_input(
+                "Min",
+                min_value=min_v,
+                max_value=max_v,
+                value=float(selected_range[0]),
+                key=f"min_{metric}"
+            )
+
+        with col_max:
+
+            user_max = st.number_input(
+                "Max",
+                min_value=min_v,
+                max_value=max_v,
+                value=float(selected_range[1]),
+                key=f"max_{metric}"
+            )
 
         filtered_df = filtered_df[
 
-            (
-                filtered_df[metric]
-                >= selected_range[0]
-            )
+            (filtered_df[metric] >= user_min)
 
             &
 
-            (
-                filtered_df[metric]
-                <= selected_range[1]
-            )
+            (filtered_df[metric] <= user_max)
+
         ]
 
     st.sidebar.metric(
