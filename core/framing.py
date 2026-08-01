@@ -15,7 +15,7 @@ def apply_framing(dataset):
     filtered_df = df.copy()
 
     with st.sidebar.expander(
-        "Context Framing",
+        "🎛️ Context Framing",
         expanded=False
     ):
 

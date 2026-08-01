@@ -114,7 +114,7 @@ def build_dataset(
         all_metrics,
         default=all_metrics
     )
-    
+
     # =================================================
     # ENRICHMENT
     # =================================================
@@ -141,7 +141,7 @@ def build_dataset(
                 )
 
         with st.sidebar.expander(
-            "Data Enrichment",
+            "⚙️ Data Enrichment",
             expanded=False
         ):
 
@@ -206,7 +206,7 @@ def build_dataset(
 def render_input_panel():
 
     with st.sidebar.expander(
-        "Input Data",
+        "📂 Input Data",
         expanded=True
     ):
 

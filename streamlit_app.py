@@ -9,6 +9,19 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown("""
+<style>
+
+[data-testid="stExpander"] details summary p {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+
 st.title("Decision Space Explorer")
 
 dataset = render_input_panel()

@@ -91,65 +91,67 @@ def render_workspace(
     # VISUAL WORKSPACE
     # ==================================================
 
-    st.sidebar.markdown(
-        "## Visual Workspace"
-    )
+    with st.sidebar.expander(
+        "🗺️ Visual Workspace",
+        expanded=False
 
-    col_reset, col_add = st.sidebar.columns(
-        [0.35, 0.65]
-    )
+    ):
 
-    with col_reset:
+        col_reset, col_add = st.sidebar.columns(
+            [0.35, 0.65]
+        )
 
-        if st.button(
-            "Reset",
-            use_container_width=True
-        ):
+        with col_reset:
 
-            z_default = (
-                dimensions[2]
-                if len(dimensions) > 2
-                else dimensions[1]
-            )
+            if st.button(
+                "Reset",
+                use_container_width=True
+            ):
 
-            st.session_state.maps = [
+                z_default = (
+                    dimensions[2]
+                    if len(dimensions) > 2
+                    else dimensions[1]
+                )
 
-                {
-                    "x": dimensions[0],
-                    "y": dimensions[1],
-                    "z": z_default,
-                    "color": None,
-                }
+                st.session_state.maps = [
 
-            ]
+                    {
+                        "x": dimensions[0],
+                        "y": dimensions[1],
+                        "z": z_default,
+                        "color": None,
+                    }
 
-            st.rerun()
+                ]
 
-    with col_add:
+                st.rerun()
 
-        if st.button(
-            "Add Map",
-            use_container_width=True
-        ):
+        with col_add:
 
-            z_default = (
-                dimensions[2]
-                if len(dimensions) > 2
-                else dimensions[1]
-            )
+            if st.button(
+                "Add Map",
+                use_container_width=True
+            ):
 
-            st.session_state.maps.append(
+                z_default = (
+                    dimensions[2]
+                    if len(dimensions) > 2
+                    else dimensions[1]
+                )
 
-                {
-                    "x": dimensions[0],
-                    "y": dimensions[1],
-                    "z": z_default,
-                    "color": None,
-                }
+                st.session_state.maps.append(
 
-            )
+                    {
+                        "x": dimensions[0],
+                        "y": dimensions[1],
+                        "z": z_default,
+                        "color": None,
+                    }
 
-            st.rerun()
+                )
+
+                st.rerun()
 
     # ==================================================
     # MAPS
