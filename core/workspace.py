@@ -230,6 +230,7 @@ def render_workspace(
                 x=x,
                 y=y,
                 z=z
+                key_prefix=f"coord_{idx}"
             )
 
         with tab2:
@@ -240,6 +241,7 @@ def render_workspace(
                 y=y,
                 size=z,
                 color=color
+                key=f"bubble_{idx}"
             )
 
         st.session_state.maps[idx] = {

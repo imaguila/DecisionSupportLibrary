@@ -7,7 +7,8 @@ def render_scatter(
     x,
     y,
     size=None,
-    color=None
+    color=None,
+    key=None
 ):
 
     fig = px.scatter(
@@ -25,7 +26,8 @@ def render_scatter(
 
     st.plotly_chart(
         fig,
-        use_container_width=True
+        use_container_width=True,
+        key=key
     )
 
 
@@ -33,7 +35,8 @@ def render_coordinated_maps(
     df,
     x,
     y,
-    z
+    z,
+    key_prefix
 ):
 
     col1, col2 = st.columns(2)
@@ -45,7 +48,8 @@ def render_coordinated_maps(
         render_scatter(
             df,
             x=x,
-            y=y
+            y=y,
+            key=f"{key_prefix}_left"
         )
 
     with col2:
@@ -55,5 +59,6 @@ def render_coordinated_maps(
         render_scatter(
             df,
             x=x,
-            y=z
+            y=z,
+            key=f"{key_prefix}_right"
         )
