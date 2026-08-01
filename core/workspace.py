@@ -160,55 +160,82 @@ def render_workspace(
         )
 
         # --------------------------------------
-        # Axis selectors ABOVE plots
+        # Axis selectors
         # --------------------------------------
 
         c1, c2, c3, c4 = st.columns(4)
 
         with c1:
 
+            current_x = (
+                current_map["x"]
+                if current_map["x"] in dimensions
+                else dimensions[0]
+            )
+
             x = st.selectbox(
                 "X Axis",
                 dimensions,
-                index=dimensions.index(
-                    current_map["x"]
-                )
-                if current_map["x"] in dimensions
-                else 0,
+                index=dimensions.index(current_x),
                 key=f"x_{idx}"
             )
 
         with c2:
 
+            y_options = [
+                d
+                for d in dimensions
+                if d != x
+            ]
+
+            current_y = (
+                current_map["y"]
+                if current_map["y"] in y_options
+                else y_options[0]
+            )
+
             y = st.selectbox(
                 "Y Axis",
-                dimensions,
-                index=dimensions.index(
-                    current_map["y"]
-                )
-                if current_map["y"] in dimensions
-                else 0,
+                y_options,
+                index=y_options.index(current_y),
                 key=f"y_{idx}"
             )
 
         with c3:
 
+            z_options = [None] + [
+                d
+                for d in dimensions
+                if d not in [x, y]
+            ]
+
+            current_z = (
+                current_map["z"]
+                if current_map["z"] in z_options
+                else None
+            )
+
             z = st.selectbox(
                 "Third Dimension",
-                dimensions,
-                index=dimensions.index(
-                    current_map["z"]
-                )
-                if current_map["z"] in dimensions
-                else 0,
+                z_options,
+                index=z_options.index(current_z),
                 key=f"z_{idx}"
             )
 
         with c4:
 
+            color_options = [None] + dimensions
+
+            current_color = (
+                current_map["color"]
+                if current_map["color"] in color_options
+                else None
+            )
+
             color = st.selectbox(
                 "Color",
-                [None] + dimensions,
+                color_options,
+                index=color_options.index(current_color),
                 key=f"color_{idx}"
             )
 
