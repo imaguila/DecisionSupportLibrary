@@ -47,6 +47,18 @@ def render_workspace(
             f"{dataset['config'].get('var_prefix')}"
         )
 
+        # ==================================================
+        # EXPORT
+        # ==================================================
+
+        st.download_button(
+            label="⬇️ Export Current Subset",
+            data=df.to_csv(index=False),
+            file_name="current_subset.csv",
+            mime="text/csv"
+        )
+
+
     # ==================================================
     # DIMENSIONS
     # ==================================================
@@ -323,16 +335,7 @@ def render_workspace(
                 "z": z,
                 "color": color,
             }
-    # ==================================================
-    # EXPORT
-    # ==================================================
 
-    st.download_button(
-        label="⬇️ Export Current Subset",
-        data=df.to_csv(index=False),
-        file_name="current_subset.csv",
-        mime="text/csv"
-    )
 
     # ==================================================
     # DATASET
