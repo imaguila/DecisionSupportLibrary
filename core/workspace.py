@@ -250,15 +250,35 @@ def render_workspace(
             ]
         )
 
+        # =====================================
+        # COORDINATED MAPS
+        # =====================================
+
         with tab1:
 
-            render_coordinated_maps(
-                df,
-                x=x,
-                y=y,
-                z=z,
-                key_prefix=f"coord_{idx}"
-            )
+            if z is None:
+
+                render_scatter(
+                    df,
+                    x=x,
+                    y=y,
+                    color=color,
+                    key=f"single_{idx}"
+                )
+
+            else:
+
+                render_coordinated_maps(
+                    df,
+                    x=x,
+                    y=y,
+                    z=z,
+                    key_prefix=f"coord_{idx}"
+                )
+
+        # =====================================
+        # BUBBLE MAP
+        # =====================================
 
         with tab2:
 
@@ -266,18 +286,10 @@ def render_workspace(
                 df,
                 x=x,
                 y=y,
-                size=z,
+                size=z if z is not None else None,
                 color=color,
                 key=f"bubble_{idx}"
             )
-
-        st.session_state.maps[idx] = {
-
-            "x": x,
-            "y": y,
-            "z": z,
-            "color": color
-        }
 
     # ==================================================
     # EXPORT
