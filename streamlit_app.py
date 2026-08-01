@@ -32,9 +32,6 @@ from core.lenses import (
 from core.lens_engine import (
     apply_lens
 )
-active_lens, lens_params = (
-    render_lenses(dataset)
-)
 
 if dataset is None:
 
