@@ -86,7 +86,6 @@ def render_workspace(
             }
 
         ]
-
     # ==================================================
     # VISUAL WORKSPACE
     # ==================================================
@@ -94,10 +93,9 @@ def render_workspace(
     with st.sidebar.expander(
         "🗺️ Visual Workspace",
         expanded=False
-
     ):
 
-        col_reset, col_add = st.sidebar.columns(
+        col_reset, col_add = st.columns(
             [0.35, 0.65]
         )
 
@@ -127,32 +125,35 @@ def render_workspace(
 
                 st.rerun()
 
-            with col_add:
+        with col_add:
 
-                if st.button(
-                    "Add Map",
-                    use_container_width=True
-                ):
+            if st.button(
+                "Add Map",
+                use_container_width=True
+            ):
 
-                    z_default = (
-                        dimensions[2]
-                        if len(dimensions) > 2
-                        else dimensions[1]
-                    )
+                z_default = (
+                    dimensions[2]
+                    if len(dimensions) > 2
+                    else dimensions[1]
+                )
 
-                    st.session_state.maps.append(
+                st.session_state.maps.append(
 
-                        {
-                            "x": dimensions[0],
-                            "y": dimensions[1],
-                            "z": z_default,
-                            "color": None,
-                        }
+                    {
+                        "x": dimensions[0],
+                        "y": dimensions[1],
+                        "z": z_default,
+                        "color": None,
+                    }
 
-                    )
+                )
 
-                    st.rerun()
+                st.rerun()
 
+        st.caption(
+            f"Active maps: {len(st.session_state.maps)}"
+        )
     # ==================================================
     # MAPS
     # ==================================================
