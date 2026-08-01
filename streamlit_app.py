@@ -5,8 +5,8 @@ from input_panel import (
 )
 
 st.set_page_config(
-    layout="wide",
-    page_title="Decision Space Explorer"
+    page_title="Decision Space Explorer",
+    layout="wide"
 )
 
 st.title(
@@ -25,6 +25,8 @@ if dataset is None:
 
 df = dataset["df"]
 
+cfg = dataset["config"]
+
 # ==================================================
 # SUMMARY
 # ==================================================
@@ -36,18 +38,21 @@ st.subheader(
 c1, c2, c3 = st.columns(3)
 
 with c1:
+
     st.metric(
         "Solutions",
         len(df)
     )
 
 with c2:
+
     st.metric(
-        "Columns",
+        "Attributes",
         len(df.columns)
     )
 
 with c3:
+
     st.metric(
         "Decision Variables",
         len(
@@ -57,12 +62,17 @@ with c3:
         )
     )
 
+st.caption(
+    "Detected decision-variable prefix: "
+    f"`{cfg.get('var_prefix', 'N/A')}`"
+)
+
 # ==================================================
-# METRICS
+# ANALYSIS DIMENSIONS
 # ==================================================
 
 st.subheader(
-    "Detected Structure"
+    "Available Analysis Dimensions"
 )
 
 col1, col2 = st.columns(2)
@@ -70,43 +80,54 @@ col1, col2 = st.columns(2)
 with col1:
 
     st.markdown(
-        "### Metrics"
+        "#### Optimization Objectives"
     )
 
-    st.write(
-        dataset["metrics"]
+    metrics = dataset.get(
+        "metrics",
+        []
     )
+
+    if metrics:
+
+        for m in metrics:
+            st.markdown(
+                f"✅ {m}"
+            )
+
+    else:
+
+        st.info(
+            "No objectives defined."
+        )
 
 with col2:
 
     st.markdown(
-        "### Decision Variables"
+        "#### Active Enrichment Indicators"
     )
 
-    st.write(
-        dataset[
-            "decision_variables"
-        ][:20]
+    indicators = dataset.get(
+        "selected_indicators",
+        []
     )
+
+    if indicators:
+
+        for i in indicators:
+
+            st.markdown(
+                f"✅ {i}"
+            )
+
+    else:
+
+        st.info(
+            "No indicators enabled."
+        )
 
 # ==================================================
-# ENRICHMENT
-# ==================================================
-
-plugin = dataset["plugin"]
-
-if plugin:
-
-    st.subheader(
-        "Applied Indicators"
-    )
-
-    st.write(
-        plugin.available_indicators()
-    )
-
-# ==================================================
-# PREVIEW
+# DATA PREVIEW
 # ==================================================
 
 st.subheader(
@@ -114,18 +135,7 @@ st.subheader(
 )
 
 st.dataframe(
-    df.head(50),
-    use_container_width=True
+    df,
+    use_container_width=True,
+    height=500
 )
-
-# ==================================================
-# RAW COLUMNS
-# ==================================================
-
-with st.expander(
-    "Column Inspector"
-):
-
-    st.write(
-        list(df.columns)
-    )

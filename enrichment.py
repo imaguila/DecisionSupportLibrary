@@ -1,19 +1,42 @@
-from problem import calcular_indicadores, REQUISITOS
+"""
+Generic enrichment layer.
+
+The core framework does not know how indicators are calculated.
+Indicator computation is delegated to the active domain plugin.
+"""
 
 
-def detectar_indicadores_posibles(df):
-    posibles = []
+def detect_available_indicators(plugin):
+    """
+    Returns the indicators exposed by the active plugin.
+    """
 
-    for nombre, requisitos in REQUISITOS.items():
-        if all(col in df.columns for col in requisitos):
-            posibles.append(nombre)
+    if plugin is None:
+        return []
 
-    return posibles
+    return sorted(
+        list(
+            plugin.available_indicators()
+        )
+    )
 
 
-def aplicar_enrichment(df, selected_indicators):
+def apply_enrichment(
+    df,
+    plugin,
+    selected_indicators
+):
+    """
+    Delegates indicator computation to the active plugin.
+    """
+
+    if plugin is None:
+        return df
+
     if not selected_indicators:
         return df
 
-    return calcular_indicadores(df, selected_indicators)
-
+    return plugin.compute_indicators(
+        df,
+        selected_indicators
+    )

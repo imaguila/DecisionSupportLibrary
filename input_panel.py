@@ -2,10 +2,20 @@ import streamlit as st
 import pandas as pd
 
 from config import CASES
+
 from plugins import PLUGIN_REGISTRY
 
+from enrichment import (
+    detect_available_indicators,
+    apply_enrichment
+)
 
-def detect_decision_variables(df, prefix):
+
+def detect_decision_variables(
+    df,
+    prefix
+):
+
     return [
         c
         for c in df.columns
@@ -13,33 +23,70 @@ def detect_decision_variables(df, prefix):
     ]
 
 
-def build_dataset(df, cfg):
+def build_dataset(
+    df,
+    cfg
+):
 
     plugin = None
 
-    plugin_name = cfg.get("plugin")
+    plugin_name = cfg.get(
+        "plugin"
+    )
 
     if plugin_name:
 
-        plugin_class = PLUGIN_REGISTRY.get(plugin_name)
+        plugin_class = (
+            PLUGIN_REGISTRY.get(
+                plugin_name
+            )
+        )
 
         if plugin_class:
 
             plugin = plugin_class(
-                var_prefix=cfg["var_prefix"]
-            )
-
-            indicators = cfg.get(
-                "default_indicators",
-                []
-            )
-
-            if indicators:
-
-                df = plugin.compute_indicators(
-                    df,
-                    indicators
+                var_prefix=cfg.get(
+                    "var_prefix",
+                    "x_"
                 )
+            )
+
+    # ----------------------------------
+    # ENRICHMENT SIDEBAR
+    # ----------------------------------
+
+    selected_indicators = []
+
+    if plugin:
+
+        available = (
+            detect_available_indicators(
+                plugin
+            )
+        )
+
+        st.sidebar.markdown(
+            "## Enrichment"
+        )
+
+        selected_indicators = (
+            st.sidebar.multiselect(
+                "Available Indicators",
+                available,
+                default=cfg.get(
+                    "default_indicators",
+                    []
+                )
+            )
+        )
+
+        df = apply_enrichment(
+            df,
+            plugin,
+            selected_indicators
+        )
+
+    # ----------------------------------
 
     dataset = {
 
@@ -54,10 +101,16 @@ def build_dataset(df, cfg):
             []
         ),
 
+        "selected_indicators":
+            selected_indicators,
+
         "decision_variables":
             detect_decision_variables(
                 df,
-                cfg["var_prefix"]
+                cfg.get(
+                    "var_prefix",
+                    "x_"
+                )
             )
     }
 
@@ -66,7 +119,9 @@ def build_dataset(df, cfg):
 
 def render_input_panel():
 
-    st.sidebar.header("Input Data")
+    st.sidebar.header(
+        "Input Data"
+    )
 
     mode = st.sidebar.radio(
         "Input Mode",
@@ -76,22 +131,32 @@ def render_input_panel():
         ]
     )
 
-    # ------------------------------------------------
-    # Example Dataset
-    # ------------------------------------------------
+    # ==================================
+    # EXAMPLES
+    # ==================================
 
     if mode == "Example Dataset":
 
-        case_name = st.sidebar.selectbox(
-            "Dataset",
-            list(CASES.keys())
+        case_name = (
+            st.sidebar.selectbox(
+                "Dataset",
+                list(CASES.keys())
+            )
         )
 
         cfg = CASES[case_name]
 
-        st.sidebar.info(cfg["help"])
+        with st.sidebar.expander(
+            "ℹ Dataset Information",
+            expanded=False
+        ):
+            st.write(
+                cfg["help"]
+            )
 
-        if st.sidebar.button("Load Dataset"):
+        if st.sidebar.button(
+            "Load Dataset"
+        ):
 
             df = pd.read_csv(
                 cfg["path_sol"]
@@ -102,15 +167,17 @@ def render_input_panel():
                 cfg
             )
 
-    # ------------------------------------------------
-    # Upload CSV
-    # ------------------------------------------------
+    # ==================================
+    # ENRICHED CSV
+    # ==================================
 
     else:
 
-        uploaded_file = st.sidebar.file_uploader(
-            "Upload enriched CSV",
-            type=["csv"]
+        uploaded_file = (
+            st.sidebar.file_uploader(
+                "Upload CSV",
+                type=["csv"]
+            )
         )
 
         if uploaded_file:
