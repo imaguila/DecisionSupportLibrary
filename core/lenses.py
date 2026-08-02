@@ -21,8 +21,7 @@ def render_lenses(dataset):
         )
         active_lens = st.selectbox(
             #"Lens",
-       #     "",
-            [
+            "", [
                 "None",
                 "Preference",
                 "Diversity",
