@@ -9,7 +9,6 @@ from core.enrichment import (
     apply_enrichment
 )
 
-
 # =====================================================
 # HELPERS
 # =====================================================
@@ -103,7 +102,8 @@ def build_dataset(
     selected_metrics = st.multiselect(
         "Optimization Objectives",
         all_metrics,
-        default=all_metrics
+        default=all_metrics,
+        help="💡 Detected objectives. Keep only those you want to analyze."
     )
 
     # =================================================
@@ -118,21 +118,17 @@ def build_dataset(
         )
 
         for indicator, reqs in requirements.items():
-
             if all(
                 metric in selected_metrics
                 for metric in reqs
             ):
-
                 available_indicators.append(
                     indicator
                 )
-
         with st.sidebar.expander(
             "⚙️ Data Enrichment",
             expanded=False
         ):
-
             selected_indicators = (
                 st.multiselect(
                     "Indicators",
@@ -161,7 +157,6 @@ def build_dataset(
     # =================================================
 
     dataset = {
-
         "df": df,
         "config": cfg,
         "plugin": plugin,
