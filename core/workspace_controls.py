@@ -15,9 +15,7 @@ def render_workspace_controls(
         )
 
         if "maps" not in st.session_state:
-
             st.session_state.maps = [
-
                 {
                     "x": dimensions[0],
                     "y": dimensions[1],

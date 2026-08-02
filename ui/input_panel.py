@@ -200,8 +200,18 @@ def render_input_panel():
                 "Example Dataset",
                 "Upload Enriched CSV"
             ],
-            help="Load precomputed Pareto fronts, including requirements and objective functions values."
+            horizontal=True,
+            help="Load precomputed Pareto fronts, including decision variables and objective functions values"
         )
+
+        if mode == "Example Dataset":
+            st.caption("💡 *Load pre-configured sample datasets to test the tool quickly.*")
+        else:
+            st.caption("💡 *Upload your own custom CSV file containing Pareto fronts and requirements.*")
+
+
+
+
         # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
@@ -281,16 +291,11 @@ def render_input_panel():
                 len(df)
             )
             cfg = {
-
                 "plugin": None,
-
                 "metrics": [],
-
                 "var_prefix":
                     var_prefix,
-
                 "exclude_cols": [],
-
                 "default_indicators":
                     []
             }
