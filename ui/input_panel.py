@@ -204,12 +204,10 @@ def render_input_panel():
             help="""Choose how the decision space will be loaded.
 
             • Domain Configuration: Load a Pareto front together with domain-specific metadata
-                    (objectives, decision variables, indicators, and enrichment logic)
-                    through an associated plugin.
+            (objectives, decision variables, indicators, and enrichment logic)
+            through an associated plugin.
             
-            • Enriched Dataset: Load a standalone dataset where all relevant dimensions are
-                    already available. Numeric attributes not identified as
-                    decision variables will be considered analysis dimensions.
+            • Enriched Dataset: Load a standalone dataset where all relevant dimensions are already available. Numeric attributes not identified as decision variables will be considered analysis dimensions.
             """
         )
         if mode == "Domain Configuration":
