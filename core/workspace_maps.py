@@ -56,10 +56,16 @@ def render_maps(
                 key=f"map_mode_{idx}"
             )
 
+            x = current_map.get("x")
+            y = current_map.get("y")
+            z = current_map.get("z")
+            color = current_map.get("color")
+
+
             # =====================================
             # SCATTER / BUBBLE
             # =====================================
-
+            
             if map_mode in [
                 "🗺️ Scatter",
                 "🫧 Bubble"
@@ -140,7 +146,9 @@ def render_maps(
                         ),
                         key=f"z_{idx}"
                     )
+
                 if map_mode == "🫧 Bubble":
+
                     with c4:
 
                         color_options = (
@@ -164,45 +172,57 @@ def render_maps(
                             key=f"color_{idx}"
                         )
 
-                    if map_mode == "🗺️ Scatter":
+                else:
 
-                        if z is None:
+                    color = None
 
-                            render_scatter(
-                                df,
-                                x=x,
-                                y=y,
-                                color=color,
-                                show_ids=show_ids,
-                                key=f"single_{idx}"
-                            )
+                # ----------------------------------
+                # Render Scatter
+                # ----------------------------------
 
-                        else:
+                if map_mode == "🗺️ Scatter":
 
-                            render_coordinated_maps(
-                                df,
-                                x=x,
-                                y=y,
-                                z=z,
-                                key_prefix=f"coord_{idx}",
-                                show_ids=show_ids
-                            )
-
-                    else:
+                    if z is None:
 
                         render_scatter(
                             df,
                             x=x,
                             y=y,
-                            size=(
-                                z
-                                if z is not None
-                                else None
-                            ),
-                            color=color,
+                            color=None,
                             show_ids=show_ids,
-                            key=f"bubble_{idx}"
+                            key=f"single_{idx}"
                         )
+
+                    else:
+
+                        render_coordinated_maps(
+                            df,
+                            x=x,
+                            y=y,
+                            z=z,
+                            key_prefix=f"coord_{idx}",
+                            show_ids=show_ids
+                        )
+
+                # ----------------------------------
+                # Render Bubble
+                # ----------------------------------
+
+                else:
+
+                    render_scatter(
+                        df,
+                        x=x,
+                        y=y,
+                        size=(
+                            z
+                            if z is not None
+                            else None
+                        ),
+                        color=color,
+                        show_ids=show_ids,
+                        key=f"bubble_{idx}"
+                    )
 
             # =====================================
             # DISTRIBUTION
