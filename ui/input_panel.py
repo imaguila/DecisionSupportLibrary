@@ -200,7 +200,6 @@ def render_input_panel():
                 "Example Dataset",
                 "Upload Enriched CSV"
             ],
-            # Esto coloca la '?' oficial de Streamlit justo a la derecha de la palabra "Source"
             help="Load precomputed Pareto fronts, including requirements and objective functions values."
         )
         # ==========================================
