@@ -45,7 +45,7 @@ def apply_framing(dataset):
             if min_v == max_v:
                 continue
 
-            col_name, col_range = st.columns([0.6, 0.4])
+            col_name, col_range = st.columns([0.4, 0.6])
 
             with col_name:
                 st.markdown(f"**{metric}**")
