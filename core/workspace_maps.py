@@ -32,30 +32,14 @@ def render_maps(
             f"🗺️ Decision-Space Map {idx + 1}",
             expanded=(idx == 0)
         ):
-            if len(dimensions) == 0:
+            if len(dimensions) < 2:
 
                 st.warning(
-                    "No dimensions available."
+                    "At least two dimensions are required."
                 )
 
                 continue
 
-            if len(dimensions) == 1:
-
-                st.info(
-                    f"Only one dimension is available: {dimensions[0]}"
-                )
-
-                with st.tabs(
-                    ["📈 Distribution"]
-                )render_distribution(
-                        df,
-                        metric=dimensions[0],
-                        mode="Violin",
-                        key=f"single_dimension_{idx}"
-                    )
-
-                continue
             # =====================================
             # AXIS SELECTION
             # =====================================
