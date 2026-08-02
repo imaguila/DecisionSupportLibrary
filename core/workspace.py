@@ -13,7 +13,8 @@ from core.workspace_dataset import (
 
 def render_workspace(
     df,
-    dataset
+    dataset,
+    show_ids
 ):
 
     render_summary(

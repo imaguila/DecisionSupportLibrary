@@ -86,3 +86,20 @@ filtered_df = apply_framing(
 active_lens, lens_params = (
     render_lenses(dataset)
 )
+
+filtered_df = apply_lens(
+    filtered_df,
+    active_lens,
+    lens_params,
+    dataset
+)
+
+# ============================================
+# WORKSPACE
+# ============================================
+
+render_workspace(
+    filtered_df,
+    dataset,
+    show_ids
+)
