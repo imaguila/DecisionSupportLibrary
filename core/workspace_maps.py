@@ -65,7 +65,10 @@ def render_maps(
                 "🫧 Bubble"
             ]:
 
-                c1, c2, c3, c4 = st.columns(4)
+                if map_mode == "🗺️ Scatter":
+                    c1, c2, c3 = st.columns(3)
+                else:
+                    c1, c2, c3, c4 = st.columns(4)
 
                 with c1:
 
@@ -137,69 +140,69 @@ def render_maps(
                         ),
                         key=f"z_{idx}"
                     )
+                if map_mode == "🫧 Bubble":
+                    with c4:
 
-                with c4:
+                        color_options = (
+                            [None]
+                            + dimensions
+                        )
 
-                    color_options = (
-                        [None]
-                        + dimensions
-                    )
+                        current_color = (
+                            current_map["color"]
+                            if current_map["color"]
+                            in color_options
+                            else None
+                        )
 
-                    current_color = (
-                        current_map["color"]
-                        if current_map["color"]
-                        in color_options
-                        else None
-                    )
+                        color = st.selectbox(
+                            "Color",
+                            color_options,
+                            index=color_options.index(
+                                current_color
+                            ),
+                            key=f"color_{idx}"
+                        )
 
-                    color = st.selectbox(
-                        "Color",
-                        color_options,
-                        index=color_options.index(
-                            current_color
-                        ),
-                        key=f"color_{idx}"
-                    )
+                    if map_mode == "🗺️ Scatter":
 
-                if map_mode == "🗺️ Scatter":
+                        if z is None:
 
-                    if z is None:
+                            render_scatter(
+                                df,
+                                x=x,
+                                y=y,
+                                color=color,
+                                show_ids=show_ids,
+                                key=f"single_{idx}"
+                            )
+
+                        else:
+
+                            render_coordinated_maps(
+                                df,
+                                x=x,
+                                y=y,
+                                z=z,
+                                key_prefix=f"coord_{idx}",
+                                show_ids=show_ids
+                            )
+
+                    else:
 
                         render_scatter(
                             df,
                             x=x,
                             y=y,
+                            size=(
+                                z
+                                if z is not None
+                                else None
+                            ),
                             color=color,
                             show_ids=show_ids,
-                            key=f"single_{idx}"
+                            key=f"bubble_{idx}"
                         )
-
-                    else:
-
-                        render_coordinated_maps(
-                            df,
-                            x=x,
-                            y=y,
-                            z=z,
-                            key_prefix=f"coord_{idx}",
-                            show_ids=show_ids
-                        )
-
-                else:
-
-                    render_scatter(
-                        df,
-                        x=x,
-                        y=y,
-                        size=(
-                            z
-                            if z is not None
-                            else None
-                        ),
-                        color=color,
-                        show_ids=show_ids,
-                        key=f"bubble_{idx}"
-                    )
 
             # =====================================
             # DISTRIBUTION
