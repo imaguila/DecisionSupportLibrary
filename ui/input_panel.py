@@ -100,17 +100,12 @@ def build_dataset(
     dataset = {
 
         "df": df,
-
         "config": cfg,
-
         "plugin": plugin,
-
         "metrics":
             selected_metrics,
-
         "selected_indicators":
             [],
-
         "decision_variables":
             detect_decision_variables(
                 df,
@@ -223,16 +218,12 @@ def render_input_panel():
                     )
                 )
             )
-            df = pd.read_csv(
-                uploaded_file
-            )
+            df = pd.read_csv( uploaded_file )
             df.reset_index(
                 drop=True,
                 inplace=True
             )
-            df["id"] = range(
-                len(df)
-            )
+            df["id"] = range(1, len(df)+1)
             cfg = {
                 "plugin": None,
                 "metrics": [],
