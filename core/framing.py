@@ -52,7 +52,7 @@ def apply_framing(dataset):
 
             with col_range:
                 st.markdown(
-                    f"`{min_v:.1f}-{max_v:.1f}`"
+                    f"`{min_v:.2f}-{max_v:.2f}`"
                 )
 
             selected_range = st.slider(
