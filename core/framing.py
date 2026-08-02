@@ -109,7 +109,9 @@ def apply_framing(dataset):
             "🔄 Reset Framing",
             use_container_width=True
         ):
-            st.session_state.framing_version += 1
+            for key in list(st.session_state.keys()):
+                if key.startswith("framing_"):
+                    del st.session_state[key]
             st.rerun()
 
     return filtered_df
