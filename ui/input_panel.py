@@ -208,7 +208,6 @@ def render_input_panel():
         # ==========================================
 
         if mode == "Example Dataset":
-
             dataset_names = list(
                 CASES.keys()
             )
