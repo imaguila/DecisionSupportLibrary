@@ -193,22 +193,13 @@ def build_dataset(
 
 def render_input_panel():
 
-    help_text = "Load precomputed Pareto fronts, including decision variables and objective functions values."
-    st.sidebar.markdown("""
-        <style>
-        .help-icon {
-            float: right; cursor: help; font-size: 14px; opacity: 0.6;
-        }
-        .help-icon:hover {
-            opacity: 1;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-    with st.sidebar.expander(
-        f"🏷️ Input and Preparation <span class='help-icon' title='{help_text}'>❓</span>",
-        expanded=True
-    ):
+    with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
+        # Usamos st.caption con un help nativo de Streamlit
+        st.caption(
+            "ℹ️ Instructions & Help", 
+            help="Load precomputed Pareto fronts, including decision variables and objective functions values."
+        )
+        
         mode = st.radio(
             "Source",
             [
@@ -216,7 +207,7 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ]
         )
-            # ==========================================
+        # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
 
