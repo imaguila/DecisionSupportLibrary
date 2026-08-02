@@ -1,12 +1,9 @@
 import streamlit as st
 
-
 def render_lenses(dataset):
 
     dimensions = (
-        dataset["metrics"]
-        +
-        dataset["selected_indicators"]
+        dataset["metrics"]  +  dataset["selected_indicators"]
     )
 
     active_lens = "None"
@@ -33,7 +30,19 @@ def render_lenses(dataset):
         # =====================================
 
         if active_lens == "Preference":
-
+            st.markdown(
+                "<span style='color: #E63946; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
+                " Scoring Method"
+                "</span>", 
+                unsafe_allow_html=True
+            )
+            params["method"] = st.selectbox(
+                "Scoring Method",
+                [
+                    "Weighted Sum",
+                    "TOPSIS"
+                ]
+            )
             params["maximize"] = st.multiselect(
                 "Metrics to Maximize",
                 dimensions
@@ -44,13 +53,7 @@ def render_lenses(dataset):
                 dimensions
             )
 
-            params["method"] = st.selectbox(
-                "Scoring Method",
-                [
-                    "Weighted Sum",
-                    "TOPSIS"
-                ]
-            )
+
 
             params["top_n"] = st.slider(
                 "Top N Solutions",
