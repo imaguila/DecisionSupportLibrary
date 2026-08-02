@@ -194,10 +194,10 @@ def build_dataset(
 def render_input_panel():
 
     with st.sidebar.expander(
-        "📂 Input Data",
-        expanded=True
+        "🏷️ Input and Preparation",
+        expanded=True,
+        help="Load precomputed Pareto fronts, including decision variables and objective functions values."
     ):
-
         mode = st.radio(
             "Source",
             [
