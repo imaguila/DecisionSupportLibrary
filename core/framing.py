@@ -54,12 +54,6 @@ def apply_framing(dataset):
                 key=f"framing_{metric}"
             )
 
-            st.sidebar.write(
-                metric,
-                min_v,
-                max_v,
-                selected_range
-            )
             if (
                 abs(selected_range[0] - min_v) < 1e-6
                 and
@@ -118,22 +112,10 @@ def apply_framing(dataset):
         # ----------------------------------
         # Reset framing
         # ----------------------------------
-
-        if st.button(
-            "🔄 Reset Framing",
-            use_container_width=True
-        ):
-
-            for key in list(
-                st.session_state.keys()
-            ):
-
-                if key.startswith(
-                    "framing_"
-                ):
-
-                    del st.session_state[key]
-
-            st.rerun()
+#        if st.button( "🔄 Reset Framing", use_container_width=True):
+#            for key in list( st.session_state.keys()):
+#                if key.startswith( "framing_"):
+#                    del st.session_state[key]
+#            st.rerun()
 
     return filtered_df
