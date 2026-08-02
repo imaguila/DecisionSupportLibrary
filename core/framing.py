@@ -35,11 +35,11 @@ def apply_framing(dataset):
                 continue
 
             min_v = float(
-                filtered_df[metric].min()
+                df[metric].min()
             )
 
             max_v = float(
-                filtered_df[metric].max()
+                df[metric].max()
             )
 
             if min_v == max_v:
