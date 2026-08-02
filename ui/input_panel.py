@@ -30,23 +30,17 @@ def build_dataset(
     df,
     cfg
 ):
-
     plugin = None
-
     plugin_name = cfg.get(
         "plugin"
     )
-
     if plugin_name:
-
         plugin_class = (
             PLUGIN_REGISTRY.get(
                 plugin_name
             )
         )
-
         if plugin_class:
-
             plugin = plugin_class(
                 var_prefix=cfg.get(
                     "var_prefix",
@@ -66,12 +60,10 @@ def build_dataset(
     # Auto-detect objectives for uploaded CSVs
 
     if not all_metrics:
-
         var_prefix = cfg.get(
             "var_prefix",
             "x_"
         )
-
         excluded = set(
             cfg.get(
                 "exclude_cols",
@@ -90,7 +82,6 @@ def build_dataset(
 
             if col in excluded:
                 continue
-
             if col in [
                 "id",
                 "highlight",
@@ -120,11 +111,8 @@ def build_dataset(
     # =================================================
 
     selected_indicators = []
-
     if plugin:
-
         available_indicators = []
-
         requirements = (
             plugin.requirements()
         )

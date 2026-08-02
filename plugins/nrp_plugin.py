@@ -4,7 +4,6 @@ import numpy as np
 
 EPS = 1e-9
 
-
 class NRPPlugin:
     """
     Minimal NRP plugin.
@@ -31,39 +30,8 @@ class NRPPlugin:
         }
 
     # --------------------------------------------------
-    # Indicator requirements
-    # --------------------------------------------------
-
-    def requirements(self):
-
-        return {
-
-            "scope": [],
-
-            "productivity": [
-                "satisfaction",
-                "effort"
-            ],
-
-            "squandering": [
-                "effort"
-            ],
-
-            "annoyance": [
-                "dissatisfaction",
-                "satisfaction"
-            ],
-
-            "dirtiness": [
-                "dissatisfaction",
-                "effort"
-            ],
-        }
-
-    # --------------------------------------------------
     # Decision variables
     # --------------------------------------------------
-
     def decision_variables(self, df):
 
         return [
@@ -71,39 +39,30 @@ class NRPPlugin:
             for c in df.columns
             if c.startswith(self.var_prefix)
         ]
+    
     # --------------------------------------------------
     # Dependencies between indicators 
     # --------------------------------------------------
-
-
     def requirements(self):
 
         return {
-
             "scope": [],
-
             "productivity": [
                 "satisfaction",
                 "effort"
             ],
-
             "squandering": [
                 "effort"
             ],
-
             "annoyance": [
                 "dissatisfaction",
                 "satisfaction"
             ],
-
             "dirtiness": [
                 "dissatisfaction",
                 "effort"
-            ]
+            ],
         }
-
-
-
 
     # --------------------------------------------------
     # Indicator computation
@@ -116,19 +75,13 @@ class NRPPlugin:
     ):
 
         result = df.copy()
-
         req_cols = self.decision_variables(result)
-
         for indicator in selected_indicators:
-
             try:
-
                 # --------------------------------------
                 # Productivity
                 # --------------------------------------
-
                 if indicator == "productivity":
-
                     result[indicator] = (
                         result["satisfaction"]
                         / np.maximum(
@@ -136,13 +89,10 @@ class NRPPlugin:
                             EPS
                         )
                     )
-
                 # --------------------------------------
                 # Dirtiness
                 # --------------------------------------
-
                 elif indicator == "dirtiness":
-
                     result[indicator] = np.where(
                         result["dissatisfaction"] == 0,
                         0,
@@ -152,13 +102,10 @@ class NRPPlugin:
                             EPS
                         )
                     )
-
                 # --------------------------------------
                 # Annoyance
                 # --------------------------------------
-
                 elif indicator == "annoyance":
-
                     result[indicator] = np.where(
                         result["dissatisfaction"] == 0,
                         0,
@@ -168,15 +115,12 @@ class NRPPlugin:
                             EPS
                         )
                     )
-
                 # --------------------------------------
                 # Squandering
                 # --------------------------------------
 
                 elif indicator == "squandering":
-
                     effort_max = result["effort"].max()
-
                     result[indicator] = (
                         effort_max
                         - result["effort"]
@@ -184,15 +128,11 @@ class NRPPlugin:
                         effort_max,
                         EPS
                     )
-
                 # --------------------------------------
                 # Scope
                 # --------------------------------------
-
                 elif indicator == "scope":
-
                     if len(req_cols) > 0:
-
                         result[indicator] = (
                             result[req_cols]
                             .sum(axis=1)
@@ -200,11 +140,9 @@ class NRPPlugin:
                         )
 
             except Exception as exc:
-
                 print(
                     f"[NRPPlugin] "
                     f"Unable to compute "
                     f"{indicator}: {exc}"
                 )
-
         return result
