@@ -19,22 +19,6 @@ def apply_framing(dataset):
         expanded=False
     ):
 
-        # ----------------------------------
-        # Reset framing
-        # ----------------------------------
-
-        if st.button(
-            "🔄 Reset Framing",
-            use_container_width=True
-        ):
-            framing_keys = [
-                k
-                for k in st.session_state.keys()
-                if k.startswith("framing_")
-            ]
-            for key in framing_keys:
-                del st.session_state[key]
-            st.rerun()
 
         # ----------------------------------
         # Dimension filters
@@ -93,12 +77,47 @@ def apply_framing(dataset):
             /
             max(total_solutions, 1)
         )
+#        st.progress(ratio)
+#        st.metric(
+#            "Remaining Solutions",
+#            f"{remaining_solutions}/{total_solutions}"
+#        )
+        
         st.progress(ratio)
-        st.metric(
-            "Remaining Solutions",
-            f"{remaining_solutions}/{total_solutions}"
+
+        st.markdown(
+            f"""
+            <div style="text-align:center">
+                <div style="font-size:0.9rem;color:gray;">
+                    Remaining Solutions
+                </div>
+                <div style="font-size:1.8rem;font-weight:bold;">
+                    {remaining_solutions}/{total_solutions}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
+
         st.caption(
-            f"{ratio:.0%} of the decision space remains visible."
+            f"{ratio:.0%} of the decision space is visible."
         )
+
+        # ----------------------------------
+        # Reset framing
+        # ----------------------------------
+
+        if st.button(
+            "🔄 Reset Framing",
+            use_container_width=True
+        ):
+            framing_keys = [
+                k
+                for k in st.session_state.keys()
+                if k.startswith("framing_")
+            ]
+            for key in framing_keys:
+                del st.session_state[key]
+            st.rerun()
+
     return filtered_df
