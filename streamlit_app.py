@@ -42,7 +42,6 @@ if dataset is None:
     st.info(
         "Select a domain configuration to begin."
     )
-
     st.stop()
 
 # ============================================
