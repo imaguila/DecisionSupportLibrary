@@ -11,7 +11,14 @@ def render_maps(
     dimensions,
     show_ids
 ):
+    if len(st.session_state.maps) == 0:
 
+        st.info(
+            "No decision maps have been created yet. "
+            "Use 'New Map' in the Visual Workspace panel."
+        )
+
+        return
     for idx in range(
         len(st.session_state.maps)
     ):
@@ -75,9 +82,7 @@ def render_maps(
                 z_options = [None] + [
 
                     d
-
                     for d in dimensions
-
                     if d not in [x, y]
 
                 ]

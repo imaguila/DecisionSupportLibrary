@@ -14,8 +14,8 @@ def render_workspace_controls(
             [0.50, 0.50]
         )
         if "maps" not in st.session_state:
-
             st.session_state.maps = []
+
         with col1:
             if st.button(
                 "🔄 Reset Maps",
