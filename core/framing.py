@@ -111,13 +111,8 @@ def apply_framing(dataset):
             "🔄 Reset Framing",
             use_container_width=True
         ):
-            framing_keys = [
-                k
-                for k in st.session_state.keys()
-                if k.startswith("framing_")
-            ]
-            for key in framing_keys:
-                del st.session_state[key]
+            for key in list(st.session_state.keys()):
+                if key.startswith("framing_"):
+                    del st.session_state[key]
             st.rerun()
-
     return filtered_df
