@@ -14,10 +14,6 @@ def apply_framing(dataset):
 
     filtered_df = df.copy()
 
-    st.sidebar.write(
-    "Original rows:",
-    len(df)
-)
 
     with st.sidebar.expander(
         "🎛️ Context Framing",
@@ -57,8 +53,12 @@ def apply_framing(dataset):
                 key=f"framing_{metric}"
             )
 
-            # Si el slider está abierto completamente,
-            # no aplicar ningún filtro.
+            st.sidebar.write(
+                metric,
+                min_v,
+                max_v,
+                selected_range
+            )
             if (
                 abs(selected_range[0] - min_v) < 1e-6
                 and
