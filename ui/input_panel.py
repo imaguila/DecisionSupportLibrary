@@ -163,17 +163,12 @@ def build_dataset(
     dataset = {
 
         "df": df,
-
         "config": cfg,
-
         "plugin": plugin,
-
         "metrics":
             selected_metrics,
-
         "selected_indicators":
             selected_indicators,
-
         "decision_variables":
             detect_decision_variables(
                 df,
@@ -220,36 +215,45 @@ def render_input_panel():
         # ==========================================
 
         if mode == "Domain Configuration":
-            dataset_names = list(
+            dataset_names = [
+                "-- Select a domain --"
+            ] + list(
                 CASES.keys()
             )
 
-            dataset_name = (
-                st.selectbox(
-                    "Domain Configuration",
-                    dataset_names,
-                    help=CASES[
-                        dataset_names[0]
-                    ].get(
-                        "help",
-                        "No information available."
-                    )
+            dataset_name = st.selectbox(
+                "Domain Configuration",
+                dataset_names,
+                help=(
+                    "Select a predefined domain package "
+                    "containing a Pareto front, objectives, "
+                    "indicators, and an optional enrichment plugin."
                 )
             )
+
+            # --------------------------------------------
+            # Nothing selected yet
+            # --------------------------------------------
+            if dataset_name == "-- Select a domain --":
+                st.info(
+                    "Select a domain configuration to continue."
+                )
+                return None
+
+            # --------------------------------------------
+            # Load selected configuration
+            # --------------------------------------------
 
             cfg = CASES[
                 dataset_name
             ]
-
             df = pd.read_csv(
                 cfg["path_sol"]
             )
-
             df.reset_index(
                 drop=True,
                 inplace=True
             )
-
             df["id"] = range(
                 len(df)
             )
@@ -257,7 +261,6 @@ def render_input_panel():
                 df,
                 cfg
             )
-
         # ==========================================
         # UPLOAD CSV
         # ==========================================
@@ -266,9 +269,7 @@ def render_input_panel():
             "Upload CSV",
             type=["csv"]
         )
-
         if uploaded_file:
-
             var_prefix = (
                 st.text_input(
                     "Decision-variable prefix",
@@ -281,7 +282,6 @@ def render_input_panel():
                     )
                 )
             )
-
             df = pd.read_csv(
                 uploaded_file
             )
@@ -289,7 +289,6 @@ def render_input_panel():
                 drop=True,
                 inplace=True
             )
-
             df["id"] = range(
                 len(df)
             )
@@ -302,10 +301,8 @@ def render_input_panel():
                 "default_indicators":
                     []
             }
-
             return build_dataset(
                 df,
                 cfg
             )
-
     return None
