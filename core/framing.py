@@ -50,12 +50,9 @@ def apply_framing(dataset):
                 min_v,
                 max_v,
                 (min_v, max_v),
-                key=(
-                    f"framing_"
-                    f"{metric}_"
-                    f"{st.session_state.framing_version}"
-                )
+                key=f"framing_{metric}"
             )
+
             filtered_df = filtered_df[
                 (
                     filtered_df[metric]
@@ -109,9 +106,13 @@ def apply_framing(dataset):
             "🔄 Reset Framing",
             use_container_width=True
         ):
+
             for key in list(st.session_state.keys()):
+
                 if key.startswith("framing_"):
+
                     del st.session_state[key]
+
             st.rerun()
 
     return filtered_df
