@@ -195,35 +195,39 @@ def render_input_panel():
 
     with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
         mode = st.radio(
-            "Source",
+            "Data Source",
             [
-                "Example Dataset",
+                "Domain Configuration",
                 "Upload Enriched CSV"
             ],
             horizontal=True,
-            help="Load precomputed Pareto fronts, including decision variables and objective functions values"
+            help="""Choose how the decision space will be loaded.
+                • Domain Configuration: Load a Pareto front together with domain-specific metadata
+                    (objectives, decision variables, indicators, and enrichment logic)
+                    through an associated plugin.
+                • Enriched Dataset: Load a standalone dataset where all relevant dimensions are
+                    already available. Numeric attributes not identified as
+                    decision variables will be considered analysis dimensions.
+            """
         )
-
-        if mode == "Example Dataset":
+        if mode == "Domain Configuration":
             st.caption("💡 *Load pre-configured sample datasets to test the tool quickly.*")
         else:
             st.caption("💡 *Upload your own custom CSV file containing Pareto fronts and requirements.*")
-
-
 
 
         # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
 
-        if mode == "Example Dataset":
+        if mode == "Domain Configuration":
             dataset_names = list(
                 CASES.keys()
             )
 
             dataset_name = (
                 st.selectbox(
-                    "Dataset",
+                    "Domain Configuration",
                     dataset_names,
                     help=CASES[
                         dataset_names[0]
