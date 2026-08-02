@@ -20,11 +20,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
-st.title("Decision Space Explorer")
-
-dataset = render_input_panel()
-
 from core.lenses import (
     render_lenses
 )
@@ -34,6 +29,8 @@ from core.lens_engine import (
 from core.enrichment import (
     render_enrichment
 )
+
+st.title("Decision Space Explorer")
 
 dataset = render_input_panel()
 
