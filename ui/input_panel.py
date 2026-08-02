@@ -190,9 +190,7 @@ def render_input_panel():
                 drop=True,
                 inplace=True
             )
-            df["id"] = range(
-                len(df)
-            )
+            df["id"] = range(1, len(df)+1)
             return build_dataset(
                 df,
                 cfg
