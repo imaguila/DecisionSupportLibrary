@@ -207,11 +207,11 @@ def render_input_panel():
         if mode == "Domain Configuration":
             st.caption(
                 " → Predefined domain package: " \
-                " Dataset + objectives + indicators + plugin"
+                " Dataset + objectives + config + plugin"
             )
         else:
             st.caption(
-                "→ Self-contained Pareto-front dataset:" \
+                "→ Self-contained Pareto-front: " \
                 " Standalone dataset + user-defined variable prefix."
             )
 

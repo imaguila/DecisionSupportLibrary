@@ -21,7 +21,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-
 st.title("Decision Space Explorer")
 
 dataset = render_input_panel()
@@ -38,7 +37,6 @@ if dataset is None:
     st.info(
         "Select a dataset to begin."
     )
-
     st.stop()
 
 filtered_df = apply_framing(dataset)
