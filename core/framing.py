@@ -45,14 +45,14 @@ def apply_framing(dataset):
             if min_v == max_v:
                 continue
 
-            col_name, col_range = st.columns([0.3, 0.7])
+            col_name, col_range = st.columns([0.5, 0.5])
 
             with col_name:
                 st.markdown(f"**{metric}**")
 
             with col_range:
                 st.markdown(
-                    f"`{min_v:.2f} - {max_v:.2f}`"
+                    f"`{min_v:.1f}-{max_v:.1f}`"
                 )
 
             selected_range = st.slider(
