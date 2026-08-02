@@ -193,14 +193,25 @@ def build_dataset(
 
 def render_input_panel():
 
-    with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
+    # 1. Creamos dos columnas: una para el desplegable y otra para el botón/icono de ayuda
+    col_expander, col_help = st.sidebar.columns([0.85, 0.15])
+
+    with col_expander:
+        expander = st.expander("🏷️ Input and Preparation", expanded=True)
+
+    with col_help:
+        # Espaciador para alinear verticalmente con el título
+        st.write("") 
+        st.help("Load precomputed Pareto fronts, including requirements and objective functions values.")
+
+    # 2. El contenido va dentro del expander como siempre
+    with expander:
         mode = st.radio(
             "Source",
             [
                 "Example Dataset",
                 "Upload Enriched CSV"
-            ],
-            help="Load precomputed Pareto fronts, including decision variables and objective functions values."
+            ]
         )
 
         # ==========================================
