@@ -39,7 +39,22 @@ def render_summary(
             f"Decision-variable prefix: "
             f"{dataset['config'].get('var_prefix')}"
         )
+        if st.button(
+            "🔄 Reset Exploration",
+            use_container_width=True
+        ):
 
+            keys_to_keep = []
+
+            for key in list(
+                st.session_state.keys()
+            ):
+
+                if key not in keys_to_keep:
+
+                    del st.session_state[key]
+
+            st.rerun()
         st.download_button(
             label="⬇️ Export Current Subset",
             data=df.to_csv(
