@@ -14,6 +14,11 @@ def apply_framing(dataset):
 
     filtered_df = df.copy()
 
+    st.sidebar.write(
+    "Original rows:",
+    len(df)
+)
+
     with st.sidebar.expander(
         "🎛️ Context Framing",
         expanded=False
