@@ -28,23 +28,18 @@ def apply_framing(dataset):
 
             if metric not in filtered_df.columns:
                 continue
-
             if not pd.api.types.is_numeric_dtype(
                 filtered_df[metric]
             ):
                 continue
-
             min_v = float(
                 df[metric].min()
             )
-
             max_v = float(
                 df[metric].max()
             )
-
             if min_v == max_v:
                 continue
-
             selected_range = st.slider(
                 metric,
                 min_v,
@@ -53,15 +48,17 @@ def apply_framing(dataset):
                 key=f"framing_{metric}"
             )
 
+            EPS = 1e-6
+
             filtered_df = filtered_df[
                 (
                     filtered_df[metric]
-                    >= selected_range[0]
+                    >= selected_range[0] - EPS
                 )
                 &
                 (
                     filtered_df[metric]
-                    <= selected_range[1]
+                    <= selected_range[1] + EPS
                 )
             ]
 
