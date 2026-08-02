@@ -201,23 +201,22 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ],
             horizontal=True,
-            help="""Choose how the decision space will be loaded.
-
-            • Domain Configuration: dataset + configuration + plugin.
-
-            • Enriched Dataset: self-contained dataset with no plugin
+            help="""💡Choose how the decision space will be loaded.
+            •Domain Configuration: dataset + configuration + plugin.
+            •Enriched Dataset: self-contained dataset with no plugin
             """
         )
         if mode == "Domain Configuration":
-
             st.caption(
-                "💡 Load a predefined domain setup including objectives, decision-variable definitions, "
-                "default indicators, and an optional enrichment plugin."
+                "💡 Load a predefined domain package including a Pareto front, "
+                "optimization objectives, decision-variable definitions, default indicators, "
+                "and an optional domain plugin for enrichment."
             )
         else:
             st.caption(
-                "💡 Upload a self-contained Pareto-front dataset. Numeric attributes that are not "
-                "identified as decision variables become available for analysis."
+                "💡 Upload a self-contained Pareto-front dataset. Decision variables are "
+                "identified using the specified prefix (e.g., req_, var_, x_). All remaining "
+                "numeric attributes become available as analysis dimensions."
             )
 
         # ==========================================
