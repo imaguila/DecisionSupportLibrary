@@ -48,6 +48,11 @@ if dataset is None:
 dataset = render_enrichment(
     dataset
 )
+# ============================================
+# INITIAL DECISION SPACE
+# ============================================
+
+filtered_df = dataset["df"]
 
 # ============================================
 # FRAMING
@@ -56,16 +61,6 @@ dataset = render_enrichment(
 filtered_df = apply_framing(
     dataset
 )
-
-# ============================================
-# WORKSPACE
-# ============================================
-
-render_workspace(
-    filtered_df,
-    dataset
-)
-
 
 # ============================================
 # LENSES
@@ -82,3 +77,11 @@ filtered_df = apply_lens(
     dataset
 )
 
+# ============================================
+# WORKSPACE
+# ============================================
+
+render_workspace(
+    filtered_df,
+    dataset
+)

@@ -107,15 +107,20 @@ def apply_framing(dataset):
         # Reset framing
         # ----------------------------------
 
-        if "framing_reset_counter" not in st.session_state:
-            st.session_state.framing_reset_counter = 0
-
         if st.button(
             "🔄 Reset Framing",
             use_container_width=True
         ):
 
-            st.session_state.framing_reset_counter += 1
+            for key in list(
+                st.session_state.keys()
+            ):
+
+                if key.startswith(
+                    "framing_"
+                ):
+
+                    del st.session_state[key]
 
             st.rerun()
     return filtered_df
