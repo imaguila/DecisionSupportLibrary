@@ -1,15 +1,12 @@
 from core.workspace_summary import (
     render_summary
 )
-
 from core.workspace_controls import (
     render_workspace_controls
 )
-
 from core.workspace_maps import (
     render_maps
 )
-
 from core.workspace_dataset import (
     render_dataset_preview
 )

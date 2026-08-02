@@ -41,18 +41,34 @@ if dataset is None:
     )
     st.stop()
 
+
 # ============================================
 # ENRICHMENT
 # ============================================
 
+
 dataset = render_enrichment(
     dataset
 )
+
+
 # ============================================
-# INITIAL DECISION SPACE
+# WORKSPACE
 # ============================================
 
-filtered_df = dataset["df"]
+from core.workspace_controls import (
+    render_workspace_controls
+)
+
+dimensions = (
+    dataset["metrics"]
+    +
+    dataset["selected_indicators"]
+)
+
+show_ids = render_workspace_controls(
+    dimensions
+)
 
 # ============================================
 # FRAMING
@@ -66,22 +82,7 @@ filtered_df = apply_framing(
 # LENSES
 # ============================================
 
+
 active_lens, lens_params = (
     render_lenses(dataset)
-)
-
-filtered_df = apply_lens(
-    filtered_df,
-    active_lens,
-    lens_params,
-    dataset
-)
-
-# ============================================
-# WORKSPACE
-# ============================================
-
-render_workspace(
-    filtered_df,
-    dataset
 )

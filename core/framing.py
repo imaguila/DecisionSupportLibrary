@@ -50,7 +50,11 @@ def apply_framing(dataset):
                 min_v,
                 max_v,
                 (min_v, max_v),
-                key=f"framing_{metric}"
+                key=(
+                    f"framing_"
+                    f"{metric}_"
+                    f"{st.session_state.framing_version}"
+                )
             )
             filtered_df = filtered_df[
                 (
@@ -67,7 +71,6 @@ def apply_framing(dataset):
         # ----------------------------------
         # Framing summary
         # ----------------------------------
-
         total_solutions = len(df)
         remaining_solutions = len(
             filtered_df
@@ -77,12 +80,7 @@ def apply_framing(dataset):
             /
             max(total_solutions, 1)
         )
-#        st.progress(ratio)
-#        st.metric(
-#            "Remaining Solutions",
-#            f"{remaining_solutions}/{total_solutions}"
-#        )
-        
+
         st.progress(ratio)
 
         st.markdown(
@@ -111,16 +109,7 @@ def apply_framing(dataset):
             "🔄 Reset Framing",
             use_container_width=True
         ):
-
-            for key in list(
-                st.session_state.keys()
-            ):
-
-                if key.startswith(
-                    "framing_"
-                ):
-
-                    del st.session_state[key]
-
+            st.session_state.framing_version += 1
             st.rerun()
+
     return filtered_df
