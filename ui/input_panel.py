@@ -193,20 +193,14 @@ def build_dataset(
 
 def render_input_panel():
 
-    # 1. El expander limpio
     with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
-        
-        # 2. Un popover discreto de ayuda justo al inicio
-        with st.popover("ℹ️ Info / Ayuda", use_container_width=True):
-            st.write("Load precomputed Pareto fronts, including requirements and objective functions values.")
-
-        # 3. El contenido
         mode = st.radio(
             "Source",
             [
                 "Example Dataset",
                 "Upload Enriched CSV"
-            ]
+            ],
+            help="Load precomputed Pareto fronts, including decision variables and objective functions values."
         )
         # ==========================================
         # BUILT-IN DATASETS
