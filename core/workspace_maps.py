@@ -32,7 +32,30 @@ def render_maps(
             f"🗺️ Decision-Space Map {idx + 1}",
             expanded=(idx == 0)
         ):
+            if len(dimensions) == 0:
 
+                st.warning(
+                    "No dimensions available."
+                )
+
+                continue
+
+            if len(dimensions) == 1:
+
+                st.info(
+                    f"Only one dimension is available: {dimensions[0]}"
+                )
+
+                with st.tabs(
+                    ["📈 Distribution"]
+                )render_distribution(
+                        df,
+                        metric=dimensions[0],
+                        mode="Violin",
+                        key=f"single_dimension_{idx}"
+                    )
+
+                continue
             # =====================================
             # AXIS SELECTION
             # =====================================
@@ -133,8 +156,8 @@ def render_maps(
 
             tab1, tab2, tab3 = st.tabs(
                 [
-                    "🗺️ Scatter Maps",
-                    "🫧 Bubble Map",
+                    "🗺️ Scatter",
+                    "🫧 Bubble",
                     "📈 Distribution"
                 ]
             )
@@ -187,24 +210,34 @@ def render_maps(
                     key=f"bubble_{idx}"
                 )
 
-                # -------------------------------------
-                # Distribution
-                # -------------------------------------
+            # -------------------------------------
+            # Distribution
+            # -------------------------------------
+            with tab3:
 
-                with tab3:
+                view_mode = st.radio(
+                    "View",
+                    [
+                        "Violin",
+                        "Box"
+                    ],
+                    horizontal=True,
+                    key=f"dist_mode_{idx}"
+                )
 
-                    distribution_metric = st.selectbox(
-                        "Dimension",
-                        dimensions,
-                        index=dimensions.index(x),
-                        key=f"distribution_{idx}"
-                    )
+                distribution_metric = st.selectbox(
+                    "Dimension",
+                    dimensions,
+                    index=dimensions.index(x),
+                    key=f"distribution_{idx}"
+                )
 
-                    render_distribution(
-                        df,
-                        metric=distribution_metric,
-                        key=f"dist_plot_{idx}"
-                    )
+                render_distribution(
+                    df,
+                    metric=distribution_metric,
+                    mode=view_mode,
+                    key=f"distribution_plot_{idx}"
+                )
 
 
             # =====================================

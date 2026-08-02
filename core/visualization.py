@@ -81,24 +81,35 @@ def render_coordinated_maps(
         )
 
 
-
 def render_distribution(
     df,
     metric,
+    mode="Violin",
     key=None
 ):
 
-    fig = px.histogram(
-        df,
-        x=metric,
-        marginal="box",
-        nbins=20,
-        template="plotly_white"
-    )
+    if mode == "Violin":
+
+        fig = px.violin(
+            df,
+            y=metric,
+            box=True,
+            points="all"
+        )
+
+    else:
+
+        fig = px.box(
+            df,
+            y=metric,
+            points="all"
+        )
 
     fig.update_layout(
-        height=500,
-        title=f"Distribution of {metric}"
+        title=f"Distribution of {metric}",
+        height=550,
+        showlegend=False,
+        template="plotly_white"
     )
 
     st.plotly_chart(
