@@ -42,7 +42,7 @@ def render_enrichment(
         )
 
         selected_indicators = st.multiselect(
-            "Indicators",
+            "Avalible candidates to enrich the solution.",
             sorted(
                 available_indicators
             ),
