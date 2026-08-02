@@ -31,20 +31,39 @@ from core.lenses import (
 from core.lens_engine import (
     apply_lens
 )
+from core.enrichment import (
+    render_enrichment
+)
+
+dataset = render_input_panel()
 
 if dataset is None:
 
     st.info(
-        "Select a dataset to begin."
+        "Select a domain configuration to begin."
     )
+
     st.stop()
 
-filtered_df = apply_framing(dataset)
+# ============================================
+# ENRICHMENT
+# ============================================
 
-render_workspace(
-    filtered_df,
+dataset = render_enrichment(
     dataset
 )
+
+# ============================================
+# FRAMING
+# ============================================
+
+filtered_df = apply_framing(
+    dataset
+)
+
+# ============================================
+# LENSES
+# ============================================
 
 active_lens, lens_params = (
     render_lenses(dataset)
@@ -54,5 +73,14 @@ filtered_df = apply_lens(
     filtered_df,
     active_lens,
     lens_params,
+    dataset
+)
+
+# ============================================
+# WORKSPACE
+# ============================================
+
+render_workspace(
+    filtered_df,
     dataset
 )

@@ -14,7 +14,6 @@ from core.workspace_dataset import (
     render_dataset_preview
 )
 
-
 def render_workspace(
     df,
     dataset

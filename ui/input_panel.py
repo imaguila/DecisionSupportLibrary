@@ -24,22 +24,27 @@ def detect_decision_variables(
         if c.startswith(prefix)
     ]
 
-
 def build_dataset(
     df,
     cfg
 ):
+
     plugin = None
+
     plugin_name = cfg.get(
         "plugin"
     )
+
     if plugin_name:
+
         plugin_class = (
             PLUGIN_REGISTRY.get(
                 plugin_name
             )
         )
+
         if plugin_class:
+
             plugin = plugin_class(
                 var_prefix=cfg.get(
                     "var_prefix",
@@ -56,8 +61,6 @@ def build_dataset(
         []
     )
 
-    # Auto-detect objectives for uploaded CSVs
-
     if not all_metrics:
         var_prefix = cfg.get(
             "var_prefix",
@@ -69,16 +72,12 @@ def build_dataset(
                 []
             )
         )
-
         all_metrics = []
-
         for col in df.columns:
-
             if col.startswith(
                 var_prefix
             ):
                 continue
-
             if col in excluded:
                 continue
             if col in [
@@ -95,75 +94,26 @@ def build_dataset(
             ):
                 all_metrics.append(col)
 
-    # =================================================
-    # OBJECTIVES
-    # =================================================
-
     selected_metrics = st.multiselect(
         "Optimization Objectives",
         all_metrics,
-        default=all_metrics,
-        help="💡 Detected objectives. Keep only those you want to analyze."
+        default=all_metrics
     )
 
-    # =================================================
-    # ENRICHMENT
-    # =================================================
-
-    selected_indicators = []
-    if plugin:
-        available_indicators = []
-        requirements = (
-            plugin.requirements()
-        )
-
-        for indicator, reqs in requirements.items():
-            if all(
-                metric in selected_metrics
-                for metric in reqs
-            ):
-                available_indicators.append(
-                    indicator
-                )
-        with st.sidebar.expander(
-            "⚙️ Data Enrichment",
-            expanded=False
-        ):
-            selected_indicators = (
-                st.multiselect(
-                    "Indicators",
-                    sorted(
-                        available_indicators
-                    ),
-                    default=[
-                        i
-                        for i in cfg.get(
-                            "default_indicators",
-                            []
-                        )
-                        if i in available_indicators
-                    ]
-                )
-            )
-
-        df = apply_enrichment(
-            df,
-            plugin,
-            selected_indicators
-        )
-
-    # =================================================
-    # DATASET OBJECT
-    # =================================================
-
     dataset = {
+
         "df": df,
+
         "config": cfg,
+
         "plugin": plugin,
+
         "metrics":
             selected_metrics,
+
         "selected_indicators":
-            selected_indicators,
+            [],
+
         "decision_variables":
             detect_decision_variables(
                 df,

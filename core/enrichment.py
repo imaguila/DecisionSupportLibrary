@@ -1,32 +1,83 @@
-"""
-Generic enrichment layer.
-
-Indicator computation is delegated
-to the active domain plugin.
-"""
-
-def detect_available_indicators(plugin):
-
-    if plugin is None:
-        return []
-    return sorted(
-        list(
-            plugin.available_indicators()
-        )
-    )
+import streamlit as st
 
 
-def apply_enrichment(
-    df,
-    plugin,
-    selected_indicators
+def render_enrichment(
+    dataset
 ):
 
+    plugin = dataset["plugin"]
+
     if plugin is None:
-        return df
-    if not selected_indicators:
-        return df
-    return plugin.compute_indicators(
-        df,
+
+        dataset["selected_indicators"] = []
+
+        return dataset
+
+    selected_metrics = dataset["metrics"]
+
+    available_indicators = []
+
+    requirements = (
+        plugin.requirements()
+    )
+
+    for indicator, reqs in requirements.items():
+
+        if all(
+            metric in selected_metrics
+            for metric in reqs
+        ):
+
+            available_indicators.append(
+                indicator
+            )
+
+    with st.sidebar.expander(
+        "⚙️ Data Enrichment",
+        expanded=False
+    ):
+
+        st.caption(
+            "💡 Derived indicators extend the decision space "
+            "with additional analysis dimensions computed "
+            "by the active domain plugin."
+        )
+
+        st.caption(
+            f"Detected "
+            f"{len(available_indicators)} "
+            f"compatible indicators."
+        )
+
+        selected_indicators = st.multiselect(
+            "Indicators",
+            sorted(
+                available_indicators
+            ),
+            default=[
+                i
+                for i in dataset["config"].get(
+                    "default_indicators",
+                    []
+                )
+                if i in available_indicators
+            ],
+            help="""
+Select derived indicators to enrich the current
+decision space.
+
+Only indicators compatible with the selected objectives
+and supported by the active plugin are available.
+"""
+        )
+
+    dataset["df"] = plugin.compute_indicators(
+        dataset["df"],
         selected_indicators
     )
+
+    dataset[
+        "selected_indicators"
+    ] = selected_indicators
+
+    return dataset
