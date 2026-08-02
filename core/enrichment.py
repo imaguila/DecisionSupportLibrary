@@ -38,15 +38,7 @@ def render_enrichment(
     ):
 
         st.caption(
-            "💡 Derived indicators extend the decision space "
-            "with additional analysis dimensions computed "
-            "by the active domain plugin."
-        )
-
-        st.caption(
-            f"Detected "
-            f"{len(available_indicators)} "
-            f"compatible indicators."
+            f"ℹ️ Detected {len(available_indicators)} indicators based on active plugin and config."
         )
 
         selected_indicators = st.multiselect(
@@ -62,9 +54,8 @@ def render_enrichment(
                 )
                 if i in available_indicators
             ],
-            help="""
-Select derived indicators to enrich the current
-decision space.
+            help=""" 💡Select  to enrich the current
+decision space. 
 
 Only indicators compatible with the selected objectives
 and supported by the active plugin are available.
