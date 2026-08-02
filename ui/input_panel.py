@@ -191,8 +191,7 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ],
             horizontal=True,
-            help="""💡Choose how the decision space is loaded.
-            """
+            help="💡Choose how the decision space is loaded."
         )
         if mode == "Domain Configuration":
             st.caption(
@@ -220,9 +219,9 @@ def render_input_panel():
                 "Domain Configuration",
                 dataset_names,
                 help=(
-                    "Select a predefined domain package "
+                    "💡Select a predefined domain package "
                     "containing a Pareto front, objectives, "
-                    "indicators, and an optional enrichment plugin."
+                    "indicators in config, and an optional enrichment plugin."
                 )
             )
 
@@ -239,7 +238,7 @@ def render_input_panel():
             # Load selected configuration
             # --------------------------------------------
 
-            cfg = CASES[
+            cfg = CASES[ 
                 dataset_name
             ]
             df = pd.read_csv(
