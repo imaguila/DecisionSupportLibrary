@@ -216,7 +216,7 @@ def render_input_panel():
 
         if mode == "Domain Configuration":
             dataset_names = [
-                "-- Select a domain --"
+                "-- No Data --"
             ] + list(
                 CASES.keys()
             )
@@ -234,9 +234,9 @@ def render_input_panel():
             # --------------------------------------------
             # Nothing selected yet
             # --------------------------------------------
-            if dataset_name == "-- Select a domain --":
+            if dataset_name == "-- No Data --":
                 st.info(
-                    "Select a domain configuration to continue."
+                    "Select data to continue."
                 )
                 return None
 

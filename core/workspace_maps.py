@@ -5,7 +5,6 @@ from core.visualization import (
     render_coordinated_maps
 )
 
-
 def render_maps(
     df,
     dataset,
@@ -16,7 +15,6 @@ def render_maps(
     for idx in range(
         len(st.session_state.maps)
     ):
-
         current_map = (
             st.session_state.maps[idx]
         )
