@@ -205,7 +205,6 @@ def render_input_panel():
         </style>
     """, unsafe_allow_html=True)
 
-    # 3. Ponemos el texto dentro del atributo title=''
     with st.sidebar.expander(
         f"🏷️ Input and Preparation <span class='help-icon' title='{help_text}'>❓</span>",
         expanded=True
