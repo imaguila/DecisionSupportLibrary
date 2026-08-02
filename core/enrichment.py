@@ -42,7 +42,7 @@ def render_enrichment(
         )
 
         selected_indicators = st.multiselect(
-            "Avalible candidates to enrich the solution.",
+            "Avalible candidates for enrichement",
             sorted(
                 available_indicators
             ),
@@ -55,9 +55,7 @@ def render_enrichment(
                 if i in available_indicators
             ],
             help=""" 💡Select  to enrich the current
-decision space. 
-
-Only indicators compatible with the selected objectives
+decision space.  Only indicators compatible with the selected objectives
 and supported by the active plugin are available.
 """
         )
