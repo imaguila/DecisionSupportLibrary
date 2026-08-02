@@ -1,7 +1,6 @@
 import plotly.express as px
 import streamlit as st
 
-
 def render_scatter(
     df,
     x,
@@ -15,10 +14,8 @@ def render_scatter(
     text_column = None
 
     if show_ids:
-
         if "id" in df.columns:
             text_column = "id"
-
         elif "ID" in df.columns:
             text_column = "ID"
 
@@ -57,9 +54,7 @@ def render_coordinated_maps(
 ):
 
     col1, col2 = st.columns(2)
-
     with col1:
-
         st.caption(
             f"{x} vs {y}"
         )
@@ -73,7 +68,6 @@ def render_coordinated_maps(
         )
 
     with col2:
-
         st.caption(
             f"{x} vs {z}"
         )
@@ -85,3 +79,30 @@ def render_coordinated_maps(
             show_ids=show_ids,
             key=f"{key_prefix}_right"
         )
+
+
+
+def render_distribution(
+    df,
+    metric,
+    key=None
+):
+
+    fig = px.histogram(
+        df,
+        x=metric,
+        marginal="box",
+        nbins=20,
+        template="plotly_white"
+    )
+
+    fig.update_layout(
+        height=500,
+        title=f"Distribution of {metric}"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        key=key
+    )

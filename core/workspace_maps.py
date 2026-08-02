@@ -2,8 +2,10 @@ import streamlit as st
 
 from core.visualization import (
     render_scatter,
-    render_coordinated_maps
+    render_coordinated_maps,
+    render_distribution
 )
+
 
 def render_maps(
     df,
@@ -129,10 +131,11 @@ def render_maps(
             # VISUALIZATION MODES
             # =====================================
 
-            tab1, tab2 = st.tabs(
+            tab1, tab2, tab3 = st.tabs(
                 [
-                    "📊 Coordinated Maps",
-                    "🫧 Bubble Map"
+                    "🗺️ Scatter Maps",
+                    "🫧 Bubble Map",
+                    "📈 Distribution"
                 ]
             )
 
@@ -183,6 +186,26 @@ def render_maps(
                     show_ids=show_ids,
                     key=f"bubble_{idx}"
                 )
+
+                # -------------------------------------
+                # Distribution
+                # -------------------------------------
+
+                with tab3:
+
+                    distribution_metric = st.selectbox(
+                        "Dimension",
+                        dimensions,
+                        index=dimensions.index(x),
+                        key=f"distribution_{idx}"
+                    )
+
+                    render_distribution(
+                        df,
+                        metric=distribution_metric,
+                        key=f"dist_plot_{idx}"
+                    )
+
 
             # =====================================
             # SAVE MAP STATE
