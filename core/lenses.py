@@ -28,6 +28,7 @@ def render_lenses(dataset):
                 "Efficiency",
                 "Domain-Specific"
             ]
+            label_visibility="collapsed"
         )
 
         # =====================================
