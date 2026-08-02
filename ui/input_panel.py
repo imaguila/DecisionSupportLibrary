@@ -193,19 +193,14 @@ def build_dataset(
 
 def render_input_panel():
 
-    # 1. Creamos dos columnas: una para el desplegable y otra para el botón/icono de ayuda
-    col_expander, col_help = st.sidebar.columns([0.85, 0.15])
+    # 1. El expander limpio
+    with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
+        
+        # 2. Un popover discreto de ayuda justo al inicio
+        with st.popover("ℹ️ Info / Ayuda", use_container_width=True):
+            st.write("Load precomputed Pareto fronts, including requirements and objective functions values.")
 
-    with col_expander:
-        expander = st.expander("🏷️ Input and Preparation", expanded=True)
-
-    with col_help:
-        # Espaciador para alinear verticalmente con el título
-        st.write("") 
-        st.help("Load precomputed Pareto fronts, including requirements and objective functions values.")
-
-    # 2. El contenido va dentro del expander como siempre
-    with expander:
+        # 3. El contenido
         mode = st.radio(
             "Source",
             [
@@ -213,7 +208,6 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ]
         )
-
         # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
