@@ -194,18 +194,15 @@ def build_dataset(
 def render_input_panel():
 
     with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
-        col_content, col_help = st.columns([0.90, 0.10])
-        with col_help:
-            st.help("Load precomputed Pareto fronts, including decision variables and objective functions values.")
-
-        with col_content:
-            mode = st.radio(
-                "Source",
-                [
-                    "Example Dataset",
-                    "Upload Enriched CSV"
-                ]
-            )
+        mode = st.radio(
+            "Source",
+            [
+                "Example Dataset",
+                "Upload Enriched CSV"
+            ],
+            # Esto coloca la '?' oficial de Streamlit justo a la derecha de la palabra "Source"
+            help="Load precomputed Pareto fronts, including requirements and objective functions values."
+        )
         # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
