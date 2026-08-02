@@ -55,9 +55,9 @@ def render_enrichment(
                 if i in available_indicators
             ],
             help=""" 💡Select  to enrich the current
-decision space.  Only indicators compatible with the selected objectives
-and supported by the active plugin are available.
-"""
+                    decision space.  Only indicators compatible with the selected objectives
+                    and supported by the active plugin are available.
+                """
         )
 
     dataset["df"] = plugin.compute_indicators(
