@@ -193,16 +193,31 @@ def build_dataset(
 
 def render_input_panel():
 
-    with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
+    help_text = "Load precomputed Pareto fronts, including decision variables and objective functions values."
+    st.sidebar.markdown("""
+        <style>
+        .help-icon {
+            float: right; cursor: help; font-size: 14px; opacity: 0.6;
+        }
+        .help-icon:hover {
+            opacity: 1;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    # 3. Ponemos el texto dentro del atributo title=''
+    with st.sidebar.expander(
+        f"🏷️ Input and Preparation <span class='help-icon' title='{help_text}'>❓</span>",
+        expanded=True
+    ):
         mode = st.radio(
             "Source",
             [
                 "Example Dataset",
                 "Upload Enriched CSV"
-            ],
-            help="Load precomputed Pareto fronts, including decision variables and objective functions values."
+            ]
         )
-        # ==========================================
+            # ==========================================
         # BUILT-IN DATASETS
         # ==========================================
 
