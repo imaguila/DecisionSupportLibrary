@@ -35,11 +35,11 @@ def render_workspace(
     if len(dimensions) < 2:
         return
 
-    show_ids = (
-        render_workspace_controls(
-            dimensions
-        )
-    )
+   # show_ids = (
+   #     render_workspace_controls(
+   #         dimensions
+   #     )
+   # )
 
     render_maps(
         df,
