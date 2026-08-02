@@ -47,9 +47,10 @@ def apply_framing(dataset):
 
             selected_range = st.slider(
                 metric,
-                min_v,
-                max_v,
-                (min_v, max_v),
+                min_value=min_v,
+                max_value=max_v,
+                value=(min_v, max_v),
+                step=(max_v - min_v) / 1000,
                 key=f"framing_{metric}"
             )
 
