@@ -112,6 +112,79 @@ lens_df = apply_lens( working_df, active_lens, lens_params, dataset
 )
 
 
+# ==================================================
+# LENS FEEDBACK
+# ==================================================
+
+if active_lens == "Diversity":
+
+    if (
+        "cluster"
+        in lens_df.columns
+    ):
+
+        n_clusters = (
+            lens_df["cluster"]
+            .dropna()
+            .astype(int)
+            .loc[
+                lambda s: s != -1
+            ]
+            .nunique()
+        )
+
+        n_noise = 0
+
+        if -1 in lens_df["cluster"].values:
+
+            n_noise = (
+                lens_df["cluster"]
+                .eq(-1)
+                .sum()
+            )
+
+        st.sidebar.info(
+            f"Clusters detected: {n_clusters}"
+        )
+
+        if n_noise > 0:
+
+            st.sidebar.caption(
+                f"Noise solutions: {n_noise}"
+            )
+
+    if (
+        "diversity_k"
+        in lens_df.columns
+    ):
+
+        k_value = (
+            lens_df["diversity_k"]
+            .dropna()
+            .iloc[0]
+        )
+
+        st.sidebar.success(
+            f"Selected k: {int(k_value)}"
+        )
+
+    if (
+        "diversity_silhouette"
+        in lens_df.columns
+    ):
+
+        silhouette_value = (
+            lens_df["diversity_silhouette"]
+            .dropna()
+            .iloc[0]
+        )
+
+        st.sidebar.caption(
+            f"Silhouette score: {silhouette_value:.3f}"
+        )
+
+
+
 if lens_df is None:
     st.sidebar.warning(
         "The selected lens returned no dataset. "
