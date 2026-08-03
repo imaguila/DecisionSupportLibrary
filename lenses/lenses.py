@@ -38,7 +38,7 @@ def render_lenses(dataset):
                     font-weight:bold;
                     margin-bottom:0.75rem;
                 ">
-                    ⭐ Active SOI: {active_lens}
+                    ⭐ Active lens: {active_lens}
                 </div>
                 """,
                 unsafe_allow_html=True
