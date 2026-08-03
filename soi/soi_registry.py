@@ -37,9 +37,6 @@ def render_soi_registry():
                     st.session_state[
                         "active_soi_name"
                     ] = soi["name"]
-                    st.session_state[
-                        "active_lens"
-                    ] = "None"
                     st.rerun()
 
             with col3:
