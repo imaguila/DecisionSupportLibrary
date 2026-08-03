@@ -10,6 +10,9 @@ from core.workspace_maps import (
 from core.workspace_dataset import (
     render_dataset_preview
 )
+from soi.soi_registry import (
+    render_soi_registry
+)
 
 def render_workspace(
     df,
@@ -35,19 +38,13 @@ def render_workspace(
     if len(dimensions) < 2:
         return
 
-   # show_ids = (
-   #     render_workspace_controls(
-   #         dimensions
-   #     )
-   # )
-
     render_maps(
         df,
         dataset,
         dimensions,
         show_ids
     )
-
+    render_soi_registry()
     render_dataset_preview(
         df,
         dataset

@@ -29,9 +29,7 @@ from lenses.lens_engine import (
 from core.enrichment import (
     render_enrichment
 )
-from soi.soi_registry import (
-    render_soi_registry
-)
+
 
 st.title("Decision Space Explorer")
 
