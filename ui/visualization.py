@@ -19,6 +19,18 @@ def render_scatter(
         elif "ID" in df.columns:
             text_column = "ID"
 
+    hover_cols = ["id", x, y]
+
+    if size is not None:
+        hover_cols.append(size)
+
+    if color is not None:
+        hover_cols.append(color)
+
+    hover_cols = list(
+        dict.fromkeys(hover_cols)
+    )
+
     fig = px.scatter(
         df,
         x=x,
@@ -26,7 +38,7 @@ def render_scatter(
         size=size,
         color=color,
         text=text_column,
-        hover_data=list(df.columns)
+        hover_data=hover_cols
     )
 
     fig.update_traces(

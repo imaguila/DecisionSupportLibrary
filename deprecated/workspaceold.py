@@ -1,6 +1,6 @@
 import streamlit as st
 
-from core.visualization import (
+from ui.visualization import (
     render_scatter,
     render_coordinated_maps
 )
