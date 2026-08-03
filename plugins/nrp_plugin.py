@@ -1,4 +1,5 @@
-# plugins/nrp_plugin.py
+## --------------------------------------------------------------------------------------
+## plugins/nrp_plugin.py
 
 import numpy as np
 
