@@ -109,77 +109,56 @@ active_lens, lens_params, lens_feedback = (  render_lenses( dataset, working_df 
 
 lens_df = apply_lens( working_df, active_lens, lens_params, dataset )
 
-
 # ==================================================
 # LENS FEEDBACK
 # ==================================================
 
-if active_lens == "Diversity":
+if lens_feedback is not None:
 
-    if (
-        "cluster"
-        in lens_df.columns
-    ):
+    with lens_feedback.container():
 
-        n_clusters = (
-            lens_df["cluster"]
-            .dropna()
-            .astype(int)
-            .loc[
-                lambda s: s != -1
-            ]
-            .nunique()
-        )
+        if active_lens == "Diversity":
 
-        n_noise = 0
+            if "cluster" in lens_df.columns:
 
-        if -1 in lens_df["cluster"].values:
+                n_clusters = (
+                    lens_df["cluster"]
+                    .dropna()
+                    .astype(int)
+                    .loc[
+                        lambda s: s != -1
+                    ]
+                    .nunique()
+                )
 
-            n_noise = (
-                lens_df["cluster"]
-                .eq(-1)
-                .sum()
-            )
+                st.info(
+                    f"Clusters detected: {n_clusters}"
+                )
 
-        st.sidebar.info(
-            f"Clusters detected: {n_clusters}"
-        )
+            if "diversity_k" in lens_df.columns:
 
-        if n_noise > 0:
+                k_value = (
+                    lens_df["diversity_k"]
+                    .dropna()
+                    .iloc[0]
+                )
 
-            st.sidebar.caption(
-                f"Noise solutions: {n_noise}"
-            )
+                st.success(
+                    f"Selected k: {int(k_value)}"
+                )
 
-    if (
-        "diversity_k"
-        in lens_df.columns
-    ):
+            if "diversity_silhouette" in lens_df.columns:
 
-        k_value = (
-            lens_df["diversity_k"]
-            .dropna()
-            .iloc[0]
-        )
+                silhouette_value = (
+                    lens_df["diversity_silhouette"]
+                    .dropna()
+                    .iloc[0]
+                )
 
-        st.sidebar.success(
-            f"Selected k: {int(k_value)}"
-        )
+                st.caption(
+                    f"Silhouette score: {silhouette_value:.3f}"
+                )
 
-    if (
-        "diversity_silhouette"
-        in lens_df.columns
-    ):
-
-        silhouette_value = (
-            lens_df["diversity_silhouette"]
-            .dropna()
-            .iloc[0]
-        )
-
-        st.sidebar.caption(
-            f"Silhouette score: {silhouette_value:.3f}"
-        )
 
 
 
