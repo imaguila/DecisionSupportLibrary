@@ -44,16 +44,13 @@ if dataset is None:
     )
     st.stop()
 
-
 # ============================================
 # ENRICHMENT
 # ============================================
 
-
 dataset = render_enrichment(
     dataset
 )
-
 
 # ============================================
 # WORKSPACE
@@ -68,7 +65,6 @@ dimensions = (
     +
     dataset["selected_indicators"]
 )
-
 show_ids = render_workspace_controls(
     dimensions
 )
@@ -85,7 +81,6 @@ filtered_df = apply_framing(
 # LENSES
 # ============================================
 
-
 active_lens, lens_params = (
     render_lenses(dataset)
 )
@@ -97,11 +92,26 @@ filtered_df = apply_lens(
     dataset
 )
 
-render_soi_registry(
-    active_lens,
-    filtered_df
-)
+if (
+    "pending_save_soi"
+    in st.session_state
+):
 
+    pending = (
+        st.session_state.pending_save_soi
+    )
+
+    st.session_state.saved_sois.append(
+        {
+            "name": pending["name"],
+            "lens": pending["lens"],
+            "ids": filtered_df["id"].tolist()
+        }
+    )
+
+    del st.session_state[
+        "pending_save_soi"
+    ]
 # ============================================
 # WORKSPACE
 # ============================================

@@ -1,76 +1,83 @@
 import streamlit as st
 
-
-def render_soi_registry(
-    active_lens,
-    soi_df
-):
-
+def render_soi_registry():
     if "saved_sois" not in st.session_state:
-
         st.session_state.saved_sois = []
-
-    if active_lens == "None":
-
-        return
-
-    st.markdown("---")
-
-    default_name = (
-        f"{active_lens} "
-        f"#{len(st.session_state.saved_sois)+1}"
-    )
-
-    soi_name = st.text_input(
-        "SOI Name",
-        value=default_name,
-        key="soi_name"
-    )
-
-    if st.button(
-        "💾 Save Current SOI",
-        use_container_width=True
+    active_ids = None
+    with st.expander(
+        "📚 Saved SOIs",
+        expanded=False
     ):
+        if not st.session_state.saved_sois:
+            st.info(
+                "No saved SOIs."
+            )
+            return None
 
-        existing = [
+        for idx, soi in enumerate(
+            st.session_state.saved_sois
+        ):
 
-            soi["name"]
-
-            for soi in st.session_state.saved_sois
-
-        ]
-
-        if soi_name in existing:
-
-            st.warning(
-                "A SOI with that name already exists."
+            col1, col2, col3 = st.columns(
+                [0.6, 0.2, 0.2]
             )
 
-        else:
+            with col1:
 
-            st.session_state.saved_sois.append(
+                st.caption(
+                    f"{soi['name']} "
+                    f"[{len(soi['ids'])}]"
+                )
 
-                {
-                    "name": soi_name,
-                    "lens": active_lens,
-                    "ids": soi_df["id"].tolist()
-                }
+            with col2:
 
-            )
+                if st.button(
+                    "Load",
+                    key=f"load_soi_{idx}"
+                ):
+
+                    active_ids = soi["ids"]
+
+                    st.session_state[
+                        "active_soi_ids"
+                    ] = active_ids
+
+                    st.rerun()
+
+            with col3:
+
+                if st.button(
+                    "🗑️",
+                    key=f"delete_soi_{idx}"
+                ):
+
+                    st.session_state.saved_sois.pop(
+                        idx
+                    )
+
+                    st.rerun()
+
+        if (
+            "active_soi_ids"
+            in st.session_state
+        ):
 
             st.success(
-                f"SOI '{soi_name}' saved."
+                f"Loaded SOI "
+                f"({len(st.session_state.active_soi_ids)} solutions)"
             )
 
-    if st.session_state.saved_sois:
+            if st.button(
+                "Clear Loaded SOI",
+                use_container_width=True
+            ):
 
-        st.markdown(
-            "##### Saved SOIs"
+                del st.session_state[
+                    "active_soi_ids"
+                ]
+
+                st.rerun()
+
+        return st.session_state.get(
+            "active_soi_ids"
         )
-
-        for soi in st.session_state.saved_sois:
-
-            st.caption(
-                f"• {soi['name']} "
-                f"({len(soi['ids'])})"
-            )
