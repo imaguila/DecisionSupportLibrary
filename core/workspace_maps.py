@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## workspace_maps.py
+
 import streamlit as st
 
 from ui.visualization import (
@@ -5,7 +8,6 @@ from ui.visualization import (
     render_coordinated_maps,
     render_distribution
 )
-
 
 def render_maps(
     df,

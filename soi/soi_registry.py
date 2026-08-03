@@ -1,3 +1,5 @@
+## soi_registry.py
+
 import streamlit as st
 
 def render_soi_registry():

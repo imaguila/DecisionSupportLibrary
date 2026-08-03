@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## streamlit_app.py
+
 import streamlit as st
 
 from ui.input_panel import render_input_panel

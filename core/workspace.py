@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## workspace.py
+
 from core.workspace_summary import (
     render_summary
 )

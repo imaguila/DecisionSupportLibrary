@@ -1,5 +1,7 @@
-import streamlit as st
+## --------------------------------------------------------------------------------------
+## workspace_summary.py
 
+import streamlit as st
 
 def render_summary(
     df,

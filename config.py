@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## config.py
+
 """
 Example configurations shipped with the framework.
 

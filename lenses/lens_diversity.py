@@ -1,5 +1,8 @@
-from sklearn.cluster import KMeans
+## --------------------------------------------------------------------------------------
+## lenses_diversity.py
 
+
+from sklearn.cluster import KMeans
 
 def apply_diversity_lens(
     df,

@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## lenses.py
+
 import streamlit as st
 
 def render_lenses(dataset):
@@ -64,8 +67,6 @@ def render_lenses(dataset):
                 "Metrics to Minimize",
                 dimensions
             )
-
-
 
             params["top_n"] = st.slider(
                 "Top N Solutions",

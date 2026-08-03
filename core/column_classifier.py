@@ -1,3 +1,6 @@
+## --------------------------------------------------------------------------------------
+## column_classifier.py
+
 import pandas as pd
 
 class ColumnClassifier:
