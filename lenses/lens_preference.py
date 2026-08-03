@@ -1,8 +1,9 @@
 ## --------------------------------------------------------------------------------------
-## lenses_preference.py
-
+## lens_preference.py
+## --------------------------------------------------------------------------------------
 
 import pandas as pd
+
 
 def apply_preference_lens(
     df,
@@ -12,60 +13,104 @@ def apply_preference_lens(
     top_n
 ):
 
-    criteria = maximize + minimize
+    result = df.copy()
+
+    # --------------------------------------------------
+    # Sanitize criteria
+    # --------------------------------------------------
+
+    maximize = [
+        m
+        for m in maximize
+        if m in result.columns
+    ]
+
+    minimize = [
+        m
+        for m in minimize
+        if (
+            m in result.columns
+            and m not in maximize
+        )
+    ]
+
+    criteria = (
+        maximize
+        +
+        minimize
+    )
 
     if not criteria:
 
-        return df
+        return result
 
-    df_temp = df.copy()
+    top_n = min(
+        top_n,
+        len(result)
+    )
 
-    # =====================================
+    # ==================================================
     # WEIGHTED SUM
-    # =====================================
+    # ==================================================
 
     if method == "Weighted Sum":
 
-        score = 0
+        score = pd.Series(
+            0.0,
+            index=result.index
+        )
 
         for metric in criteria:
 
-            mi = df_temp[metric].min()
-            ma = df_temp[metric].max()
+            mi = result[metric].min()
+            ma = result[metric].max()
 
             if ma > mi:
 
                 norm = (
-                    df_temp[metric] - mi
+                    result[metric]
+                    -
+                    mi
                 ) / (
-                    ma - mi
+                    ma
+                    -
+                    mi
                 )
 
             else:
 
-                norm = 0
+                norm = pd.Series(
+                    0.0,
+                    index=result.index
+                )
 
             if metric in maximize:
 
-                score += norm
+                score = score + norm
 
             else:
 
-                score -= norm
+                score = score + (
+                    1.0 - norm
+                )
 
-        df_temp["preference_score"] = score
+        result[
+            "preference_score"
+        ] = score
 
-        score_col = "preference_score"
-
-    # =====================================
+    # ==================================================
     # TOPSIS
-    # =====================================
+    # ==================================================
 
-    else:
+    elif method == "TOPSIS":
 
-        norm_df = df_temp[
+        norm_df = result[
             criteria
         ].copy()
+
+        # ----------------------------------------------
+        # Vector normalization
+        # ----------------------------------------------
 
         for metric in criteria:
 
@@ -80,6 +125,10 @@ def apply_preference_lens(
                     /
                     denom
                 )
+
+            else:
+
+                norm_df[metric] = 0.0
 
         ideal = {}
         anti_ideal = {}
@@ -109,34 +158,24 @@ def apply_preference_lens(
         d_plus = []
         d_minus = []
 
-        for i in range(
-            len(norm_df)
-        ):
-
-            row = norm_df.iloc[i]
+        for _, row in norm_df.iterrows():
 
             dp = sum(
-
                 (
-                    row[m]
+                    row[metric]
                     -
-                    ideal[m]
+                    ideal[metric]
                 ) ** 2
-
-                for m in criteria
-
+                for metric in criteria
             ) ** 0.5
 
             dm = sum(
-
                 (
-                    row[m]
+                    row[metric]
                     -
-                    anti_ideal[m]
+                    anti_ideal[metric]
                 ) ** 2
-
-                for m in criteria
-
+                for metric in criteria
             ) ** 0.5
 
             d_plus.append(
@@ -147,29 +186,26 @@ def apply_preference_lens(
                 dm
             )
 
-        df_temp[
+        result[
             "preference_score"
         ] = [
-
-            dm / (dp + dm)
-            if (dp + dm) != 0
-            else 0
+            (
+                dm / (dp + dm)
+                if (dp + dm) != 0
+                else 0.0
+            )
             for dp, dm in zip(
                 d_plus,
                 d_minus
             )
         ]
-        score_col = (
-            "preference_score"
-        )
 
-    result = (
-        df_temp
-        .sort_values(
-            score_col,
-            ascending=False
-        )
-        .head(top_n)
-    )
+    # ==================================================
+    # UNKNOWN METHOD
+    # ==================================================
 
-    return result
+    else:
+
+        return result
+
+    

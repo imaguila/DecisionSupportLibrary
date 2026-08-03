@@ -1,7 +1,9 @@
 ## --------------------------------------------------------------------------------------
 ## lenses.py
+## --------------------------------------------------------------------------------------
 
 import streamlit as st
+
 
 def render_lenses(
     dataset,
@@ -9,11 +11,19 @@ def render_lenses(
 ):
 
     dimensions = (
-        dataset["metrics"]  +  dataset["selected_indicators"]
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
+
+    indicators = (
+        dataset["selected_indicators"]
     )
 
     active_lens = "None"
+
     params = {}
+
     max_n = max(
         len(working_df),
         1
@@ -23,10 +33,12 @@ def render_lenses(
         5,
         max_n
     )
+
     with st.sidebar.expander(
         "🧭 Solution of interest",
         expanded=False
     ):
+
         active_lens = st.selectbox(
             "Select an analytical lens",
             [
@@ -38,6 +50,16 @@ def render_lenses(
             ],
             key="active_lens"
         )
+
+        if (
+            "active_soi_name"
+            in st.session_state
+        ):
+
+            st.caption(
+                f"Working on loaded SOI: "
+                f"{st.session_state.active_soi_name}"
+            )
 
         if active_lens != "None":
 
@@ -56,36 +78,46 @@ def render_lenses(
                 unsafe_allow_html=True
             )
 
-
         # =====================================
         # Preference Lens
         # =====================================
 
         if active_lens == "Preference":
+
             params["method"] = st.selectbox(
                 "Scoring Method",
                 [
                     "Weighted Sum",
                     "TOPSIS"
-                ]
+                ],
+                key="pref_method"
             )
+
             params["maximize"] = st.multiselect(
                 "Metrics to Maximize",
-                dimensions
+                dimensions,
+                key="pref_maximize"
             )
+
+            minimize_options = [
+                d
+                for d in dimensions
+                if d not in params["maximize"]
+            ]
 
             params["minimize"] = st.multiselect(
                 "Metrics to Minimize",
-                dimensions
+                minimize_options,
+                key="pref_minimize"
             )
 
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
                 max_n,
-                default_n
+                default_n,
+                key="pref_top_n"
             )
-            
 
         # =====================================
         # Diversity Lens
@@ -98,14 +130,16 @@ def render_lenses(
                 [
                     "K-Medoids",
                     "HDBSCAN"
-                ]
+                ],
+                key="div_method"
             )
 
             params["target_size"] = st.slider(
                 "Target Subset Size",
                 1,
-                100,
-                20
+                max_n,
+                default_n,
+                key="div_target_size"
             )
 
         # =====================================
@@ -116,38 +150,85 @@ def render_lenses(
 
             params["benefit"] = st.selectbox(
                 "Benefit Metric",
-                dimensions
+                dimensions,
+                key="eff_benefit"
             )
 
-            params["cost"] = st.selectbox(
-                "Cost Metric",
-                dimensions
-            )
+            cost_options = [
+                d
+                for d in dimensions
+                if d != params["benefit"]
+            ]
+
+            if len(cost_options) == 0:
+
+                st.warning(
+                    "At least two dimensions are required for the Efficiency lens."
+                )
+
+                params["cost"] = params["benefit"]
+
+            else:
+
+                params["cost"] = st.selectbox(
+                    "Cost Metric",
+                    cost_options,
+                    key="eff_cost"
+                )
 
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
                 max_n,
-                default_n
+                default_n,
+                key="eff_top_n"
             )
 
         # =====================================
-        # Domain Lens
+        # Domain-Specific Lens
         # =====================================
 
         elif active_lens == "Domain-Specific":
 
-            params["indicators"] = st.multiselect(
-                "Indicators",
-                dataset["selected_indicators"]
-            )
+            if len(indicators) == 0:
 
-            params["top_n"] = st.slider(
-                "Top N Solutions",
-                1,
-                max_n,
-                default_n
-            )
+                st.info(
+                    "No domain indicators are currently selected. "
+                    "Enable indicators in Data Enrichment first."
+                )
+
+                params["maximize"] = []
+                params["minimize"] = []
+                params["top_n"] = default_n
+
+            else:
+
+                params["maximize"] = st.multiselect(
+                    "Indicators to Maximize",
+                    indicators,
+                    key="domain_maximize"
+                )
+
+                minimize_options = [
+                    d
+                    for d in indicators
+                    if d not in params["maximize"]
+                ]
+
+                params["minimize"] = st.multiselect(
+                    "Indicators to Minimize",
+                    minimize_options,
+                    key="domain_minimize"
+                )
+
+                params["top_n"] = st.slider(
+                    "Top N Solutions",
+                    1,
+                    max_n,
+                    default_n,
+                    key="domain_top_n"
+                )
+
         # =====================================
         # SAVE SOI
         # =====================================
@@ -162,18 +243,33 @@ def render_lenses(
 
             default_name = (
                 f"{active_lens} "
-                f"#{len(st.session_state.saved_sois)+1}"
+                f"#{len(st.session_state.saved_sois) + 1}"
             )
+
+            if (
+                st.session_state.get(
+                    "soi_name_lens"
+                )
+                != active_lens
+            ):
+
+                st.session_state[
+                    "soi_name"
+                ] = default_name
+
+                st.session_state[
+                    "soi_name_lens"
+                ] = active_lens
 
             soi_name = st.text_input(
                 "Name",
-                value=default_name,
                 key="soi_name"
             )
 
             if st.button(
                 "💾 Save Current Set",
-                use_container_width=True
+                use_container_width=True,
+                key="save_current_soi"
             ):
 
                 st.session_state.pending_save_soi = {
@@ -181,4 +277,5 @@ def render_lenses(
                     "lens": active_lens,
                     "params": params
                 }
+
     return active_lens, params

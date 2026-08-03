@@ -1,7 +1,6 @@
 ## --------------------------------------------------------------------------------------
 ## streamlit_app.py
-
-
+## --------------------------------------------------------------------------------------
 
 import streamlit as st
 
@@ -88,15 +87,77 @@ show_ids = render_workspace_controls(
     dimensions
 )
 
+# ==================================================
+# FRAMING
+# ==================================================
+
+framed_df = apply_framing(
+    dataset
+)
+
+# ==================================================
+# WORKING DATASET
+# ==================================================
+# By default, the working dataset is the framed dataset.
+# If a saved SOI has been loaded, the working dataset
+# becomes that SOI.
+#
+# Any lens is applied on top of this working dataset.
+
+working_df = framed_df.copy()
+
+if "active_soi_ids" in st.session_state:
+
+    working_df = working_df[
+        working_df["id"].isin(
+            st.session_state.active_soi_ids
+        )
+    ].copy()
+
+# ==================================================
+# RESET LENS AFTER LOADING SOI
+# ==================================================
+# This runs before render_lenses(), because render_lenses()
+# creates the selectbox with key="active_lens".
+
+if st.session_state.get(
+    "pending_lens_reset",
+    False
+):
+
+    st.session_state[
+        "active_lens"
+    ] = "None"
+
+    st.session_state[
+        "pending_lens_reset"
+    ] = False
+
+# ==================================================
+# LENSES / SOI IDENTIFICATION
+# ==================================================
+
+active_lens, lens_params = (
+    render_lenses(
+        dataset,
+        working_df
+    )
+)
+
+lens_df = apply_lens(
+    working_df,
+    active_lens,
+    lens_params,
+    dataset
+)
 
 # ==================================================
 # SAVE CURRENT SOI
 # ==================================================
+# The saved SOI is always the current lens result.
+# If no lens is active, it will save the current working dataset.
 
-if (
-    "pending_save_soi"
-    in st.session_state
-):
+if "pending_save_soi" in st.session_state:
 
     if "saved_sois" not in st.session_state:
 
@@ -140,30 +201,11 @@ if (
     ]
 
 # ==================================================
-# LOADED SOI
-# ==================================================
-
-view_df = lens_df.copy()
-
-if (
-    active_lens == "None"
-    and
-    "active_soi_ids"
-    in st.session_state
-):
-
-    view_df = view_df[
-        view_df["id"].isin(
-            st.session_state.active_soi_ids
-        )
-    ]
-
-# ==================================================
 # WORKSPACE
 # ==================================================
 
 render_workspace(
-    view_df,
+    lens_df,
     dataset,
     show_ids
 )
