@@ -15,13 +15,13 @@ def render_lenses(dataset):
     ):
         st.markdown(
             "<span style='color: #0066CC; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-            "Lens"
+            "Analytical Lenses"
             "</span>", 
             unsafe_allow_html=True
         )
         active_lens = st.selectbox(
             "Analytical Lenses",
-            "", [
+            [
                 "None",
                 "Preference",
                 "Diversity",
