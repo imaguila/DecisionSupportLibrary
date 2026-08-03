@@ -1,6 +1,7 @@
 import plotly.express as px
 import streamlit as st
 
+
 def render_scatter(
     df,
     x,
@@ -14,22 +15,26 @@ def render_scatter(
     text_column = None
 
     if show_ids:
+
         if "id" in df.columns:
             text_column = "id"
+
         elif "ID" in df.columns:
             text_column = "ID"
 
-    hover_cols = ["id", x, y]
+    hover_cols = [
 
-    if size is not None:
-        hover_cols.append(size)
+        c
 
-    if color is not None:
-        hover_cols.append(color)
+        for c in df.columns
 
-    hover_cols = list(
-        dict.fromkeys(hover_cols)
-    )
+        if not (
+            c.startswith("req_")
+            or c.startswith("var_")
+            or c.startswith("x_")
+        )
+
+    ]
 
     fig = px.scatter(
         df,
@@ -66,7 +71,9 @@ def render_coordinated_maps(
 ):
 
     col1, col2 = st.columns(2)
+
     with col1:
+
         st.caption(
             f"{x} vs {y}"
         )
@@ -80,6 +87,7 @@ def render_coordinated_maps(
         )
 
     with col2:
+
         st.caption(
             f"{x} vs {z}"
         )
