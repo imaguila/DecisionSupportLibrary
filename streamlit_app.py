@@ -131,12 +131,11 @@ if lens_feedback is not None:
                     .nunique()
                 )
 
-                st.info(
-                    f"Clusters detected: {n_clusters}"
+                st.caption(
+                    f"Clusters Used: {n_clusters}"
                 )
 
                 if "diversity_k" in lens_df.columns:
-
                     k_value = (
                         lens_df["diversity_k"]
                         .dropna()
@@ -152,7 +151,7 @@ if lens_feedback is not None:
                     )
 
                     st.caption(
-                        f"Silhouette score: {silhouette_value:.3f}"
+                        f"Cluster Detected:{n_clusters}, Silhouette score: {silhouette_value:.3f}"
                     )
 
 
