@@ -425,5 +425,5 @@ def render_lenses(
 
         lens_feedback = st.empty()
 
-    return active_lens, params
+    return active_lens, params, lens_feedback
             
