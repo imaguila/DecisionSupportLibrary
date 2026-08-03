@@ -131,7 +131,7 @@ if lens_feedback is not None:
                     .nunique()
                 )
 
-                st.caption(
+                st.info(
                     f"Clusters Used: {n_clusters}"
                 )
 
@@ -151,7 +151,7 @@ if lens_feedback is not None:
                     )
 
                     st.caption(
-                        f"Cluster Detected:{n_clusters}, Silhouette score: {silhouette_value:.3f}"
+                        f" Silhouette score: {silhouette_value:.3f}, Cluster Detected: {n_clusters},"
                     )
 
 
