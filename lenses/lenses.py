@@ -370,3 +370,54 @@ def render_lenses(
                     "Indicator Dominance identifies solutions that repeatedly "
                     "appear among the best candidates for selected indicators."
                 )
+        # =====================================
+        # Save SOI
+        # =====================================
+
+        if "saved_sois" not in st.session_state:
+
+            st.session_state.saved_sois = []
+
+        if active_lens != "None":
+
+            st.markdown("---")
+
+            default_name = (
+                f"{active_lens} "
+                f"#{len(st.session_state.saved_sois) + 1}"
+            )
+
+            if (
+                st.session_state.get(
+                    "soi_name_lens"
+                )
+                != active_lens
+            ):
+
+                st.session_state[
+                    "soi_name"
+                ] = default_name
+
+                st.session_state[
+                    "soi_name_lens"
+                ] = active_lens
+
+            soi_name = st.text_input(
+                "Name",
+                key="soi_name"
+            )
+
+            if st.button(
+                "💾 Save Current Set",
+                use_container_width=True,
+                key="save_current_soi"
+            ):
+
+                st.session_state.pending_save_soi = {
+                    "name": soi_name,
+                    "lens": active_lens,
+                    "params": params
+                }
+
+    return active_lens, params
+            
