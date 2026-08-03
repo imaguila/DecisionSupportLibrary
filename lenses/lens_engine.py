@@ -88,6 +88,7 @@ def apply_lens( df, lens_name, params, dataset ):
     # ==================================================
     # Diversity Lens
     # ==================================================
+    
 
     if lens_name == "Diversity":
 
@@ -100,13 +101,7 @@ def apply_lens( df, lens_name, params, dataset ):
         return apply_diversity_lens(
             df,
             dimensions,
-            params.get(
-                "target_size",
-                min(
-                    5,
-                    len(df)
-                )
-            )
+            params
         )
 
     return df.copy()
