@@ -88,10 +88,16 @@ def render_lenses(
                 "Scoring Method",
                 [
                     "Weighted Sum",
-                    "TOPSIS"
+                    "TOPSIS",
+                    "VIKOR",
+                    "Reference Point"
                 ],
                 key="pref_method"
             )
+
+            st.caption(
+                "All preference methods currently use equal weights."
+            )            
 
             params["maximize"] = st.multiselect(
                 "Metrics to Maximize",
