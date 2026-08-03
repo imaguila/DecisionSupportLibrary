@@ -151,6 +151,17 @@ lens_df = apply_lens(
     dataset
 )
 
+
+if lens_df is None:
+
+    st.sidebar.warning(
+        "The selected lens returned no dataset. "
+        "Reverting to the current working dataset."
+    )
+
+    lens_df = working_df.copy()
+
+
 # ==================================================
 # SAVE CURRENT SOI
 # ==================================================
