@@ -3,74 +3,56 @@
 ## --------------------------------------------------------------------------------------
 
 from lenses.lens_preference import (
-    apply_preference_lens
-)
+    apply_preference_lens )
 
 from lenses.lens_diversity import (
-    apply_diversity_lens
-)
+    apply_diversity_lens )
 
 from lenses.lens_efficiency import (
-    apply_efficiency_lens
-)
+    apply_efficiency_lens )
 
 from lenses.lens_domain import (
-    apply_domain_lens
-)
+    apply_domain_lens )
 
 
-def apply_lens(
-    df,
-    lens_name,
-    params,
-    dataset
-):
+def apply_lens( df, lens_name, params, dataset ):
 
     if df is None:
-
         return df
 
     if lens_name == "None":
-
         return df.copy()
+
+    # ==================================================
+    # Preference Lens
+    # ==================================================
 
     if lens_name == "Preference":
 
-        return apply_preference_lens(
-            df,
-            params.get(
-                "method",
-                "Weighted Sum"
-            ),
-            params.get(
-                "maximize",
-                []
-            ),
-            params.get(
-                "minimize",
-                []
-            ),
-            params.get(
-                "top_n",
-                len(df)
-            )
+        return apply_preference_lens( df,
+            params.get( "method", "Weighted Sum"),
+            params.get( "maximize", [] ),
+            params.get( "minimize", [] ),
+            params.get(  "top_n",  len(df) )
         )
+
+    # ==================================================
+    # Efficiency Lens
+    # ==================================================
 
     if lens_name == "Efficiency":
 
         return apply_efficiency_lens(
             df,
-            params.get(
-                "benefit"
-            ),
-            params.get(
-                "cost"
-            ),
-            params.get(
-                "top_n",
-                len(df)
-            )
+            params.get( "method", "Benefit/Cost Ratio" ),
+            params.get( "benefit" ),
+            params.get( "cost" ),
+            params.get( "top_n", len(df) )
         )
+
+    # ==================================================
+    # Indicator Dominance / Domain-Specific Lens
+    # ==================================================
 
     if lens_name == "Domain-Specific":
 
@@ -89,6 +71,10 @@ def apply_lens(
                 len(df)
             )
         )
+
+    # ==================================================
+    # Diversity Lens
+    # ==================================================
 
     if lens_name == "Diversity":
 
