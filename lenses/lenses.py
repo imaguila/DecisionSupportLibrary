@@ -36,7 +36,7 @@ def render_lenses(dataset):
                     text-align:center;
                     margin:0.3rem 0 0.8rem 0;
                 ">
-                ───── {active_lens} ─────
+                ───── {active_lens} lens ─────
                 </div>
                 """,
                 unsafe_allow_html=True
