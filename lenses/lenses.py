@@ -13,14 +13,14 @@ def render_lenses(dataset):
         "🧭 Solution of interest",
         expanded=False
     ):
-        st.markdown(
-            "<span style='color: #0066CC; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-            "Analytical Lens selected:"
-            "</span>", 
-            unsafe_allow_html=True
-        )
+        #st.markdown(
+        #    "<span style='color: #0066CC; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
+        #    "Analytical Lens selected:"
+        #    "</span>", 
+        #    unsafe_allow_html=True
+        #)
         active_lens = st.selectbox(
-            "Analytical Lenses",
+            "Analytical Lens Selected",
             [
                 "None",
                 "Preference",
@@ -28,7 +28,7 @@ def render_lenses(dataset):
                 "Efficiency",
                 "Domain-Specific"
             ],
-            label_visibility="collapsed"
+            #label_visibility="collapsed"
         )
 
         # =====================================
