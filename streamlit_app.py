@@ -88,44 +88,6 @@ show_ids = render_workspace_controls(
     dimensions
 )
 
-# ==================================================
-# FRAMING
-# ==================================================
-
-framed_df = apply_framing(
-    dataset
-)
-
-# ==================================================
-# LENSES / SOI IDENTIFICATION
-# ==================================================
-
-active_lens, lens_params = (
-    render_lenses(dataset)
-)
-
-# If a new analytical lens is selected, any loaded SOI
-# is cleared to avoid combining two modes implicitly.
-if active_lens != "None":
-
-    if "active_soi_ids" in st.session_state:
-
-        del st.session_state[
-            "active_soi_ids"
-        ]
-
-    if "active_soi_name" in st.session_state:
-
-        del st.session_state[
-            "active_soi_name"
-        ]
-
-lens_df = apply_lens(
-    framed_df,
-    active_lens,
-    lens_params,
-    dataset
-)
 
 # ==================================================
 # SAVE CURRENT SOI

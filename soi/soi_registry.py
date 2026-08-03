@@ -34,6 +34,7 @@ def render_soi_registry():
                 f"({len(st.session_state.active_soi_ids)} solutions)"
             )
 
+
             if st.button(
                 "Clear Loaded SOI",
                 use_container_width=True,
@@ -88,7 +89,12 @@ def render_soi_registry():
                         "active_soi_name"
                     ] = soi["name"]
 
+                    st.session_state[
+                        "pending_lens_reset"
+                    ] = True
+
                     st.rerun()
+
 
             with col3:
 

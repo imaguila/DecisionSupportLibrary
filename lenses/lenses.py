@@ -3,7 +3,10 @@
 
 import streamlit as st
 
-def render_lenses(dataset):
+def render_lenses(
+    dataset,
+    working_df
+):
 
     dimensions = (
         dataset["metrics"]  +  dataset["selected_indicators"]
@@ -11,7 +14,15 @@ def render_lenses(dataset):
 
     active_lens = "None"
     params = {}
+    max_n = max(
+        len(working_df),
+        1
+    )
 
+    default_n = min(
+        5,
+        max_n
+    )
     with st.sidebar.expander(
         "🧭 Solution of interest",
         expanded=False
@@ -71,9 +82,10 @@ def render_lenses(dataset):
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
-                len(dataset["df"]),
-                min(5, len(dataset["df"]))
+                max_n,
+                default_n
             )
+            
 
         # =====================================
         # Diversity Lens
@@ -115,8 +127,8 @@ def render_lenses(dataset):
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
-                100,
-                20
+                max_n,
+                default_n
             )
 
         # =====================================
@@ -133,8 +145,8 @@ def render_lenses(dataset):
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
-                100,
-                20
+                max_n,
+                default_n
             )
         # =====================================
         # SAVE SOI
