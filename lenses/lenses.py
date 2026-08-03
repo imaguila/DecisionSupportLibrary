@@ -15,7 +15,7 @@ def render_lenses(dataset):
     ):
         st.markdown(
             "<span style='color: #0066CC; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-            "Analytical Lenses"
+            "Analytical Lens selected:"
             "</span>", 
             unsafe_allow_html=True
         )
@@ -36,12 +36,12 @@ def render_lenses(dataset):
         # =====================================
 
         if active_lens == "Preference":
-            st.markdown(
-                "<span style='color: #E63946; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-                " Scoring Method"
-                "</span>", 
-                unsafe_allow_html=True
-            )
+           # st.markdown(
+           #     "<span style='color: #E63946; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
+           #     " Scoring Method"
+           #     "</span>", 
+           #     unsafe_allow_html=True
+           # )
             params["method"] = st.selectbox(
                 "Scoring Method",
                 [
