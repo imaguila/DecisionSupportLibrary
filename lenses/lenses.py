@@ -10,7 +10,7 @@ def render_lenses(dataset):
     params = {}
 
     with st.sidebar.expander(
-        "🧭 Analytical Lenses",
+        "🧭 Solution of interest",
         expanded=False
     ):
         st.markdown(
@@ -20,7 +20,7 @@ def render_lenses(dataset):
             unsafe_allow_html=True
         )
         active_lens = st.selectbox(
-            #"Lens",
+            "Analytical Lenses",
             "", [
                 "None",
                 "Preference",

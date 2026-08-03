@@ -20,10 +20,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-from core.lenses import (
+from lenses.lenses import (
     render_lenses
 )
-from core.lens_engine import (
+from lenses.lens_engine import (
     apply_lens
 )
 from core.enrichment import (

@@ -1,16 +1,16 @@
-from core.lens_preference import (
+from lenses.lens_preference import (
     apply_preference_lens
 )
 
-from core.lens_diversity import (
+from lenses.lens_diversity import (
     apply_diversity_lens
 )
 
-from core.lens_efficiency import (
+from lenses.lens_efficiency import (
     apply_efficiency_lens
 )
 
-from core.lens_domain import (
+from lenses.lens_domain import (
     apply_domain_lens
 )
 
