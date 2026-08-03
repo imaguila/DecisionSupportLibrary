@@ -11,120 +11,60 @@ from plugins import PLUGIN_REGISTRY
 # HELPERS
 # =====================================================
 
-def detect_decision_variables(
-    df,
-    prefix
-):
-    return [
-        c
-        for c in df.columns
-        if c.startswith(prefix)
-    ]
+def detect_decision_variables( df, prefix ):
+    return [ c for c in df.columns if c.startswith(prefix) ]
 
-def build_dataset(
-    df,
-    cfg
-):
-
+def build_dataset( df, cfg ):
     plugin = None
-
-    plugin_name = cfg.get(
-        "plugin"
-    )
+    plugin_name = cfg.get( "plugin")
 
     if plugin_name:
-
         plugin_class = (
-            PLUGIN_REGISTRY.get(
-                plugin_name
-            )
+            PLUGIN_REGISTRY.get( plugin_name )
         )
-
         if plugin_class:
-
-            plugin = plugin_class(
-                var_prefix=cfg.get(
-                    "var_prefix",
-                    "x_"
-                )
-            )
+            plugin = plugin_class(  var_prefix=cfg.get( "var_prefix", "x_" ) )
 
     # =================================================
     # OBJECTIVES
     # =================================================
 
-    all_metrics = cfg.get(
-        "metrics",
-        []
-    )
+    all_metrics = cfg.get( "metrics", [] )
 
     if not all_metrics:
-        var_prefix = cfg.get(
-            "var_prefix",
-            "x_"
-        )
-        excluded = set(
-            cfg.get(
-                "exclude_cols",
-                []
-            )
-        )
+        var_prefix = cfg.get( "var_prefix", "x_" )
+        excluded = set( cfg.get( "exclude_cols", [] ))
         all_metrics = []
         for col in df.columns:
-            if col.startswith(
-                var_prefix
-            ):
+            if col.startswith( var_prefix ):
                 continue
             if col in excluded:
                 continue
-            if col in [
-                "id",
-                "highlight",
-                "label",
-                "cluster",
-                "score"
-            ]:
+            if col in [ "id", "highlight",
+                "label", "cluster",  "score"]:
                 continue
-
             if pd.api.types.is_numeric_dtype(
                 df[col]
             ):
                 all_metrics.append(col)
 
-    selected_metrics = st.multiselect(
-        "Optimization Objectives",
-        all_metrics,
-        default=all_metrics
-    )
+    selected_metrics = st.multiselect( "Optimization Objectives",
+        all_metrics, default=all_metrics )
 
-    dataset = {
-
-        "df": df,
-        "config": cfg,
-        "plugin": plugin,
-        "metrics":
-            selected_metrics,
-        "selected_indicators":
-            [],
-        "decision_variables":
+    dataset = { "df": df, "config": cfg, "plugin": plugin,
+        "metrics": selected_metrics, "selected_indicators":
+        [], "decision_variables":
             detect_decision_variables(
-                df,
-                cfg.get(
-                    "var_prefix",
-                    "x_"
-                )
+                df, cfg.get( "var_prefix", "x_")
             )
     }
-
     return dataset
-
 
 # =====================================================
 # MAIN PANEL
 # =====================================================
 
 def render_input_panel():
-
     with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
         mode = st.radio(
             "Data Source",
@@ -153,9 +93,7 @@ def render_input_panel():
         if mode == "Domain Configuration":
             dataset_names = [
                 "-- No Data --"
-            ] + list(
-                CASES.keys()
-            )
+            ] + list( CASES.keys() )
 
             dataset_name = st.selectbox(
                 "Domain Configuration",
@@ -171,37 +109,25 @@ def render_input_panel():
             # Nothing selected yet
             # --------------------------------------------
             if dataset_name == "-- No Data --":
-                st.info(
-                    "Select data to continue."
-                )
+                st.info( "Select data to continue." )
                 return None
 
             # --------------------------------------------
             # Load selected configuration
             # --------------------------------------------
 
-            cfg = CASES[ 
-                dataset_name
-            ]
-            df = pd.read_csv(
-                cfg["path_sol"]
-            )
-            df.reset_index(
-                drop=True,
-                inplace=True
-            )
+            cfg = CASES[ dataset_name ]
+            df = pd.read_csv(  cfg["path_sol"] )
+            df.reset_index( drop=True, inplace=True )
             df["id"] = range(1, len(df)+1)
-            return build_dataset(
-                df,
-                cfg
-            )
+            return build_dataset( df,  cfg )
+
         # ==========================================
         # UPLOAD CSV
         # ==========================================
 
         uploaded_file = st.file_uploader(
-            "Upload CSV",
-            type=["csv"]
+            "Upload CSV",  type=["csv"]
         )
         if uploaded_file:
             var_prefix = (
@@ -217,10 +143,7 @@ def render_input_panel():
                 )
             )
             df = pd.read_csv( uploaded_file )
-            df.reset_index(
-                drop=True,
-                inplace=True
-            )
+            df.reset_index( drop=True, inplace=True )
             df["id"] = range(1, len(df)+1)
             cfg = {
                 "plugin": None,
@@ -231,8 +154,5 @@ def render_input_panel():
                 "default_indicators":
                     []
             }
-            return build_dataset(
-                df,
-                cfg
-            )
+            return build_dataset( df, cfg )
     return None

@@ -4,45 +4,22 @@
 
 import pandas as pd
 
-
 def _sanitize_criteria(  df, maximize, minimize ) :
-    maximize = [
-        m
-        for m in maximize
-        if m in df.columns
-    ]
-    minimize = [
-        m
-        for m in minimize
-        if (m in df.columns
-            and m not in maximize
-        )
-    ]
-    criteria = ( maximize + minimize)
+    maximize = [ m for m in maximize if m in df.columns ]
+    minimize = [ m for m in minimize if (m in df.columns and m not in maximize) ]
+    criteria = ( maximize + minimize )
 
     return maximize, minimize, criteria
 
 def _minmax_normalize( df, criteria ) :
 
-    norm = pd.DataFrame(
-        index=df.index
-    )
-
+    norm = pd.DataFrame( index=df.index )
     for metric in criteria:
-
         min_v = df[metric].min()
         max_v = df[metric].max()
-
         if max_v > min_v:
-            norm[metric] = (
-                df[metric]
-                -
-                min_v
-            ) / (
-                max_v
-                -
-                min_v
-            )
+            norm[metric] = ( df[metric] - min_v 
+            )  / ( max_v  - min_v )
         else:
             norm[metric] = 0.0
     return norm
@@ -50,10 +27,7 @@ def _minmax_normalize( df, criteria ) :
 def _weighted_sum( df, maximize, minimize) :
 
     criteria =  ( maximize + minimize )
-    norm = _minmax_normalize(
-        df,
-        criteria
-    )
+    norm = _minmax_normalize( df, criteria )
 
     score = pd.Series(
         0.0,

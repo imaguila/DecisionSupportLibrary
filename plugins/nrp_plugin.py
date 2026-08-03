@@ -61,17 +61,11 @@ class NRPPlugin:
                 "effort"
             ],
         }
-
     # --------------------------------------------------
     # Indicator computation
     # --------------------------------------------------
 
-    def compute_indicators(
-        self,
-        df,
-        selected_indicators
-    ):
-
+    def compute_indicators( self, df, selected_indicators ):
         result = df.copy()
         req_cols = self.decision_variables(result)
         for indicator in selected_indicators:
@@ -80,7 +74,7 @@ class NRPPlugin:
                 # Productivity
                 # --------------------------------------
                 if indicator == "productivity":
-                    result[indicator] = (
+                    result[indicator] = ( 
                         result["satisfaction"]
                         / np.maximum(
                             result["effort"],
@@ -116,7 +110,6 @@ class NRPPlugin:
                 # --------------------------------------
                 # Squandering
                 # --------------------------------------
-
                 elif indicator == "squandering":
                     effort_max = result["effort"].max()
                     result[indicator] = (
@@ -136,7 +129,6 @@ class NRPPlugin:
                             .sum(axis=1)
                             / len(req_cols)
                         )
-
             except Exception as exc:
                 print(
                     f"[NRPPlugin] "

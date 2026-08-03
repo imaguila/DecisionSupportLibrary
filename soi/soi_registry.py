@@ -90,9 +90,7 @@ def render_soi_registry():
                     deleted_name = (
                         st.session_state.saved_sois[idx]["name"]
                     )
-                    st.session_state.saved_sois.pop(
-                        idx
-                    )
+                    st.session_state.saved_sois.pop( idx )
                     if (
                         st.session_state.get(
                             "active_soi_name"
