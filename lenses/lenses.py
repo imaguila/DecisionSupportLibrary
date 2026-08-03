@@ -111,7 +111,6 @@ def render_lenses( dataset,  working_df ):
         # =====================================
         # Diversity Lens
         # =====================================
-
         elif active_lens == "Diversity":
 
             params["method"] = st.selectbox(
@@ -123,14 +122,111 @@ def render_lenses( dataset,  working_df ):
                 key="div_method"
             )
 
-            params["target_size"] = st.slider(
-                "Target Subset Size",
-                1,
-                max_n,
-                default_n,
-                key="div_target_size"
+            params["cluster_metrics"] = st.multiselect(
+                "Metrics for Clustering",
+                dimensions,
+                default=dimensions[
+                    :min(
+                        2,
+                        len(dimensions)
+                    )
+                ],
+                key="div_cluster_metrics"
             )
 
+            if params["method"] == "K-Medoids":
+
+                params["k_mode"] = st.radio(
+                    "Number of Clusters",
+                    [
+                        "Auto",
+                        "Manual"
+                    ],
+                    horizontal=True,
+                    key="div_k_mode"
+                )
+
+                if params["k_mode"] == "Manual":
+
+                    params["k"] = st.slider(
+                        "k Clusters",
+                        2,
+                        max(
+                            2,
+                            min(
+                                10,
+                                max_n
+                            )
+                        ),
+                        min(
+                            3,
+                            max(
+                                2,
+                                max_n
+                            )
+                        ),
+                        key="div_k"
+                    )
+
+                else:
+
+                    st.caption(
+                        "Auto mode selects k using silhouette score."
+                    )
+
+            elif params["method"] == "HDBSCAN":
+
+                params["cluster_size_mode"] = st.radio(
+                    "Cluster Size",
+                    [
+                        "Auto",
+                        "Manual"
+                    ],
+                    horizontal=True,
+                    key="div_hdbscan_size_mode"
+                )
+
+                if params["cluster_size_mode"] == "Auto":
+
+                    params["granularity"] = st.selectbox(
+                        "Cluster Granularity",
+                        [
+                            "Small (~5%)",
+                            "Medium (~10%)",
+                            "Large (~20%)"
+                        ],
+                        index=1,
+                        key="div_hdbscan_granularity"
+                    )
+
+                else:
+
+                    params["min_cluster_size"] = st.slider(
+                        "Minimum Cluster Size",
+                        2,
+                        max(
+                            2,
+                            max_n
+                        ),
+                        max(
+                            2,
+                            int(
+                                0.10 * max_n
+                            )
+                        ),
+                        key="div_hdbscan_min_cluster_size"
+                    )
+
+                params["exclude_noise"] = st.checkbox(
+                    "Exclude noise solutions",
+                    value=True,
+                    key="div_hdbscan_exclude_noise"
+                )
+
+            st.caption(
+        "Diversity structures the current subset into clusters "
+        "instead of applying a preference score."
+    )
         # =====================================
         # Efficiency Lens
         # =====================================
