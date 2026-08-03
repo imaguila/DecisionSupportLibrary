@@ -29,17 +29,12 @@ def render_lenses(dataset):
 
             st.markdown(
                 f"""
-                <div style="
-                    background-color:#FFE5E5;
-                    color:#B00020;
-                    border-left:4px solid #E63946;
-                    padding:0.5rem;
-                    border-radius:0.3rem;
+                <span style="
+                    color:#E63946;
                     font-weight:bold;
-                    margin-bottom:0.75rem;
                 ">
-                    ⭐ Active lens: {active_lens}
-                </div>
+                ⭐ Active lens: {active_lens}
+                </span>
                 """,
                 unsafe_allow_html=True
             )
