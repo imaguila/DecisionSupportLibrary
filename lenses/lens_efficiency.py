@@ -6,19 +6,14 @@ def apply_efficiency_lens(
 ):
 
     result = df.copy()
-
     result["lens_score"] = (
-
         result[benefit]
-
         /
-
         (
             result[cost]
             + 1e-9
         )
     )
-
     result = result.sort_values(
         "lens_score",
         ascending=False

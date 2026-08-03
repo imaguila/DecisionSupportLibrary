@@ -14,14 +14,11 @@ def apply_domain_lens(
     for indicator in indicators:
         if indicator not in result.columns:
             continue
-
         norm = (
             result[indicator]
             -
             result[indicator].min()
-
         ) / (
-
             result[indicator].max()
             -
             result[indicator].min()
