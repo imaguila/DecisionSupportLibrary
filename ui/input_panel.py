@@ -43,9 +43,7 @@ def build_dataset( df, cfg ):
             if col in [ "id", "highlight",
                 "label", "cluster",  "score"]:
                 continue
-            if pd.api.types.is_numeric_dtype(
-                df[col]
-            ):
+            if pd.api.types.is_numeric_dtype( df[col] ):
                 all_metrics.append(col)
 
     selected_metrics = st.multiselect( "Optimization Objectives",

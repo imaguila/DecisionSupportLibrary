@@ -1,14 +1,9 @@
 ## --------------------------------------------------------------------------------------
 ## workspace_dataset.py
 
-
 import streamlit as st
 
-
-def render_dataset_preview(
-    df,
-    dataset
-):
+def render_dataset_preview(   df,  dataset ):
 
     with st.expander(
         f"📋 Current Dataset "
@@ -21,9 +16,7 @@ def render_dataset_preview(
             "x_"
         )
         objective_cols = dataset["metrics"]
-        indicator_cols = dataset[
-            "selected_indicators"
-        ]
+        indicator_cols = dataset["selected_indicators"]
         decision_cols = [
             c
             for c in df.columns
@@ -42,17 +35,8 @@ def render_dataset_preview(
             )
         ]
 
-        ordered_cols = (
-            ["id"]
-            +
-            objective_cols
-            +
-            indicator_cols
-            +
-            other_cols
-            +
-            decision_cols
-        )
+        ordered_cols = (  ["id"] + objective_cols +  indicator_cols
+            + other_cols + decision_cols )
 
         ordered_cols = [
             c
@@ -60,9 +44,5 @@ def render_dataset_preview(
             if c in df.columns
         ]
 
-        st.dataframe(
-            df[ordered_cols],
-            use_container_width=True,
-            height=500,
-            hide_index=True
-        )
+        st.dataframe(  df[ordered_cols],  use_container_width=True,
+            height=500,  hide_index=True )

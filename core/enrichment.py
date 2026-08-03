@@ -3,52 +3,35 @@
 
 import streamlit as st
 
-
-def render_enrichment(
-    dataset
-):
+def render_enrichment( dataset ):
 
     plugin = dataset["plugin"]
 
     if plugin is None:
-
         dataset["selected_indicators"] = []
-
         return dataset
 
     selected_metrics = dataset["metrics"]
-
     available_indicators = []
 
-    requirements = (
-        plugin.requirements()
-    )
+    requirements = (  plugin.requirements() )
 
     for indicator, reqs in requirements.items():
 
-        if all(
-            metric in selected_metrics
-            for metric in reqs
-        ):
-
-            available_indicators.append(
-                indicator
-            )
+        if all(  metric in selected_metrics for metric in reqs ):
+            available_indicators.append(  indicator )
 
     with st.sidebar.expander(
         "⚙️ Data Enrichment",
         expanded=False
     ):
-
-        st.caption(
+        st.caption( 
             f"ℹ️ Detected {len(available_indicators)} indicators based on active plugin and config."
         )
 
         selected_indicators = st.multiselect(
             "Avalible candidates for enrichement",
-            sorted(
-                available_indicators
-            ),
+            sorted( available_indicators ),
             default=[
                 i
                 for i in dataset["config"].get(
@@ -63,13 +46,7 @@ def render_enrichment(
                 """
         )
 
-    dataset["df"] = plugin.compute_indicators(
-        dataset["df"],
-        selected_indicators
-    )
-
-    dataset[
-        "selected_indicators"
-    ] = selected_indicators
+    dataset["df"] = plugin.compute_indicators( dataset["df"],  selected_indicators )
+    dataset[ "selected_indicators" ] = selected_indicators
 
     return dataset

@@ -3,7 +3,6 @@
 
 import streamlit as st
 
-
 def render_workspace_controls(
     dimensions
 ):
@@ -26,10 +25,8 @@ def render_workspace_controls(
             ):
                 st.session_state.maps = [
                     {
-                        "x": dimensions[0],
-                        "y": dimensions[1],
-                        "z": None,
-                        "color": None
+                        "x": dimensions[0],  "y": dimensions[1],
+                        "z": None,  "color": None
                     }
                 ]
                 st.rerun()
@@ -40,19 +37,14 @@ def render_workspace_controls(
             ):
                 st.session_state.maps.append(
                     {
-                        "x": dimensions[0],
-                        "y": dimensions[1],
-                        "z": None,
-                        "color": None
+                        "x": dimensions[0],  "y": dimensions[1],
+                        "z": None,  "color": None
                     }
                 )
 
                 st.rerun()
 
-        show_ids = st.checkbox(
-            "Show solution IDs",
-            value=False
-        )
+        show_ids = st.checkbox(  "Show solution IDs", value=False )
 
         st.caption(
             f"Active maps: "

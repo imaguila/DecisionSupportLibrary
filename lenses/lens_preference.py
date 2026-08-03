@@ -29,44 +29,19 @@ def _weighted_sum( df, maximize, minimize) :
     criteria =  ( maximize + minimize )
     norm = _minmax_normalize( df, criteria )
 
-    score = pd.Series(
-        0.0,
-        index=df.index
-    )
-
-    weight = (
-        1.0
-        /
-        len(criteria)
-    )
+    score = pd.Series(  0.0,  index=df.index )
+    weight = ( 1.0 / len(criteria) )
 
     for metric in criteria:
         if metric in maximize:
-            score = (
-                score
-                +
-                weight
-                *
-                norm[metric]
-            )
+            score = ( score + weight * norm[metric] )
         else:
-            score = (
-                score
-                +
-                weight
-                *
-                (
-                    1.0
-                    -
-                    norm[metric]
-                )
-            )
+            score = ( score +  weight * ( 1.0 - norm[metric] ) )
     return score
 
 def _topsis( df, maximize, minimize ) :
 
     criteria = ( maximize + minimize)
-
     norm = df[ criteria ].copy()
     weight = ( 1.0 / len(criteria))
     for metric in criteria:
@@ -75,14 +50,9 @@ def _topsis( df, maximize, minimize ) :
         ).sum() ** 0.5
 
         if denom != 0:
-            norm[metric] = (
-                norm[metric]
-                /
-                denom
-            )
+            norm[metric] = (  norm[metric] / denom  )
         else:
             norm[metric] = 0.0
-
         norm[metric] = ( norm[metric] * weight )
 
     ideal = {}
@@ -93,78 +63,32 @@ def _topsis( df, maximize, minimize ) :
             ideal[metric] = ( norm[metric].max())
             anti_ideal[metric] = ( norm[metric].min())
         else:
-            ideal[metric] = (
-                norm[metric].min()
-            )
-
-            anti_ideal[metric] = (
-                norm[metric].max()
-            )
+            ideal[metric] = (  norm[metric].min() )
+            anti_ideal[metric] = (  norm[metric].max() )
 
     scores = []
 
     for _, row in norm.iterrows():
-        d_plus = sum(
-            (
-                row[metric]
-                -
-                ideal[metric]
-            ) ** 2
-            for metric in criteria
-        ) ** 0.5
-
-        d_minus = sum(
-            (
-                row[metric]
-                -
-                anti_ideal[metric]
-            ) ** 2
-            for metric in criteria
-        ) ** 0.5
-
-        if (
-            d_plus
-            +
-            d_minus
-        ) != 0:
-            score = (
-                d_minus
-                /
-                (
-                    d_plus
-                    +
-                    d_minus
-                )
-            )
-
+        d_plus = sum( ( row[metric] - ideal[metric] ) ** 2 
+                    for metric in criteria ) ** 0.5
+        d_minus = sum( ( row[metric] -  anti_ideal[metric] ) ** 2
+                    for metric in criteria ) ** 0.5
+        if ( d_plus +  d_minus ) != 0:
+            score = ( d_minus / ( d_plus +  d_minus ) )
         else:
-
             score = 0.0
 
-        scores.append(
-            score
-        )
+        scores.append( score )
 
-    return pd.Series(
-        scores,
-        index=df.index
-    )
+    return pd.Series( scores, index=df.index )
 
 def _vikor(  df, maximize, minimize, v=0.5) :
     criteria = ( maximize + minimize)
 
-    weight = (
-        1.0
-        /
-        len(criteria)
-    )
-
-    regret = pd.DataFrame(
-        index=df.index
-    )
+    weight = ( 1.0 / len(criteria) )
+    regret = pd.DataFrame( index=df.index )
 
     for metric in criteria:
-
         if metric in maximize:
             best = df[metric].max()
             worst = df[metric].min()
@@ -172,227 +96,81 @@ def _vikor(  df, maximize, minimize, v=0.5) :
             best = df[metric].min()
             worst = df[metric].max()
 
-        denom = abs(
-            best
-            -
-            worst
-        )
+        denom = abs( best - worst )
 
         if denom == 0:
             regret[metric] = 0.0
         else:
-            regret[metric] = (
-                weight
-                *
-                abs(
-                    best
-                    -
-                    df[metric]
-                )
-                /
-                denom
-            )
+            regret[metric] = ( weight *  abs( best - df[metric] ) / denom )
 
     s_value = regret.sum( axis=1 )
     r_value = regret.max( axis=1 )
 
     if s_value.max() > s_value.min():
-
-        s_norm = (
-            s_value
-            -
-            s_value.min()
-        ) / (
-            s_value.max()
-            -
-            s_value.min()
-        )
+        s_norm = ( s_value - s_value.min()) / ( s_value.max() -  s_value.min() )
     else:
         s_norm = 0.0
 
     if r_value.max() > r_value.min():
-
-        r_norm = (
-            r_value
-            -
-            r_value.min()
-        ) / (
-            r_value.max()
-            -
-            r_value.min()
-        )
-
+        r_norm = ( r_value -  r_value.min() ) / ( r_value.max() - r_value.min()  )
     else:
         r_norm = 0.0
 
-    q_value = (
-        v
-        *
-        s_norm
-        +
-        (
-            1.0
-            -
-            v
-        )
-        *
-        r_norm
-    )
+    q_value = ( v * s_norm + ( 1.0 - v ) * r_norm )
 
-    return (
-        1.0
-        -
-        q_value
-    )
+    return ( 1.0 - q_value )
 
-def _reference_point(
-    df,
-    maximize,
-    minimize
-):
+def _reference_point( df, maximize,  minimize):
 
-    criteria = (
-        maximize
-        +
-        minimize
-    )
-    norm = _minmax_normalize(
-        df,
-        criteria
-    )
-    oriented = pd.DataFrame(
-        index=df.index
-    )
+    criteria = ( maximize +  minimize)
+    norm = _minmax_normalize( df, criteria )
+    oriented = pd.DataFrame( index=df.index)
     for metric in criteria:
         if metric in maximize:
-
-            oriented[metric] = (
-                norm[metric]
-            )
+            oriented[metric] = ( norm[metric])
         else:
-            oriented[metric] = (
-                1.0
-                -
-                norm[metric]
-            )
+            oriented[metric] = ( 1.0 -  norm[metric]  )
     distances = []
 
     for _, row in oriented.iterrows():
 
-        distance = sum(
-            (
-                1.0
-                -
-                row[metric]
-            ) ** 2
-            for metric in criteria
-        ) ** 0.5
+        distance = sum( ( 1.0 - row[metric]) ** 2
+            for metric in criteria) ** 0.5
 
-        distances.append(
-            distance
-        )
+        distances.append( distance )
 
-    distances = pd.Series(
-        distances,
-        index=df.index
-    )
+    distances = pd.Series( distances, index=df.index )
 
     max_distance = distances.max()
 
     if max_distance > 0:
+        return ( 1.0 - distances /  max_distance )
+    return pd.Series( 1.0,  index=df.index )
 
-        return (
-            1.0
-            -
-            distances
-            /
-            max_distance
-        )
-    return pd.Series(
-        1.0,
-        index=df.index
-    )
-
-def apply_preference_lens(
-    df,
-    method,
-    maximize,
-    minimize,
-    top_n
-):
+def apply_preference_lens( df,  method,  maximize, minimize, top_n ):
     result = df.copy()
 
-    maximize, minimize, criteria = _sanitize_criteria(
-        result,
-        maximize,
-        minimize
-    )
+    maximize, minimize, criteria = _sanitize_criteria( result, maximize,  minimize )
 
     if not criteria:
-
         return result
 
-    top_n = min(
-        top_n,
-        len(result)
-    )
+    top_n = min(  top_n,  len(result) )
 
     if method == "Weighted Sum":
-
-        score = _weighted_sum(
-            result,
-            maximize,
-            minimize
-        )
-
+        score = _weighted_sum( result, maximize, minimize )
     elif method == "TOPSIS":
-
-        score = _topsis(
-            result,
-            maximize,
-            minimize
-        )
-
+        score = _topsis( result, maximize, minimize )
     elif method == "VIKOR":
-
-        score = _vikor(
-            result,
-            maximize,
-            minimize
-        )
-
+        score = _vikor( result, maximize, minimize )
     elif method == "Reference Point":
-
-        score = _reference_point(
-            result,
-            maximize,
-            minimize
-        )
-
+        score = _reference_point( result, maximize, minimize )
     else:
-
         return result
 
-    result[
-        "preference_score"
-    ] = score
+    result[ "preference_score"] = score
+    result = result.sort_values( "preference_score", ascending=False ).copy()
+    result[ "preference_rank" ] = range( 1, len(result) + 1 )
+    result[ "preference_method"] = method
 
-    result = result.sort_values(
-        "preference_score",
-        ascending=False
-    ).copy()
-
-    result[
-        "preference_rank"
-    ] = range(
-        1,
-        len(result) + 1
-    )
-
-    result[
-        "preference_method"
-    ] = method
-
-    return result.head(
-        top_n
-    )
+    return result.head( top_n )

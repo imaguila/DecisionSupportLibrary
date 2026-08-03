@@ -5,40 +5,23 @@
 import streamlit as st
 
 
-def render_lenses(
-    dataset,
-    working_df
-):
+def render_lenses( dataset,  working_df ):
 
-    dimensions = (
-        dataset["metrics"]
-        +
-        dataset["selected_indicators"]
-    )
-
-    indicators = (
-        dataset["selected_indicators"]
-    )
+    dimensions = (  dataset["metrics"] + dataset["selected_indicators"] )
+    indicators = (  dataset["selected_indicators"] )
 
     active_lens = "None"
 
     params = {}
 
-    max_n = max(
-        len(working_df),
-        1
-    )
+    max_n = max( len(working_df), 1 )
 
-    default_n = min(
-        5,
-        max_n
-    )
+    default_n = min( 5,max_n )
 
     with st.sidebar.expander(
         "🧭 Solution of interest",
         expanded=False
     ):
-
         active_lens = st.selectbox(
             "Select an analytical lens",
             [
@@ -46,7 +29,7 @@ def render_lenses(
                 "Preference",
                 "Diversity",
                 "Efficiency",
-                "Domain-Specific"
+                "Indicator Dominance"
             ],
             key="active_lens"
         )

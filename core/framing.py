@@ -4,76 +4,45 @@
 import streamlit as st
 import pandas as pd
 
-
 def apply_framing(dataset):
 
     df = dataset["df"].copy()
 
-    dimensions = (
-        dataset["metrics"]
-        +
-        dataset["selected_indicators"]
-    )
+    dimensions = (  dataset["metrics"] + dataset["selected_indicators"] )
 
     filtered_df = df.copy()
 
-
-    with st.sidebar.expander(
-        "🎛️ Context Framing",
-        expanded=False
-    ):
+    with st.sidebar.expander("🎛️ Context Framing",
+        expanded=False ):
 
         # ----------------------------------
         # Dimension filters
         # ----------------------------------
 
         for metric in dimensions:
-
             if metric not in df.columns:
                 continue
-
-            if not pd.api.types.is_numeric_dtype(
-                df[metric]
-            ):
+            if not pd.api.types.is_numeric_dtype( df[metric] ):
                 continue
-
-            min_v = float(
-                df[metric].min()
-            )
-
-            max_v = float(
-                df[metric].max()
-            )
+            min_v = float( df[metric].min() )
+            max_v = float( df[metric].max() )
 
             if min_v == max_v:
                 continue
 
             selected_range = st.slider(
-                metric,
-                min_value=min_v,
-                max_value=max_v,
-                value=(min_v, max_v),
-                step=(max_v - min_v) / 1000,
-                key=f"framing_{metric}"
-            )
+                metric,  min_value=min_v,  max_value=max_v,
+                value=(min_v, max_v),  step=(max_v - min_v) / 1000,
+                key=f"framing_{metric}"  )
 
-            if (
-                abs(selected_range[0] - min_v) < 1e-6
-                and
-                abs(selected_range[1] - max_v) < 1e-6
-            ):
+            if ( abs(selected_range[0] - min_v) < 1e-6 and
+                abs(selected_range[1] - max_v) < 1e-6 ):
                 continue
 
             filtered_df = filtered_df[
-                (
-                    filtered_df[metric]
-                    >= selected_range[0]
-                )
+                (  filtered_df[metric]  >= selected_range[0] )
                 &
-                (
-                    filtered_df[metric]
-                    <= selected_range[1]
-                )
+                (  filtered_df[metric]  <= selected_range[1] )
             ]
 
         # ----------------------------------
@@ -82,15 +51,10 @@ def apply_framing(dataset):
 
         total_solutions = len(df)
 
-        remaining_solutions = len(
-            filtered_df
-        )
+        remaining_solutions = len( filtered_df )
 
-        ratio = (
-            remaining_solutions
-            /
-            max(total_solutions, 1)
-        )
+        ratio = (  remaining_solutions
+            / max(total_solutions, 1) )
 
         st.progress(ratio)
 
@@ -108,22 +72,6 @@ def apply_framing(dataset):
             unsafe_allow_html=True
         )
 
-        st.caption(
-            f"{ratio:.0%} of the decision space is visible."
-        )
-
-        # ----------------------------------
-        # Reset framing
-        # ----------------------------------
- #       st.button(
- #           "🔄 Reset Framing",
- #           use_container_width=True,
- #           key="reset_framing_button"
- #       )
-#        if st.button( "🔄 Reset Framing", use_container_width=True):
-#            for key in list( st.session_state.keys()):
-#                if key.startswith( "framing_"):
-#                    del st.session_state[key]
-#            st.rerun()
+        st.caption(  f"{ratio:.0%} of the decision space is visible." )
 
     return filtered_df

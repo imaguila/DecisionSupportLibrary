@@ -6,8 +6,7 @@ import streamlit as st
 from ui.visualization import (
     render_scatter,
     render_coordinated_maps,
-    render_distribution
-)
+    render_distribution  )
 
 def render_maps(
     df,
@@ -62,7 +61,6 @@ def render_maps(
             y = current_map.get("y")
             z = current_map.get("z")
             color = current_map.get("color")
-
 
             # =====================================
             # SCATTER / BUBBLE
