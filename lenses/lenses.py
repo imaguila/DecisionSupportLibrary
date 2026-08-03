@@ -13,12 +13,6 @@ def render_lenses(dataset):
         "🧭 Solution of interest",
         expanded=False
     ):
-        #st.markdown(
-        #    "<span style='color: #0066CC; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-        #    "Analytical Lens selected:"
-        #    "</span>", 
-        #    unsafe_allow_html=True
-        #)
         active_lens = st.selectbox(
             "Analytical Lens Selected",
             [
@@ -30,6 +24,26 @@ def render_lenses(dataset):
             ],
             #label_visibility="collapsed"
         )
+
+        if active_lens != "None":
+
+            st.markdown(
+                f"""
+                <div style="
+                    background-color:#FFE5E5;
+                    color:#B00020;
+                    border-left:4px solid #E63946;
+                    padding:0.5rem;
+                    border-radius:0.3rem;
+                    font-weight:bold;
+                    margin-bottom:0.75rem;
+                ">
+                    ⭐ Active SOI: {active_lens}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
 
         # =====================================
         # Preference Lens
