@@ -135,30 +135,25 @@ if lens_feedback is not None:
                     f"Clusters detected: {n_clusters}"
                 )
 
-            if "diversity_k" in lens_df.columns:
+                if "diversity_k" in lens_df.columns:
 
-                k_value = (
-                    lens_df["diversity_k"]
-                    .dropna()
-                    .iloc[0]
-                )
+                    k_value = (
+                        lens_df["diversity_k"]
+                        .dropna()
+                        .iloc[0]
+                    )
 
-                st.success(
-                    f"Selected k: {int(k_value)}"
-                )
+                if "diversity_silhouette" in lens_df.columns:
 
-            if "diversity_silhouette" in lens_df.columns:
+                    silhouette_value = (
+                        lens_df["diversity_silhouette"]
+                        .dropna()
+                        .iloc[0]
+                    )
 
-                silhouette_value = (
-                    lens_df["diversity_silhouette"]
-                    .dropna()
-                    .iloc[0]
-                )
-
-                st.caption(
-                    f"Silhouette score: {silhouette_value:.3f}"
-                )
-
+                    st.caption(
+                        f"Silhouette score: {silhouette_value:.3f}"
+                    )
 
 
 
