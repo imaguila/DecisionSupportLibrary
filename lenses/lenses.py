@@ -22,6 +22,7 @@ def render_lenses(dataset):
                 "Efficiency",
                 "Domain-Specific"
             ],
+            key="active_lens"
         )
 
         if active_lens != "None":

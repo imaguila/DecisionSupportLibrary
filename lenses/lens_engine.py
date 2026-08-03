@@ -1,19 +1,15 @@
 from lenses.lens_preference import (
     apply_preference_lens
 )
-
 from lenses.lens_diversity import (
     apply_diversity_lens
 )
-
 from lenses.lens_efficiency import (
     apply_efficiency_lens
 )
-
 from lenses.lens_domain import (
     apply_domain_lens
 )
-
 
 def apply_lens(
     df,
@@ -21,10 +17,9 @@ def apply_lens(
     params,
     dataset
 ):
-
     if lens_name == "None":
         return df
-
+    
     if lens_name == "Preference":
         return apply_preference_lens(
             df,
@@ -43,14 +38,13 @@ def apply_lens(
         )
 
     if lens_name == "Domain-Specific":
-
         return apply_domain_lens(
             df,
             params["maximize"],
             params["minimize"],
             params["top_n"]
         )
-
+    
     if lens_name == "Diversity":
         dimensions = (
             dataset["metrics"]
