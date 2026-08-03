@@ -7,8 +7,6 @@ import pandas as pd
 from config import CASES
 from plugins import PLUGIN_REGISTRY
 
-
-
 # =====================================================
 # HELPERS
 # =====================================================
@@ -17,7 +15,6 @@ def detect_decision_variables(
     df,
     prefix
 ):
-
     return [
         c
         for c in df.columns

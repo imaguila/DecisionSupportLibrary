@@ -21,7 +21,6 @@ class NRPPlugin:
     # --------------------------------------------------
 
     def available_indicators(self):
-
         return {
             "scope",
             "productivity",
@@ -34,7 +33,6 @@ class NRPPlugin:
     # Decision variables
     # --------------------------------------------------
     def decision_variables(self, df):
-
         return [
             c
             for c in df.columns
@@ -45,7 +43,6 @@ class NRPPlugin:
     # Dependencies between indicators 
     # --------------------------------------------------
     def requirements(self):
-
         return {
             "scope": [],
             "productivity": [
