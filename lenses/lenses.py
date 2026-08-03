@@ -137,6 +137,17 @@ def render_lenses( dataset,  working_df ):
 
         elif active_lens == "Efficiency":
 
+            params["method"] = st.selectbox(
+                "Efficiency Method",
+                [
+                    "Benefit/Cost Ratio",
+                    "Normalized Ratio",
+                    "Distance to Ideal",
+                    "Composite Cost Ratio"
+                ],
+                key="eff_method"
+            )
+
             params["benefit"] = st.selectbox(
                 "Benefit Metric",
                 dimensions,
@@ -152,10 +163,25 @@ def render_lenses( dataset,  working_df ):
             if len(cost_options) == 0:
 
                 st.warning(
-                    "At least two dimensions are required for the Efficiency lens."
+                    "At least two dimensions are required "
+                    "for the Efficiency lens."
                 )
 
                 params["cost"] = params["benefit"]
+
+            elif params["method"] == "Composite Cost Ratio":
+
+                params["cost"] = st.multiselect(
+                    "Cost Metrics",
+                    cost_options,
+                    default=cost_options[
+                        :min(
+                            2,
+                            len(cost_options)
+                        )
+                    ],
+                    key="eff_costs"
+                )
 
             else:
 
@@ -173,6 +199,10 @@ def render_lenses( dataset,  working_df ):
                 key="eff_top_n"
             )
 
+            st.caption(
+                "Efficiency methods rank solutions "
+                "by benefit-cost trade-off."
+            )
         # =====================================
         # Domain-Specific Lens
         # =====================================

@@ -4,7 +4,34 @@
 
 import pandas as pd
 
+
 EPS = 1e-9
+
+
+def _normalize_series(
+    series
+):
+
+    min_v = series.min()
+    max_v = series.max()
+
+    if max_v > min_v:
+
+        return (
+            series
+            -
+            min_v
+        ) / (
+            max_v
+            -
+            min_v
+        )
+
+    return pd.Series(
+        0.0,
+        index=series.index
+    )
+
 
 def apply_efficiency_lens(
     df,
@@ -18,11 +45,39 @@ def apply_efficiency_lens(
 
     if (
         benefit is None
-        or cost is None
         or benefit not in result.columns
-        or cost not in result.columns
-        or benefit == cost
     ):
+
+        return result
+
+    if cost is None:
+
+        return result
+
+    if isinstance(
+        cost,
+        str
+    ):
+
+        cost_metrics = [
+            cost
+        ]
+
+    else:
+
+        cost_metrics = [
+            c
+            for c in cost
+            if c in result.columns
+        ]
+
+    cost_metrics = [
+        c
+        for c in cost_metrics
+        if c != benefit
+    ]
+
+    if len(cost_metrics) == 0:
 
         return result
 
@@ -32,13 +87,15 @@ def apply_efficiency_lens(
     )
 
     # ==================================================
-    # RAW BENEFIT / COST RATIO
+    # BENEFIT / COST RATIO
     # ==================================================
 
     if method == "Benefit/Cost Ratio":
 
+        cost_metric = cost_metrics[0]
+
         safe_cost = result[
-            cost
+            cost_metric
         ].replace(
             0,
             EPS
@@ -58,59 +115,15 @@ def apply_efficiency_lens(
 
     elif method == "Normalized Ratio":
 
-        benefit_min = result[
-            benefit
-        ].min()
+        cost_metric = cost_metrics[0]
 
-        benefit_max = result[
-            benefit
-        ].max()
+        benefit_norm = _normalize_series(
+            result[benefit]
+        )
 
-        cost_min = result[
-            cost
-        ].min()
-
-        cost_max = result[
-            cost
-        ].max()
-
-        if benefit_max > benefit_min:
-
-            benefit_norm = (
-                result[benefit]
-                -
-                benefit_min
-            ) / (
-                benefit_max
-                -
-                benefit_min
-            )
-
-        else:
-
-            benefit_norm = pd.Series(
-                0.0,
-                index=result.index
-            )
-
-        if cost_max > cost_min:
-
-            cost_norm = (
-                result[cost]
-                -
-                cost_min
-            ) / (
-                cost_max
-                -
-                cost_min
-            )
-
-        else:
-
-            cost_norm = pd.Series(
-                0.0,
-                index=result.index
-            )
+        cost_norm = _normalize_series(
+            result[cost_metric]
+        )
 
         result[
             "efficiency_score"
@@ -130,59 +143,15 @@ def apply_efficiency_lens(
 
     elif method == "Distance to Ideal":
 
-        benefit_min = result[
-            benefit
-        ].min()
+        cost_metric = cost_metrics[0]
 
-        benefit_max = result[
-            benefit
-        ].max()
+        benefit_norm = _normalize_series(
+            result[benefit]
+        )
 
-        cost_min = result[
-            cost
-        ].min()
-
-        cost_max = result[
-            cost
-        ].max()
-
-        if benefit_max > benefit_min:
-
-            benefit_norm = (
-                result[benefit]
-                -
-                benefit_min
-            ) / (
-                benefit_max
-                -
-                benefit_min
-            )
-
-        else:
-
-            benefit_norm = pd.Series(
-                0.0,
-                index=result.index
-            )
-
-        if cost_max > cost_min:
-
-            cost_norm = (
-                result[cost]
-                -
-                cost_min
-            ) / (
-                cost_max
-                -
-                cost_min
-            )
-
-        else:
-
-            cost_norm = pd.Series(
-                0.0,
-                index=result.index
-            )
+        cost_norm = _normalize_series(
+            result[cost_metric]
+        )
 
         distance_to_ideal = (
             (
@@ -210,6 +179,55 @@ def apply_efficiency_lens(
             max_distance
         )
 
+    # ==================================================
+    # COMPOSITE COST RATIO
+    # ==================================================
+
+    elif method == "Composite Cost Ratio":
+
+        benefit_norm = _normalize_series(
+            result[benefit]
+        )
+
+        composite_cost = pd.Series(
+            0.0,
+            index=result.index
+        )
+
+        for cost_metric in cost_metrics:
+
+            composite_cost = (
+                composite_cost
+                +
+                _normalize_series(
+                    result[cost_metric]
+                )
+            )
+
+        composite_cost = (
+            composite_cost
+            /
+            len(cost_metrics)
+        )
+
+        result[
+            "efficiency_score"
+        ] = (
+            benefit_norm
+            /
+            (
+                composite_cost
+                +
+                EPS
+            )
+        )
+
+        result[
+            "efficiency_costs"
+        ] = ", ".join(
+            cost_metrics
+        )
+
     else:
 
         return result
@@ -229,6 +247,10 @@ def apply_efficiency_lens(
     result[
         "efficiency_method"
     ] = method
+
+    result[
+        "efficiency_benefit"
+    ] = benefit
 
     return result.head(
         top_n

@@ -44,11 +44,24 @@ def apply_lens( df, lens_name, params, dataset ):
 
         return apply_efficiency_lens(
             df,
-            params.get( "method", "Benefit/Cost Ratio" ),
-            params.get( "benefit" ),
-            params.get( "cost" ),
-            params.get( "top_n", len(df) )
+            params.get(
+                "method",
+                "Benefit/Cost Ratio"
+            ),
+            params.get(
+                "benefit"
+            ),
+            params.get(
+                "cost"
+            ),
+            params.get(
+                "top_n",
+                len(df)
+            )
         )
+
+
+
 
     # ==================================================
     # Indicator Dominance / Domain-Specific Lens
