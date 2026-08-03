@@ -32,9 +32,9 @@ def render_lenses(dataset):
                 <span style="
                     color:#E63946;
                     font-weight:bold;
-                ">
-                ⭐ Active lens: {active_lens}
-                </span>
+                "> -----------
+#                ⭐ Active lens: {active_lens}
+#                </span>
                 """,
                 unsafe_allow_html=True
             )
