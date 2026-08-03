@@ -29,10 +29,15 @@ def render_lenses(dataset):
 
             st.markdown(
                 f"""
-                <span style="
+                <div style="
                     color:#E63946;
-                    font-weight:bold;
-                "> _____________</span>
+                    font-size:12px;
+                    font-weight:600;
+                    text-align:center;
+                    margin:0.3rem 0 0.8rem 0;
+                ">
+                ───── {active_lens} ─────
+                </div>
                 """,
                 unsafe_allow_html=True
             )
