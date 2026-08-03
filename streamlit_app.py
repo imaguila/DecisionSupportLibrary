@@ -105,11 +105,9 @@ if st.session_state.get( "pending_lens_reset", False) :
 # LENSES / SOI IDENTIFICATION
 # ==================================================
 
-active_lens, lens_params = (  render_lenses( dataset, working_df )
-)
+active_lens, lens_params, lens_feedback = (  render_lenses( dataset, working_df ) )
 
-lens_df = apply_lens( working_df, active_lens, lens_params, dataset
-)
+lens_df = apply_lens( working_df, active_lens, lens_params, dataset )
 
 
 # ==================================================

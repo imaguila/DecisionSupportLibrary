@@ -419,5 +419,11 @@ def render_lenses(
                     "params": params
                 }
 
+        # =====================================
+        # Lens feedback placeholder
+        # =====================================
+
+        lens_feedback = st.empty()
+
     return active_lens, params
             
