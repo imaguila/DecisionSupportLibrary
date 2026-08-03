@@ -108,10 +108,6 @@ def apply_preference_lens(
             criteria
         ].copy()
 
-        # ----------------------------------------------
-        # Vector normalization
-        # ----------------------------------------------
-
         for metric in criteria:
 
             denom = (
@@ -208,4 +204,22 @@ def apply_preference_lens(
 
         return result
 
-    
+    # ==================================================
+    # RANKING AND SELECTION
+    # ==================================================
+
+    result = result.sort_values(
+        "preference_score",
+        ascending=False
+    ).copy()
+
+    result[
+        "preference_rank"
+    ] = range(
+        1,
+        len(result) + 1
+    )
+
+    return result.head(
+        top_n
+    )
