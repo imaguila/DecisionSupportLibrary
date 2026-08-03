@@ -101,7 +101,7 @@ CASES = {
 
     "Replacement Access, Library and ID Card (RALIC)": {
         "plugin": "nrp",
-        "path_sol": "data/ralicsreqsoluciones.csv",
+        "path_sol": "data/ralic.csv",
         "metrics": [
             "satisfaction",
             "effort"
