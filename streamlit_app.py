@@ -90,6 +90,24 @@ filtered_df = apply_lens(
     dataset
 )
 
+
+# ============================================
+# LOADED SOI
+# ============================================
+
+if (
+    "active_soi_ids"
+    in st.session_state
+):
+
+    filtered_df = filtered_df[
+        filtered_df["id"].isin(
+            st.session_state.active_soi_ids
+        )
+    ]
+
+
+
 if (
     "pending_save_soi"
     in st.session_state

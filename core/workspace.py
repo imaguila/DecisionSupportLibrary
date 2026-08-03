@@ -24,20 +24,13 @@ def render_workspace(
         df,
         dataset
     )
-
     dimensions = (
-
         dataset["metrics"]
-
         +
-
         dataset["selected_indicators"]
-
     )
-
     if len(dimensions) < 2:
         return
-
     render_maps(
         df,
         dataset,
