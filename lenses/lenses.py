@@ -5,23 +5,40 @@
 import streamlit as st
 
 
-def render_lenses( dataset,  working_df ):
+def render_lenses(
+    dataset,
+    working_df
+):
 
-    dimensions = (  dataset["metrics"] + dataset["selected_indicators"] )
-    indicators = (  dataset["selected_indicators"] )
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
+
+    indicators = (
+        dataset["selected_indicators"]
+    )
 
     active_lens = "None"
 
     params = {}
 
-    max_n = max( len(working_df), 1 )
+    max_n = max(
+        len(working_df),
+        1
+    )
 
-    default_n = min( 5,max_n )
+    default_n = min(
+        5,
+        max_n
+    )
 
     with st.sidebar.expander(
         "🧭 Solution of interest",
         expanded=False
     ):
+
         active_lens = st.selectbox(
             "Select an analytical lens",
             [
@@ -80,7 +97,7 @@ def render_lenses( dataset,  working_df ):
 
             st.caption(
                 "All preference methods currently use equal weights."
-            )            
+            )
 
             params["maximize"] = st.multiselect(
                 "Metrics to Maximize",
@@ -111,6 +128,7 @@ def render_lenses( dataset,  working_df ):
         # =====================================
         # Diversity Lens
         # =====================================
+
         elif active_lens == "Diversity":
 
             params["method"] = st.selectbox(
@@ -122,15 +140,17 @@ def render_lenses( dataset,  working_df ):
                 key="div_method"
             )
 
+            default_cluster_metrics = dimensions[
+                :min(
+                    2,
+                    len(dimensions)
+                )
+            ]
+
             params["cluster_metrics"] = st.multiselect(
                 "Metrics for Clustering",
                 dimensions,
-                default=dimensions[
-                    :min(
-                        2,
-                        len(dimensions)
-                    )
-                ],
+                default=default_cluster_metrics,
                 key="div_cluster_metrics"
             )
 
@@ -148,23 +168,24 @@ def render_lenses( dataset,  working_df ):
 
                 if params["k_mode"] == "Manual":
 
+                    max_k = max(
+                        2,
+                        min(
+                            10,
+                            max_n
+                        )
+                    )
+
+                    default_k = min(
+                        3,
+                        max_k
+                    )
+
                     params["k"] = st.slider(
                         "k Clusters",
                         2,
-                        max(
-                            2,
-                            min(
-                                10,
-                                max_n
-                            )
-                        ),
-                        min(
-                            3,
-                            max(
-                                2,
-                                max_n
-                            )
-                        ),
+                        max_k,
+                        default_k,
                         key="div_k"
                     )
 
@@ -173,7 +194,6 @@ def render_lenses( dataset,  working_df ):
                     st.caption(
                         "Auto mode selects k using silhouette score."
                     )
-
             elif params["method"] == "HDBSCAN":
 
                 params["cluster_size_mode"] = st.radio(
@@ -201,6 +221,13 @@ def render_lenses( dataset,  working_df ):
 
                 else:
 
+                    default_min_cluster_size = max(
+                        2,
+                        int(
+                            0.10 * max_n
+                        )
+                    )
+
                     params["min_cluster_size"] = st.slider(
                         "Minimum Cluster Size",
                         2,
@@ -208,12 +235,7 @@ def render_lenses( dataset,  working_df ):
                             2,
                             max_n
                         ),
-                        max(
-                            2,
-                            int(
-                                0.10 * max_n
-                            )
-                        ),
+                        default_min_cluster_size,
                         key="div_hdbscan_min_cluster_size"
                     )
 
@@ -224,9 +246,10 @@ def render_lenses( dataset,  working_df ):
                 )
 
             st.caption(
-        "Diversity structures the current subset into clusters "
-        "instead of applying a preference score."
-    )
+                "Diversity structures the current subset into clusters "
+                "instead of applying a preference score."
+            )
+
         # =====================================
         # Efficiency Lens
         # =====================================
@@ -243,7 +266,6 @@ def render_lenses( dataset,  working_df ):
                 ],
                 key="eff_method"
             )
-
             params["benefit"] = st.selectbox(
                 "Benefit Metric",
                 dimensions,
@@ -300,15 +322,15 @@ def render_lenses( dataset,  working_df ):
                 "by benefit-cost trade-off."
             )
         # =====================================
-        # Domain-Specific Lens
+        # Indicator Dominance Lens
         # =====================================
 
-        elif active_lens == "Domain-Specific":
+        elif active_lens == "Indicator Dominance":
 
             if len(indicators) == 0:
 
                 st.info(
-                    "No domain indicators are currently selected. "
+                    "No indicators are currently selected. "
                     "Enable indicators in Data Enrichment first."
                 )
 
@@ -337,60 +359,14 @@ def render_lenses( dataset,  working_df ):
                 )
 
                 params["top_n"] = st.slider(
-                    "Top N Solutions",
+                    "Top N per Indicator",
                     1,
                     max_n,
                     default_n,
                     key="domain_top_n"
                 )
 
-        # =====================================
-        # SAVE SOI
-        # =====================================
-
-        if "saved_sois" not in st.session_state:
-
-            st.session_state.saved_sois = []
-
-        if active_lens != "None":
-
-            st.markdown("---")
-
-            default_name = (
-                f"{active_lens} "
-                f"#{len(st.session_state.saved_sois) + 1}"
-            )
-
-            if (
-                st.session_state.get(
-                    "soi_name_lens"
+                st.caption(
+                    "Indicator Dominance identifies solutions that repeatedly "
+                    "appear among the best candidates for selected indicators."
                 )
-                != active_lens
-            ):
-
-                st.session_state[
-                    "soi_name"
-                ] = default_name
-
-                st.session_state[
-                    "soi_name_lens"
-                ] = active_lens
-
-            soi_name = st.text_input(
-                "Name",
-                key="soi_name"
-            )
-
-            if st.button(
-                "💾 Save Current Set",
-                use_container_width=True,
-                key="save_current_soi"
-            ):
-
-                st.session_state.pending_save_soi = {
-                    "name": soi_name,
-                    "lens": active_lens,
-                    "params": params
-                }
-
-    return active_lens, params
