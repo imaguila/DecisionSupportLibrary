@@ -370,6 +370,16 @@ def render_lenses(
                     "Indicator Dominance identifies solutions that repeatedly "
                     "appear among the best candidates for selected indicators."
                 )
+
+
+
+        # =====================================
+        # Lens feedback placeholder
+        # =====================================
+
+        lens_feedback = st.empty()
+
+        
         # =====================================
         # Save SOI
         # =====================================
@@ -419,11 +429,6 @@ def render_lenses(
                     "params": params
                 }
 
-        # =====================================
-        # Lens feedback placeholder
-        # =====================================
-
-        lens_feedback = st.empty()
 
     return active_lens, params, lens_feedback
             
