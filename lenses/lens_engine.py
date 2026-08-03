@@ -52,12 +52,10 @@ def apply_lens(
         )
 
     if lens_name == "Diversity":
-
         dimensions = (
             dataset["metrics"]
             +
             dataset["selected_indicators"]
-
         )
 
         return apply_diversity_lens(
