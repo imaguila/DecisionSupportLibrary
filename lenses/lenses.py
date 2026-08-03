@@ -14,7 +14,7 @@ def render_lenses(dataset):
         expanded=False
     ):
         active_lens = st.selectbox(
-            "Analytical Lens Selected",
+            "Select an analytical lens",
             [
                 "None",
                 "Preference",
@@ -22,7 +22,6 @@ def render_lenses(dataset):
                 "Efficiency",
                 "Domain-Specific"
             ],
-            #label_visibility="collapsed"
         )
 
         if active_lens != "None":
@@ -48,12 +47,6 @@ def render_lenses(dataset):
         # =====================================
 
         if active_lens == "Preference":
-           # st.markdown(
-           #     "<span style='color: #E63946; font-weight: bold; font-size: 18px; font-family: sans-serif;'>"
-           #     " Scoring Method"
-           #     "</span>", 
-           #     unsafe_allow_html=True
-           # )
             params["method"] = st.selectbox(
                 "Scoring Method",
                 [
@@ -76,8 +69,8 @@ def render_lenses(dataset):
             params["top_n"] = st.slider(
                 "Top N Solutions",
                 1,
-                100,
-                20
+                len(dataset["df"]),
+                min(5, len(dataset["df"]))
             )
 
         # =====================================
