@@ -3,24 +3,35 @@
 ## --------------------------------------------------------------------------------------
 
 from lenses.lens_preference import (
-    apply_preference_lens )
+    apply_preference_lens
+)
 
 from lenses.lens_diversity import (
-    apply_diversity_lens )
+    apply_diversity_lens
+)
 
 from lenses.lens_efficiency import (
-    apply_efficiency_lens )
+    apply_efficiency_lens
+)
 
 from lenses.lens_domain import (
-    apply_domain_lens )
+    apply_domain_lens
+)
 
 
-def apply_lens( df, lens_name, params, dataset ):
+def apply_lens(
+    df,
+    lens_name,
+    params,
+    dataset
+):
 
     if df is None:
+
         return df
 
     if lens_name == "None":
+
         return df.copy()
 
     # ==================================================
@@ -29,11 +40,42 @@ def apply_lens( df, lens_name, params, dataset ):
 
     if lens_name == "Preference":
 
-        return apply_preference_lens( df,
-            params.get( "method", "Weighted Sum"),
-            params.get( "maximize", [] ),
-            params.get( "minimize", [] ),
-            params.get(  "top_n",  len(df) )
+        return apply_preference_lens(
+            df,
+            params.get(
+                "method",
+                "Weighted Sum"
+            ),
+            params.get(
+                "maximize",
+                []
+            ),
+            params.get(
+                "minimize",
+                []
+            ),
+            params.get(
+                "top_n",
+                len(df)
+            )
+        )
+
+    # ==================================================
+    # Diversity Lens
+    # ==================================================
+
+    if lens_name == "Diversity":
+
+        dimensions = (
+            dataset["metrics"]
+            +
+            dataset["selected_indicators"]
+        )
+
+        return apply_diversity_lens(
+            df,
+            dimensions,
+            params
         )
 
     # ==================================================
@@ -60,14 +102,11 @@ def apply_lens( df, lens_name, params, dataset ):
             )
         )
 
-
-
-
     # ==================================================
-    # Indicator Dominance / Domain-Specific Lens
+    # Indicator Dominance Lens
     # ==================================================
 
-    if lens_name == "Domain-Specific":
+    if lens_name == "Indicator Dominance":
 
         return apply_domain_lens(
             df,
@@ -82,30 +121,6 @@ def apply_lens( df, lens_name, params, dataset ):
             params.get(
                 "top_n",
                 len(df)
-            )
-        )
-
-    # ==================================================
-    # Diversity Lens
-    # ==================================================
-    
-    if lens_name == "Diversity":
-
-        dimensions = (
-            dataset["metrics"]
-            +
-            dataset["selected_indicators"]
-        )
-
-        return apply_diversity_lens(
-            df,
-            dimensions,
-            params.get(
-                "target_size",
-                min(
-                    5,
-                    len(df)
-                )
             )
         )
 
