@@ -27,20 +27,14 @@ CASES = {
     # =====================================================================
 
     "CLASSIC Dataset": {
-
         "plugin": "nrp",
-
         "path_sol": "data/bagnallsoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "effort"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 18,
-
         "exclude_cols": [
             "id",
             "run_id",
@@ -67,21 +61,15 @@ CASES = {
     # =====================================================================
 
     "MSLite System": {
-
         "plugin": "nrp",
-
         "path_sol": "data/mslitesoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "effort",
             "dissatisfaction"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 16,
-
         "exclude_cols": [
             "id",
             "run_id",
@@ -112,32 +100,24 @@ CASES = {
     # =====================================================================
 
     "Replacement Access, Library and ID Card (RALIC)": {
-
         "plugin": "nrp",
-
         "path_sol": "data/ralicsreqsoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "effort"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 83,
-
         "exclude_cols": [
             "id",
             "run_id",
             "timestamp"
         ],
-
         "default_indicators": [
             "scope",
             "productivity",
             "squandering"
         ],
-
         "help": (
             "Lim, S. L., & Finkelstein, A. (2011). "
             "StakeRare: using social networks and collaborative "
@@ -153,27 +133,20 @@ CASES = {
     # =====================================================================
 
     "Word Processing Software Project": {
-
         "plugin": "nrp",
-
         "path_sol": "data/wordprocsoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "effort",
             "time"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 42,
-
         "exclude_cols": [
             "id",
             "run_id",
             "timestamp"
         ],
-
         "default_indicators": [
             "scope",
             "productivity",
@@ -181,7 +154,6 @@ CASES = {
             "response",
             "opportunity"
         ],
-
         "help": (
             "Agarwal, N., Karimpour, R., & Ruhe, G. (2014). "
             "Theme-based product release planning: An analytical "
@@ -196,26 +168,19 @@ CASES = {
     # =====================================================================
 
     "Large Dataset": {
-
         "plugin": "nrp",
-
         "path_sol": "data/req100frente.csv",
-
         "metrics": [
             "satisfaction",
             "effort"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 96,
-
         "exclude_cols": [
             "id",
             "run_id",
             "timestamp"
         ],
-
         "default_indicators": [
             "scope",
             "productivity",
@@ -236,11 +201,8 @@ CASES = {
     # =====================================================================
 
     "ReleasePlanner™ Dataset": {
-
         "plugin": "nrp",
-
         "path_sol": "data/themesoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "prevalence",
@@ -249,17 +211,13 @@ CASES = {
             "inestability",
             "effort"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 22,
-
         "exclude_cols": [
             "id",
             "run_id",
             "timestamp"
         ],
-
         "default_indicators": [
             "scope",
             "productivity",
@@ -288,32 +246,24 @@ CASES = {
     # =====================================================================
 
     "Motorola Dataset": {
-
         "plugin": "nrp",
-
         "path_sol": "data/motorolasoluciones.csv",
-
         "metrics": [
             "satisfaction",
             "effort"
         ],
-
         "var_prefix": "req_",
-
         "num_x": 35,
-
         "exclude_cols": [
             "id",
             "run_id",
             "timestamp"
         ],
-
         "default_indicators": [
             "scope",
             "productivity",
             "squandering"
         ],
-
         "help": (
             "Baker, P., Harman, M., Steinhofel, K., "
             "& Skaliotis, A. (2006). Search based approaches "
@@ -329,31 +279,23 @@ CASES = {
     # =====================================================================
 
     "Aerospace Wing Design": {
-
         "plugin": "aerospace",
-
         "path_sol": "data/wing_pareto_front.csv",
-
         "metrics": [
             "drag",
             "weight"
         ],
-
         "var_prefix": "var_",
-
         "num_x": 10,
-
         "exclude_cols": [
             "sim_time",
             "solver_status"
         ],
-
         "default_indicators": [
             "density",
             "lift_to_drag_ratio",
             "structural_efficiency"
         ],
-
         "help": (
             "Example, A. et al. (2025). "
             "Multi-objective aerodynamic design optimization "
