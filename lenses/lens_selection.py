@@ -199,10 +199,16 @@ def render_group_selector_and_save(
             st.session_state.pending_save_soi = {
                 "name": soi_name,
                 "lens": active_lens,
+                "method": lens_params.get(
+                    "method",
+                    None
+                ),
                 "params": lens_params,
                 "ids": current_df["id"].tolist(),
                 "group": group_value,
-                "group_column": group_column
+                "group_column": group_column,
+                "source_size": len(lens_df),
+                "soi_size": len(current_df)
             }
-
+            
         return current_df

@@ -41,6 +41,12 @@ def clear_loaded_soi():
             "active_soi_name"
         ]
 
+    if "active_soi_metadata" in st.session_state:
+
+        del st.session_state[
+            "active_soi_metadata"
+        ]
+
     st.session_state[
         "pending_lens_reset"
     ] = True
@@ -61,6 +67,36 @@ def load_soi(
     ] = soi[
         "name"
     ]
+
+    st.session_state[
+        "active_soi_metadata"
+    ] = {
+        "lens": soi.get(
+            "lens"
+        ),
+        "method": soi.get(
+            "method"
+        ),
+        "group": soi.get(
+            "group"
+        ),
+        "group_column": soi.get(
+            "group_column"
+        ),
+        "source_size": soi.get(
+            "source_size"
+        ),
+        "soi_size": soi.get(
+            "soi_size"
+        ),
+        "created_at": soi.get(
+            "created_at"
+        ),
+        "params": soi.get(
+            "params",
+            {}
+        )
+    }
 
     st.session_state[
         "pending_lens_reset"
@@ -92,7 +128,7 @@ def delete_soi(
 
 
 # =====================================================
-# RENDER LOADED SOI
+# RENDER HELPERS
 # =====================================================
 
 def render_loaded_soi_status():
@@ -107,6 +143,45 @@ def render_loaded_soi_status():
         f"({len(st.session_state.active_soi_ids)} solutions)"
     )
 
+    metadata = st.session_state.get(
+        "active_soi_metadata",
+        {}
+    )
+
+    if metadata:
+
+        lens = metadata.get(
+            "lens"
+        )
+
+        method = metadata.get(
+            "method"
+        )
+
+        group = metadata.get(
+            "group"
+        )
+
+        if lens or method:
+
+            label = lens or "Unknown lens"
+
+            if method:
+
+                label = (
+                    f"{label} / {method}"
+                )
+
+            st.caption(
+                label
+            )
+
+        if group:
+
+            st.caption(
+                f"Group: {group}"
+            )
+
     if st.button(
         "Clear Loaded SOI",
         use_container_width=True,
@@ -120,6 +195,93 @@ def render_loaded_soi_status():
     st.markdown(
         "---"
     )
+
+
+def build_soi_main_label(
+    soi
+):
+
+    name = soi.get(
+        "name",
+        "Unnamed SOI"
+    )
+
+    size = len(
+        soi.get(
+            "ids",
+            []
+        )
+    )
+
+    lens = soi.get(
+        "lens",
+        "Unknown"
+    )
+
+    method = soi.get(
+        "method"
+    )
+
+    if method:
+
+        return (
+            f"{name} "
+            f"[{size}] · "
+            f"{lens} / {method}"
+        )
+
+    return (
+        f"{name} "
+        f"[{size}] · "
+        f"{lens}"
+    )
+
+
+def render_soi_details(
+    soi,
+    idx
+):
+
+    with st.expander(
+        "Details",
+        expanded=False
+    ):
+
+        st.write(
+            {
+                "lens": soi.get(
+                    "lens"
+                ),
+                "method": soi.get(
+                    "method"
+                ),
+                "group": soi.get(
+                    "group"
+                ),
+                "group_column": soi.get(
+                    "group_column"
+                ),
+                "source_size": soi.get(
+                    "source_size"
+                ),
+                "soi_size": soi.get(
+                    "soi_size",
+                    len(
+                        soi.get(
+                            "ids",
+                            []
+                        )
+                    )
+                ),
+                "created_at": soi.get(
+                    "created_at"
+                ),
+                "params": soi.get(
+                    "params",
+                    {}
+                )
+            }
+        )
 
 
 # =====================================================
@@ -142,9 +304,34 @@ def render_saved_soi_row(
     with col1:
 
         st.caption(
-            f"{soi['name']} "
-            f"[{len(soi['ids'])}] · "
-            f"{soi.get('lens', 'Unknown')}"
+            build_soi_main_label(
+                soi
+            )
+        )
+
+        group_label = soi.get(
+            "group"
+        )
+
+        if group_label:
+
+            st.caption(
+                f"Group: {group_label}"
+            )
+
+        created_at = soi.get(
+            "created_at"
+        )
+
+        if created_at:
+
+            st.caption(
+                f"Created: {created_at}"
+            )
+
+        render_soi_details(
+            soi,
+            idx
         )
 
     with col2:

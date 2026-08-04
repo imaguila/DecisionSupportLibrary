@@ -6,13 +6,15 @@ from lenses import lens_preference
 from lenses import lens_diversity
 from lenses import lens_efficiency
 from lenses import lens_indicator
+from lenses import lens_consensus
 
 
 LENS_REGISTRY = {
     "Preference": lens_preference,
     "Diversity": lens_diversity,
     "Efficiency": lens_efficiency,
-    "Indicator Dominance": lens_indicator
+    "Indicator Dominance": lens_indicator,
+    "SOI Consensus": lens_consensus
 }
 
 

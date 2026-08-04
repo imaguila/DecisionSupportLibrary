@@ -42,6 +42,10 @@ def infer_lens_color_column(
 
         return "efficiency_score"
 
+    if "consensus_score" in df.columns:
+
+        return "consensus_score"
+
     if "domain_match_count" in df.columns:
 
         return "domain_match_count"

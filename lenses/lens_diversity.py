@@ -1049,7 +1049,7 @@ def render_feedback(
         st.caption(
             f"Minimum cluster size: {int(min_cluster_size)}"
         )
-        
+
     distance_threshold = _safe_first_value(
         lens_df,
         "diversity_distance_threshold"
@@ -1060,8 +1060,6 @@ def render_feedback(
         st.caption(
             f"Distance threshold: {float(distance_threshold):.2f}"
         )
-
-
 
     noise_count = _safe_first_value(
         lens_df,

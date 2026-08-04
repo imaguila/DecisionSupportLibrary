@@ -14,8 +14,7 @@ from lenses.lenses import render_lens_panel
 from lenses.lens_engine import apply_lens
 from lenses.lens_feedback import render_lens_feedback
 from lenses.lens_selection import (
-    render_group_selector_and_save
-)
+    render_group_selector_and_save )
 
 
 st.set_page_config(
@@ -35,9 +34,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title(
-    "Decision Space Explorer"
-)
+st.title(  "Decision Space Explorer" )
 
 
 # ==================================================
@@ -47,37 +44,22 @@ st.title(
 dataset = render_input_panel()
 
 if dataset is None:
-
-    st.info(
-        "Select a domain configuration to begin."
-    )
-
+    st.info( "Select a domain configuration to begin.")
     st.stop()
-
 
 # ==================================================
 # ENRICHMENT
 # ==================================================
 
-dataset = render_enrichment(
-    dataset
-)
-
+dataset = render_enrichment( dataset )
 
 # ==================================================
 # WORKSPACE CONTROLS
 # ==================================================
 
-dimensions = (
-    dataset["metrics"]
-    +
-    dataset["selected_indicators"]
-)
+dimensions = ( dataset["metrics"] + dataset["selected_indicators"] )
 
-show_ids = render_workspace_controls(
-    dimensions
-)
-
+show_ids = render_workspace_controls( dimensions )
 
 # ==================================================
 # FRAMING
@@ -95,31 +77,17 @@ framed_df = apply_framing(
 working_df = framed_df.copy()
 
 if "active_soi_ids" in st.session_state:
-
     working_df = working_df[
-        working_df["id"].isin(
-            st.session_state.active_soi_ids
-        )
+        working_df["id"].isin(  st.session_state.active_soi_ids )
     ].copy()
-
 
 # ==================================================
 # RESET LENS AFTER LOADING / CLEARING SOI
 # ==================================================
 
-if st.session_state.get(
-    "pending_lens_reset",
-    False
-):
-
-    st.session_state[
-        "active_lens"
-    ] = "None"
-
-    st.session_state[
-        "pending_lens_reset"
-    ] = False
-
+if st.session_state.get( "pending_lens_reset", False ):
+    st.session_state[ "active_lens" ] = "None"
+    st.session_state["pending_lens_reset" ] = False
 
 # ==================================================
 # LENSES / SOI IDENTIFICATION
