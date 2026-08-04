@@ -212,6 +212,26 @@ def render_scatter(
         )
     )
 
+    if (
+        "highlight"
+        in df.columns
+        and df["highlight"].any()
+    ):
+
+        marker_opacity = df[
+            "highlight"
+        ].apply(
+            lambda value: 1.0 if value else 0.25
+        )
+
+        fig.update_traces(
+            marker=dict(
+                opacity=marker_opacity
+            )
+        )
+
+        
+
     fig.update_layout(
         height=500,
         template="plotly_white",

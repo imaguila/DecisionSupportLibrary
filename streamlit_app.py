@@ -3,6 +3,7 @@
 ## --------------------------------------------------------------------------------------
 
 import streamlit as st
+from datetime import datetime
 
 from core.input_panel import render_input_panel
 from core.enrichment import render_enrichment
@@ -14,7 +15,18 @@ from lenses.lenses import render_lens_panel
 from lenses.lens_engine import apply_lens
 from lenses.lens_feedback import render_lens_feedback
 from lenses.lens_selection import (
-    render_group_selector_and_save )
+    render_group_selector_and_save
+)
+
+from css.css_panel import (
+    render_css_panel
+)
+
+from css.css_comparison import (
+    render_css_comparison
+)
+
+
 
 
 st.set_page_config(
@@ -206,11 +218,31 @@ if "pending_save_soi" in st.session_state:
 
 
 # ==================================================
+# CANDIDATE SOLUTION SET
+# ==================================================
+
+css_df = render_css_panel(
+    current_df,
+    dataset
+)
+
+
+# ==================================================
 # WORKSPACE
 # ==================================================
 
 render_workspace(
-    current_df,
+    css_df,
     dataset,
     show_ids
+)
+
+
+# ==================================================
+# DETAILED COMPARISON
+# ==================================================
+
+render_css_comparison(
+    css_df,
+    dataset
 )
