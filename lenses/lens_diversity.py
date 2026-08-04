@@ -2,7 +2,12 @@
 ## lens_diversity.py
 ## --------------------------------------------------------------------------------------
 
+## --------------------------------------------------------------------------------------
+## lens_diversity.py
+## --------------------------------------------------------------------------------------
+
 import pandas as pd
+import streamlit as st
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
@@ -18,6 +23,166 @@ try:
 except Exception:
     HDBSCAN = None
 
+
+# =====================================================
+# UI
+# =====================================================
+
+def render_params(
+    dataset,
+    working_df
+):
+
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
+
+    params = {}
+
+    max_n = max(
+        len(working_df),
+        1
+    )
+
+    if len(dimensions) < 2:
+
+        st.info(
+            "At least two dimensions are required "
+            "for clustering."
+        )
+
+        params["method"] = "K-Medoids"
+        params["cluster_metrics"] = []
+
+        return params
+
+    params["method"] = st.selectbox(
+        "Clustering Method",
+        [
+            "K-Medoids",
+            "HDBSCAN"
+        ],
+        key="div_method"
+    )
+
+    default_cluster_metrics = dimensions[
+        :min(
+            2,
+            len(dimensions)
+        )
+    ]
+
+    params["cluster_metrics"] = st.multiselect(
+        "Metrics for Clustering",
+        dimensions,
+        default=default_cluster_metrics,
+        key="div_cluster_metrics"
+    )
+
+    if params["method"] == "K-Medoids":
+
+        params["k_mode"] = st.radio(
+            "Number of Clusters",
+            [
+                "Auto",
+                "Manual"
+            ],
+            horizontal=True,
+            key="div_k_mode"
+        )
+
+        if params["k_mode"] == "Manual":
+
+            max_k = max(
+                2,
+                min(
+                    10,
+                    max_n
+                )
+            )
+
+            default_k = min(
+                3,
+                max_k
+            )
+
+            params["k"] = st.slider(
+                "k Clusters",
+                2,
+                max_k,
+                default_k,
+                key="div_k"
+            )
+
+        else:
+
+            st.caption(
+                "Auto mode selects k using silhouette score."
+            )
+
+    elif params["method"] == "HDBSCAN":
+
+        params["cluster_size_mode"] = st.radio(
+            "Cluster Size",
+            [
+                "Auto",
+                "Manual"
+            ],
+            horizontal=True,
+            key="div_hdbscan_size_mode"
+        )
+
+        if params["cluster_size_mode"] == "Auto":
+
+            params["granularity"] = st.selectbox(
+                "Cluster Granularity",
+                [
+                    "Small (~5%)",
+                    "Medium (~10%)",
+                    "Large (~20%)"
+                ],
+                index=1,
+                key="div_hdbscan_granularity"
+            )
+
+        else:
+
+            default_min_cluster_size = max(
+                2,
+                int(
+                    0.10 * max_n
+                )
+            )
+
+            params["min_cluster_size"] = st.slider(
+                "Minimum Cluster Size",
+                2,
+                max(
+                    2,
+                    max_n
+                ),
+                default_min_cluster_size,
+                key="div_hdbscan_min_cluster_size"
+            )
+
+        params["exclude_noise"] = st.checkbox(
+            "Exclude noise solutions",
+            value=True,
+            key="div_hdbscan_exclude_noise"
+        )
+
+    st.caption(
+        "Diversity structures the current subset into clusters "
+        "instead of applying a preference score."
+    )
+
+    return params
+
+# =====================================================
+# HELPERS
+# =====================================================
 
 def _valid_numeric_metrics(
     df,
@@ -177,9 +342,7 @@ def _fit_hdbscan(
             )
         ]
 
-        method_used = (
-            "HDBSCAN unavailable"
-        )
+        method_used = "HDBSCAN unavailable"
 
         return labels, method_used
 
@@ -194,7 +357,6 @@ def _fit_hdbscan(
     method_used = "HDBSCAN"
 
     return labels, method_used
-
 
 def _add_cluster_labels(
     result,
@@ -252,6 +414,22 @@ def _add_cluster_labels(
         ")"
     )
 
+    n_clusters = (
+        result["cluster"]
+        .dropna()
+        .astype(int)
+        .loc[
+            lambda values: values != -1
+        ]
+        .nunique()
+    )
+
+    noise_count = (
+        result["cluster"]
+        .eq(-1)
+        .sum()
+    )
+
     result[
         "diversity_method"
     ] = method_used
@@ -262,16 +440,34 @@ def _add_cluster_labels(
         metrics_used
     )
 
+    result[
+        "diversity_n_clusters"
+    ] = n_clusters
+
+    result[
+        "diversity_noise_count"
+    ] = noise_count
+
     return result
 
 
-def apply_diversity_lens(
+# =====================================================
+# APPLY
+# =====================================================
+
+def apply(
     df,
-    dimensions,
-    params
+    params,
+    dataset
 ):
 
     result = df.copy()
+
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
 
     method = params.get(
         "method",
@@ -300,10 +496,6 @@ def apply_diversity_lens(
         result,
         cluster_metrics
     )
-
-    # ==================================================
-    # K-MEDOIDS
-    # ==================================================
 
     if method == "K-Medoids":
 
@@ -361,10 +553,7 @@ def apply_diversity_lens(
                 "diversity_silhouette"
             ] = silhouette
 
-
-    # ==================================================
-    # HDBSCAN
-    # ==================================================
+        return result
 
     if method == "HDBSCAN":
 
@@ -434,6 +623,7 @@ def apply_diversity_lens(
             method_used,
             cluster_metrics
         )
+
         result[
             "diversity_min_cluster_size"
         ] = min_cluster_size
@@ -452,3 +642,62 @@ def apply_diversity_lens(
         return result
 
     return result
+
+
+# =====================================================
+# FEEDBACK
+# =====================================================
+
+def render_feedback(
+    lens_df
+):
+
+    if "diversity_n_clusters" in lens_df.columns:
+
+        n_clusters = (
+            lens_df["diversity_n_clusters"]
+            .dropna()
+            .iloc[0]
+        )
+
+        st.info(
+            f"Clusters detected: {int(n_clusters)}"
+        )
+
+    if "diversity_k" in lens_df.columns:
+
+        k_value = (
+            lens_df["diversity_k"]
+            .dropna()
+            .iloc[0]
+        )
+
+        st.success(
+            f"Selected k: {int(k_value)}"
+        )
+
+    if "diversity_silhouette" in lens_df.columns:
+
+        silhouette_value = (
+            lens_df["diversity_silhouette"]
+            .dropna()
+            .iloc[0]
+        )
+
+        st.caption(
+            f"Silhouette score: {silhouette_value:.3f}"
+        )
+
+    if "diversity_noise_count" in lens_df.columns:
+
+        noise_count = (
+            lens_df["diversity_noise_count"]
+            .dropna()
+            .iloc[0]
+        )
+
+        if int(noise_count) > 0:
+
+            st.caption(
+                f"Noise solutions: {int(noise_count)}"
+            )

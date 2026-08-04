@@ -1819,7 +1819,7 @@ from lenses.lens_efficiency import (
     apply_efficiency_lens
 )
 
-from lenses.lens_domain import (
+from lenses.lens_indicators import (
     apply_domain_lens
 )
 
