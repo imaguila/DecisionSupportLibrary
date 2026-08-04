@@ -79,15 +79,13 @@ def render_params(
         key="div_cluster_metrics"
     )
 
-
     if params["method"] in [
         "K-Medoids",
-        "K-Means",
-        "Agglomerative"
+        "K-Means"
     ]:
 
         params["k_mode"] = st.radio(
-            "Number of groups",
+            "Number of Groups",
             [
                 "Auto",
                 "Manual"
@@ -95,8 +93,6 @@ def render_params(
             horizontal=True,
             key="div_k_mode"
         )
-
-
 
         if params["k_mode"] == "Manual":
 
@@ -114,7 +110,7 @@ def render_params(
             )
 
             params["k"] = st.slider(
-                "k Clusters",
+                "k Groups",
                 2,
                 max_k,
                 default_k,
@@ -123,19 +119,79 @@ def render_params(
 
         else:
 
-            if params["method"] == "Agglomerative":
+            st.caption(
+                "Auto mode selects k using silhouette score."
+            )
+
+    elif params["method"] == "Agglomerative":
+
+        params["agglomerative_mode"] = st.radio(
+            "Hierarchy Cut Mode",
+            [
+                "Number of Groups",
+                "Distance Cut"
+            ],
+            horizontal=True,
+            key="div_agglomerative_mode"
+        )
+
+        if params["agglomerative_mode"] == "Number of Groups":
+
+            params["k_mode"] = st.radio(
+                "Number of Groups",
+                [
+                    "Auto",
+                    "Manual"
+                ],
+                horizontal=True,
+                key="div_agg_k_mode"
+            )
+
+            if params["k_mode"] == "Manual":
+
+                max_k = max(
+                    2,
+                    min(
+                        10,
+                        max_n
+                    )
+                )
+
+                default_k = min(
+                    3,
+                    max_k
+                )
+
+                params["k"] = st.slider(
+                    "k Groups",
+                    2,
+                    max_k,
+                    default_k,
+                    key="div_agg_k"
+                )
+
+            else:
 
                 st.caption(
                     "Auto mode selects the dendrogram cut "
                     "that produces the best silhouette score."
                 )
 
-            else:
+        else:
 
-                st.caption(
-                    "Auto mode selects k using silhouette score."
-                )
+            params["distance_threshold"] = st.slider(
+                "Distance Threshold",
+                0.10,
+                10.00,
+                2.00,
+                0.10,
+                key="div_agg_distance_threshold"
+            )
 
+            st.caption(
+                "Distance Cut builds the hierarchy and cuts it at the selected "
+                "distance. The number of groups is determined automatically."
+            )
 
 
     elif params["method"] == "HDBSCAN":
@@ -417,6 +473,58 @@ def _fit_hdbscan(
 
     return labels, method_used
 
+def _fit_agglomerative_distance_cut(
+    x_scaled,
+    distance_threshold
+):
+
+    model = AgglomerativeClustering(
+        n_clusters=None,
+        distance_threshold=distance_threshold,
+        compute_full_tree=True
+    )
+
+    labels = model.fit_predict(
+        x_scaled
+    )
+
+    method_used = "Agglomerative distance cut"
+
+    return labels, method_used
+
+
+def _compute_silhouette_if_valid(
+    x_scaled,
+    labels
+):
+
+    unique_labels = set(
+        labels
+    )
+
+    n = len(
+        labels
+    )
+
+    if (
+        len(unique_labels) <= 1
+        or
+        len(unique_labels) >= n
+    ):
+
+        return None
+
+    try:
+
+        return silhouette_score(
+            x_scaled,
+            labels
+        )
+
+    except Exception:
+
+        return None
+
 
 def _add_cluster_labels(
     result,
@@ -565,9 +673,10 @@ def apply(
 
     if method in [
         "K-Medoids",
-        "K-Means",
-        "Agglomerative"
+        "K-Means"
     ]:
+        
+
 
         k_mode = params.get(
             "k_mode",
@@ -626,6 +735,113 @@ def apply(
             ] = silhouette
 
         return result
+
+
+
+
+    if method == "Agglomerative":
+
+        agglomerative_mode = params.get(
+            "agglomerative_mode",
+            "Number of Groups"
+        )
+
+        if agglomerative_mode == "Distance Cut":
+
+            distance_threshold = params.get(
+                "distance_threshold",
+                2.0
+            )
+
+            labels, method_used = _fit_agglomerative_distance_cut(
+                x_scaled,
+                distance_threshold
+            )
+
+            result = _add_cluster_labels(
+                result,
+                labels,
+                method_used,
+                cluster_metrics
+            )
+
+            result[
+                "diversity_distance_threshold"
+            ] = distance_threshold
+
+            silhouette = _compute_silhouette_if_valid(
+                x_scaled,
+                labels
+            )
+
+            if silhouette is not None:
+
+                result[
+                    "diversity_silhouette"
+                ] = silhouette
+
+            return result
+
+        k_mode = params.get(
+            "k_mode",
+            "Auto"
+        )
+
+        if k_mode == "Manual":
+
+            k = params.get(
+                "k",
+                2
+            )
+
+            k = max(
+                2,
+                min(
+                    k,
+                    len(result)
+                )
+            )
+
+            silhouette = None
+
+        else:
+
+            k, silhouette = _compute_auto_k(
+                x_scaled,
+                method
+            )
+
+            if k < 2:
+
+                return result
+
+        labels, method_used = _fit_partition_clustering(
+            x_scaled,
+            method,
+            k
+        )
+
+        result = _add_cluster_labels(
+            result,
+            labels,
+            method_used,
+            cluster_metrics
+        )
+
+        result[
+            "diversity_k"
+        ] = k
+
+        if silhouette is not None:
+
+            result[
+                "diversity_silhouette"
+            ] = silhouette
+
+        return result
+
+
+
 
     # ==================================================
     # HDBSCAN
@@ -833,6 +1049,19 @@ def render_feedback(
         st.caption(
             f"Minimum cluster size: {int(min_cluster_size)}"
         )
+        
+    distance_threshold = _safe_first_value(
+        lens_df,
+        "diversity_distance_threshold"
+    )
+
+    if distance_threshold is not None:
+
+        st.caption(
+            f"Distance threshold: {float(distance_threshold):.2f}"
+        )
+
+
 
     noise_count = _safe_first_value(
         lens_df,
