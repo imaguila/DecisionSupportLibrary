@@ -803,3 +803,214 @@ def render_feedback(
             st.caption(
                 f"Noise solutions: {int(noise_count)}"
             )
+
+# =====================================================
+# APPLY
+# =====================================================
+
+def apply(
+    df,
+    params,
+    dataset
+):
+
+    result = df.copy()
+
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
+
+    method = params.get(
+        "method",
+        "K-Medoids"
+    )
+
+    cluster_metrics = params.get(
+        "cluster_metrics",
+        dimensions
+    )
+
+    cluster_metrics = _valid_numeric_metrics(
+        result,
+        cluster_metrics
+    )
+
+    if len(cluster_metrics) < 2:
+
+        return result
+
+    if len(result) < 2:
+
+        return result
+
+    x_scaled = _prepare_matrix(
+        result,
+        cluster_metrics
+    )
+
+    if method in [
+        "K-Medoids",
+        "K-Means",
+        "Agglomerative"
+    ]:
+
+        k_mode = params.get(
+            "k_mode",
+            "Auto"
+        )
+
+        if k_mode == "Manual":
+
+            k = params.get(
+                "k",
+                2
+            )
+
+            k = max(
+                2,
+                min(
+                    k,
+                    len(result)
+                )
+            )
+
+            silhouette = None
+
+        else:
+
+            k, silhouette = _compute_auto_k(
+                x_scaled,
+                method
+            )
+
+            if k < 2:
+
+                return result
+
+        labels, method_used = _fit_partition_clustering(
+            x_scaled,
+            method,
+            k
+        )
+
+        result = _add_cluster_labels(
+            result,
+            labels,
+            method_used,
+            cluster_metrics
+        )
+
+        result[
+            "diversity_k"
+        ] = k
+
+        if silhouette is not None:
+
+            result[
+                "diversity_silhouette"
+            ] = silhouette
+
+        return result
+
+    if method == "HDBSCAN":
+
+        n = len(
+            result
+        )
+
+        size_mode = params.get(
+            "cluster_size_mode",
+            "Auto"
+        )
+
+        if size_mode == "Manual":
+
+            min_cluster_size = params.get(
+                "min_cluster_size",
+                max(
+                    2,
+                    int(
+                        0.1 * n
+                    )
+                )
+            )
+
+        else:
+
+            granularity = params.get(
+                "granularity",
+                "Medium (~10%)"
+            )
+
+            if granularity == "Small (~5%)":
+
+                min_cluster_size = max(
+                    2,
+                    int(
+                        0.05 * n
+                    )
+                )
+
+            elif granularity == "Large (~20%)":
+
+                min_cluster_size = max(
+                    2,
+                    int(
+                        0.20 * n
+                    )
+                )
+
+            else:
+
+                min_cluster_size = max(
+                    2,
+                    int(
+                        0.10 * n
+                    )
+                )
+
+        labels, method_used = _fit_hdbscan(
+            x_scaled,
+            min_cluster_size
+        )
+
+        result = _add_cluster_labels(
+            result,
+            labels,
+            method_used,
+            cluster_metrics
+        )
+
+        result[
+            "diversity_min_cluster_size"
+        ] = min_cluster_size
+
+        exclude_noise = params.get(
+            "exclude_noise",
+            True
+        )
+
+        if exclude_noise:
+
+            filtered_result = result[
+                result["cluster"] != -1
+            ].copy()
+
+            if filtered_result.empty:
+
+                result[
+                    "diversity_warning"
+                ] = (
+                    "All solutions were classified as noise. "
+                    "Noise exclusion was not applied."
+                )
+
+                return result
+
+            return filtered_result
+
+        return result
+
+    return result
