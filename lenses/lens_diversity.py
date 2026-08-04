@@ -87,7 +87,7 @@ def render_params(
     ]:
 
         params["k_mode"] = st.radio(
-            "Number of Clusters",
+            "Number of groups",
             [
                 "Auto",
                 "Manual"
@@ -95,6 +95,8 @@ def render_params(
             horizontal=True,
             key="div_k_mode"
         )
+
+
 
         if params["k_mode"] == "Manual":
 
@@ -121,9 +123,20 @@ def render_params(
 
         else:
 
-            st.caption(
-                "Auto mode selects k using silhouette score."
-            )
+            if params["method"] == "Agglomerative":
+
+                st.caption(
+                    "Auto mode selects the dendrogram cut "
+                    "that produces the best silhouette score."
+                )
+
+            else:
+
+                st.caption(
+                    "Auto mode selects k using silhouette score."
+                )
+
+
 
     elif params["method"] == "HDBSCAN":
 
@@ -834,4 +847,3 @@ def render_feedback(
                 f"Noise solutions: {int(noise_count)}"
             )
 
-            
