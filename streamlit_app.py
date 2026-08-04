@@ -9,6 +9,9 @@ from core.workspace import render_workspace
 from lenses.lenses import render_lens_panel
 from lenses.lens_engine import apply_lens
 from lenses.lens_feedback import render_lens_feedback
+from lenses.lens_selection import (
+    render_group_selector_and_save
+)
 
 
 st.set_page_config(
@@ -33,18 +36,33 @@ st.title(
 )
 
 
+# ==================================================
+# INPUT
+# ==================================================
+
 dataset = render_input_panel()
 
 if dataset is None:
+
     st.info(
         "Select a domain configuration to begin."
     )
+
     st.stop()
 
+
+# ==================================================
+# ENRICHMENT
+# ==================================================
 
 dataset = render_enrichment(
     dataset
 )
+
+
+# ==================================================
+# WORKSPACE CONTROLS
+# ==================================================
 
 dimensions = (
     dataset["metrics"]
@@ -56,9 +74,19 @@ show_ids = render_workspace_controls(
     dimensions
 )
 
+
+# ==================================================
+# FRAMING
+# ==================================================
+
 framed_df = apply_framing(
     dataset
 )
+
+
+# ==================================================
+# WORKING DATASET
+# ==================================================
 
 working_df = framed_df.copy()
 
@@ -70,6 +98,10 @@ if "active_soi_ids" in st.session_state:
         )
     ].copy()
 
+
+# ==================================================
+# RESET LENS AFTER LOADING / CLEARING SOI
+# ==================================================
 
 if st.session_state.get(
     "pending_lens_reset",
@@ -85,7 +117,16 @@ if st.session_state.get(
     ] = False
 
 
-active_lens, lens_params, feedback_placeholder = render_lens_panel(
+# ==================================================
+# LENSES / SOI IDENTIFICATION
+# ==================================================
+
+(
+    active_lens,
+    lens_params,
+    feedback_placeholder,
+    selection_placeholder
+) = render_lens_panel(
     dataset,
     working_df
 )
@@ -107,6 +148,10 @@ if lens_df is None:
     lens_df = working_df.copy()
 
 
+# ==================================================
+# LENS FEEDBACK
+# ==================================================
+
 render_lens_feedback(
     feedback_placeholder,
     active_lens,
@@ -114,13 +159,35 @@ render_lens_feedback(
 )
 
 
+# ==================================================
+# GROUP SELECTION / CURRENT SOI CANDIDATE SET
+# ==================================================
+
+current_df = render_group_selector_and_save(
+    selection_placeholder,
+    active_lens,
+    lens_df,
+    lens_params
+)
+
+if current_df is None:
+
+    current_df = lens_df.copy()
+
+
+# ==================================================
+# SAVE CURRENT SOI
+# ==================================================
+
 if "pending_save_soi" in st.session_state:
 
     if "saved_sois" not in st.session_state:
 
         st.session_state.saved_sois = []
 
-    pending = st.session_state.pending_save_soi
+    pending = (
+        st.session_state.pending_save_soi
+    )
 
     existing_names = [
         soi["name"]
@@ -143,7 +210,17 @@ if "pending_save_soi" in st.session_state:
                     "params",
                     {}
                 ),
-                "ids": lens_df["id"].tolist()
+                "ids": pending.get(
+                    "ids",
+                    current_df["id"].tolist()
+                ),
+                "group": pending.get(
+                    "group",
+                    "All groups"
+                ),
+                "group_column": pending.get(
+                    "group_column"
+                )
             }
         )
 
@@ -155,8 +232,13 @@ if "pending_save_soi" in st.session_state:
         "pending_save_soi"
     ]
 
+
+# ==================================================
+# WORKSPACE
+# ==================================================
+
 render_workspace(
-    lens_df,
+    current_df,
     dataset,
     show_ids
 )

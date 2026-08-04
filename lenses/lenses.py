@@ -10,54 +10,11 @@ from lenses.lens_registry import (
 )
 
 
-# =====================================================
-# SESSION HELPERS
-# =====================================================
-
-def ensure_soi_state():
-
-    if "saved_sois" not in st.session_state:
-
-        st.session_state.saved_sois = []
-
-
-def reset_soi_name_if_lens_changed(
-    active_lens
-):
-
-    default_name = (
-        f"{active_lens} "
-        f"#{len(st.session_state.saved_sois) + 1}"
-    )
-
-    if (
-        st.session_state.get(
-            "soi_name_lens"
-        )
-        != active_lens
-    ):
-
-        st.session_state[
-            "soi_name"
-        ] = default_name
-
-        st.session_state[
-            "soi_name_lens"
-        ] = active_lens
-
-
-# =====================================================
-# HEADER
-# =====================================================
-
 def render_lens_header(
     active_lens
 ):
 
-    if (
-        "active_soi_name"
-        in st.session_state
-    ):
+    if "active_soi_name" in st.session_state:
 
         st.caption(
             f"Working on loaded SOI: "
@@ -81,10 +38,6 @@ def render_lens_header(
             unsafe_allow_html=True
         )
 
-
-# =====================================================
-# LENS PARAMETERS
-# =====================================================
 
 def render_active_lens_params(
     active_lens,
@@ -125,53 +78,10 @@ def render_active_lens_params(
     )
 
 
-# =====================================================
-# SAVE SOI
-# =====================================================
-
-def render_save_soi_controls(
-    active_lens,
-    params
-):
-
-    if active_lens == "None":
-
-        return
-
-    st.markdown("---")
-
-    reset_soi_name_if_lens_changed(
-        active_lens
-    )
-
-    soi_name = st.text_input(
-        "Name",
-        key="soi_name"
-    )
-
-    if st.button(
-        "💾 Save Current Set",
-        use_container_width=True,
-        key="save_current_soi"
-    ):
-
-        st.session_state.pending_save_soi = {
-            "name": soi_name,
-            "lens": active_lens,
-            "params": params
-        }
-
-
-# =====================================================
-# MAIN PANEL
-# =====================================================
-
 def render_lens_panel(
     dataset,
     working_df
 ):
-
-    ensure_soi_state()
 
     params = {}
 
@@ -196,11 +106,15 @@ def render_lens_panel(
             working_df
         )
 
-        render_save_soi_controls(
-            active_lens,
-            params
-        )
-
+        # Feedback goes here after the lens is applied.
         feedback_placeholder = st.empty()
 
-    return active_lens, params, feedback_placeholder
+        # Group selection and save controls go here after feedback.
+        selection_placeholder = st.empty()
+
+    return (
+        active_lens,
+        params,
+        feedback_placeholder,
+        selection_placeholder
+    )

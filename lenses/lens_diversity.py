@@ -2,10 +2,6 @@
 ## lens_diversity.py
 ## --------------------------------------------------------------------------------------
 
-## --------------------------------------------------------------------------------------
-## lens_diversity.py
-## --------------------------------------------------------------------------------------
-
 import pandas as pd
 import streamlit as st
 
@@ -675,20 +671,16 @@ def render_feedback(
 ):
 
     if lens_df is None:
-
         st.warning(
             "No clustering result is available."
         )
-
         return
 
     if lens_df.empty:
-
         st.warning(
             "The clustering lens returned an empty subset. "
             "Try reducing the HDBSCAN cluster size or disabling noise exclusion."
         )
-
         return
 
     n_clusters = _safe_first_value(
@@ -697,21 +689,17 @@ def render_feedback(
     )
 
     if n_clusters is not None:
-
-        st.info(
-            f"Clusters detected: {int(n_clusters)}"
-        )
+        st.info(f"Clusters detected: {int(n_clusters)}")
 
     k_value = _safe_first_value(
         lens_df,
         "diversity_k"
     )
 
-    if k_value is not None:
-
-        st.success(
-            f"Selected k: {int(k_value)}"
-        )
+#    if k_value is not None:
+#        st.success(
+#            f"Selected k: {int(k_value)}"
+#        )
 
     silhouette_value = _safe_first_value(
         lens_df,
@@ -719,7 +707,6 @@ def render_feedback(
     )
 
     if silhouette_value is not None:
-
         st.caption(
             f"Silhouette score: {silhouette_value:.3f}"
         )
