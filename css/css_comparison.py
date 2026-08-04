@@ -92,7 +92,9 @@ def normalize_metric(
 
     return normalized
 
-
+# =====================================================
+# TRADE-OFF RADAR
+# =====================================================
 # =====================================================
 # TRADE-OFF RADAR
 # =====================================================
@@ -146,8 +148,22 @@ def render_tradeoff_radar(
     for idx, metric in enumerate(
         selected_metrics
     ):
+        
+        metric_goals = {}
 
-        with colsmetric_goals[
+        cols = st.columns(
+            len(selected_metrics)
+        )
+
+    for idx, metric in enumerate(
+        selected_metrics
+    ):
+
+        col = cols[idx]
+
+        with col:
+
+            metric_goals[
                 metric
             ] = st.selectbox(
                 metric,
@@ -157,6 +173,7 @@ def render_tradeoff_radar(
                 ],
                 key=f"css_goal_{metric}"
             )
+
 
     radar_df = compare_df.copy()
 
@@ -218,9 +235,8 @@ def render_tradeoff_radar(
         use_container_width=True
     )
 
-
 # =====================================================
-# DECISION-VARIABLE COMPOSITION
+# DECISION-VARIABLE MATRIX
 # =====================================================
 
 def render_decision_variable_matrix(
@@ -312,196 +328,3 @@ def render_decision_variable_matrix(
         use_container_width=True
     )
 
-
-def render_decision_variable_distribution(
-    css_df,
-    dataset
-):
-
-    variable_cols = get_decision_variable_columns(
-        css_df,
-        dataset
-    )
-
-    var_prefix = (
-        dataset["config"]
-        .get(
-            "var_prefix",
-            "x_"
-        )
-    )
-
-    if not variable_cols:
-
-        st.info(
-            f"No decision-variable columns with prefix "
-            f"'{var_prefix}' found in the current CSS."
-        )
-
-        return
-
-    variable_summary = (
-        css_df[variable_cols]
-        .mean()
-        .reset_index()
-    )
-
-    variable_summary.columns = [
-        "decision_variable",
-        "selection_rate"
-    ]
-
-    variable_summary = variable_summary.sort_values(
-        "selection_rate",
-        ascending=False
-    )
-
-    max_variables = min(
-        50,
-        len(variable_summary)
-    )
-
-    top_n = st.slider(
-        "Decision variables to show",
-        5,
-        max(
-            5,
-            max_variables
-        ),
-        min(
-            20,
-            max_variables
-        ),
-        key="css_decision_variable_top_n"
-    )
-
-    plot_df = variable_summary.head(
-        top_n
-    )
-
-    fig = px.bar(
-        plot_df,
-        x="decision_variable",
-        y="selection_rate",
-        labels={
-            "decision_variable": "Decision variable",
-            "selection_rate": "Selection rate in CSS"
-        }
-    )
-
-    fig.update_layout(
-        template="plotly_white",
-        height=420,
-        xaxis_tickangle=-45
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
-
-
-# =====================================================
-# MAIN CSS COMPARISON
-# =====================================================
-
-def render_css_comparison(
-    css_df,
-    dataset
-):
-
-    if not st.session_state.get(
-        "show_css_comparison",
-        False
-    ):
-
-        return
-
-    st.markdown(
-        "## 🆚 Detailed comparison"
-    )
-
-    if css_df is None or css_df.empty:
-
-        st.info(
-            "No Candidate Solution Set is available for comparison."
-        )
-
-        return
-
-    if "id" not in css_df.columns:
-
-        st.warning(
-            "The current CSS does not contain an 'id' column."
-        )
-
-        return
-
-    css_ids = (
-        css_df["id"]
-        .dropna()
-        .astype(int)
-        .tolist()
-    )
-
-    default_ids = st.session_state.get(
-        "css_highlight_ids",
-        []
-    )
-
-    default_ids = [
-        solution_id
-        for solution_id in default_ids
-        if solution_id in css_ids
-    ]
-
-    compare_ids = st.multiselect(
-        "Pick solutions to compare",
-        css_ids,
-        default=default_ids,
-        key="css_compare_ids"
-    )
-
-    if len(compare_ids) < 2:
-
-        st.info(
-            "Select at least 2 solutions to compare."
-        )
-
-        return
-
-    compare_df = css_df[
-        css_df["id"].isin(
-            compare_ids
-        )
-    ].copy()
-
-    tab1, tab2, tab3 = st.tabs(
-        [
-            "📊 Objectives and indicators",
-            "📋 Decision-variable matrix",
-            "📈 Decision-variable distribution"
-        ]
-    )
-
-    with tab1:
-
-        render_tradeoff_radar(
-            compare_df,
-            css_df,
-            dataset
-        )
-
-    with tab2:
-
-        render_decision_variable_matrix(
-            compare_df,
-            dataset
-        )
-
-    with tab3:
-
-        render_decision_variable_distribution(
-            css_df,
-            dataset
-        )
