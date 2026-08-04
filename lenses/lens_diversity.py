@@ -648,53 +648,99 @@ def apply(
 # FEEDBACK
 # =====================================================
 
+
+def _safe_first_value(
+    df,
+    column
+):
+
+    if column not in df.columns:
+
+        return None
+
+    values = (
+        df[column]
+        .dropna()
+    )
+
+    if values.empty:
+
+        return None
+
+    return values.iloc[0]
+
+
 def render_feedback(
     lens_df
 ):
 
-    if "diversity_n_clusters" in lens_df.columns:
+    if lens_df is None:
 
-        n_clusters = (
-            lens_df["diversity_n_clusters"]
-            .dropna()
-            .iloc[0]
+        st.warning(
+            "No clustering result is available."
         )
+
+        return
+
+    if lens_df.empty:
+
+        st.warning(
+            "The clustering lens returned an empty subset. "
+            "Try reducing the HDBSCAN cluster size or disabling noise exclusion."
+        )
+
+        return
+
+    n_clusters = _safe_first_value(
+        lens_df,
+        "diversity_n_clusters"
+    )
+
+    if n_clusters is not None:
 
         st.info(
             f"Clusters detected: {int(n_clusters)}"
         )
 
-    if "diversity_k" in lens_df.columns:
+    k_value = _safe_first_value(
+        lens_df,
+        "diversity_k"
+    )
 
-        k_value = (
-            lens_df["diversity_k"]
-            .dropna()
-            .iloc[0]
-        )
+    if k_value is not None:
 
         st.success(
             f"Selected k: {int(k_value)}"
         )
 
-    if "diversity_silhouette" in lens_df.columns:
+    silhouette_value = _safe_first_value(
+        lens_df,
+        "diversity_silhouette"
+    )
 
-        silhouette_value = (
-            lens_df["diversity_silhouette"]
-            .dropna()
-            .iloc[0]
-        )
+    if silhouette_value is not None:
 
         st.caption(
             f"Silhouette score: {silhouette_value:.3f}"
         )
 
-    if "diversity_noise_count" in lens_df.columns:
+    min_cluster_size = _safe_first_value(
+        lens_df,
+        "diversity_min_cluster_size"
+    )
 
-        noise_count = (
-            lens_df["diversity_noise_count"]
-            .dropna()
-            .iloc[0]
+    if min_cluster_size is not None:
+
+        st.caption(
+            f"Minimum cluster size: {int(min_cluster_size)}"
         )
+
+    noise_count = _safe_first_value(
+        lens_df,
+        "diversity_noise_count"
+    )
+
+    if noise_count is not None:
 
         if int(noise_count) > 0:
 

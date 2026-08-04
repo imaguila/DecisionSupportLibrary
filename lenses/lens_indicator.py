@@ -10,11 +10,16 @@ import streamlit as st
 # =====================================================
 # UI
 # =====================================================
-
 def render_params(
     dataset,
     working_df
 ):
+
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
 
     indicators = dataset[
         "selected_indicators"
@@ -32,11 +37,11 @@ def render_params(
         max_n
     )
 
-    if len(indicators) == 0:
+    if len(dimensions) == 0:
 
         st.info(
-            "No indicators are currently selected. "
-            "Enable indicators in Data Enrichment first."
+            "No dimensions are currently available. "
+            "Select objectives or enable indicators first."
         )
 
         params["method"] = "Top-N Matches"
@@ -55,20 +60,50 @@ def render_params(
         key="indicator_method"
     )
 
+    if params["method"] == "Top-N Matches":
+
+        available_criteria = dimensions
+
+        st.caption(
+            "Top-N Matches can use both original objectives "
+            "and enriched indicators."
+        )
+
+    else:
+
+        available_criteria = indicators
+
+        if len(available_criteria) == 0:
+
+            st.info(
+                "Non-dominated analysis currently uses enriched indicators. "
+                "Enable indicators in Data Enrichment first."
+            )
+
+            params["maximize"] = []
+            params["minimize"] = []
+            params["top_n"] = None
+
+            return params
+
+        st.caption(
+            "Non-dominated analysis uses enriched indicators."
+        )
+
     params["maximize"] = st.multiselect(
-        "Indicators to Maximize",
-        indicators,
+        "Dimensions to Maximize",
+        available_criteria,
         key="indicator_maximize"
     )
 
     minimize_options = [
-        indicator
-        for indicator in indicators
-        if indicator not in params["maximize"]
+        criterion
+        for criterion in available_criteria
+        if criterion not in params["maximize"]
     ]
 
     params["minimize"] = st.multiselect(
-        "Indicators to Minimize",
+        "Dimensions to Minimize",
         minimize_options,
         key="indicator_minimize"
     )
@@ -76,7 +111,7 @@ def render_params(
     if params["method"] == "Top-N Matches":
 
         params["top_n"] = st.slider(
-            "Top N per Indicator",
+            "Top N per Dimension",
             1,
             max_n,
             default_n,
@@ -84,8 +119,8 @@ def render_params(
         )
 
         st.caption(
-            "Top-N Matches counts how often each solution appears "
-            "among the best solutions for the selected indicators."
+            "This method counts how often each solution appears "
+            "among the best candidates for the selected dimensions."
         )
 
     else:
@@ -93,8 +128,8 @@ def render_params(
         params["top_n"] = None
 
         st.caption(
-            "Non-dominated keeps solutions that are not clearly "
-            "outperformed within the selected indicator space."
+            "This method keeps solutions that are not clearly "
+            "outperformed within the selected enriched-indicator space."
         )
 
     return params
