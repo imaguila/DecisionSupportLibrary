@@ -60,7 +60,9 @@ def filter_by_group(
         return lens_df.copy()
 
     return lens_df[
-        lens_df[group_column].astype(str) == str(group_value)
+        lens_df[group_column].astype(str)
+        ==
+        str(group_value)
     ].copy()
 
 
@@ -172,7 +174,8 @@ def render_group_selector_and_save(
         )
 
         st.caption(
-            f"Current SOI candidate size: {len(current_df)} solutions"
+            f"Current SOI candidate size: "
+            f"{len(current_df)} solutions"
         )
 
         st.markdown("---")

@@ -106,10 +106,8 @@ def render_lens_panel(
             working_df
         )
 
-        # Feedback goes here after the lens is applied.
         feedback_placeholder = st.empty()
 
-        # Group selection and save controls go here after feedback.
         selection_placeholder = st.empty()
 
     return (
