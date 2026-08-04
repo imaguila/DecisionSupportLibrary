@@ -10,24 +10,12 @@ from core.enrichment import render_enrichment
 from core.framing import apply_framing
 from core.workspace_controls import render_workspace_controls
 from core.workspace import render_workspace
-
 from lenses.lenses import render_lens_panel
 from lenses.lens_engine import apply_lens
 from lenses.lens_feedback import render_lens_feedback
-from lenses.lens_selection import (
-    render_group_selector_and_save
-)
-
-from css.css_panel import (
-    render_css_panel
-)
-
-from css.css_comparison import (
-    render_css_comparison
-)
-
-
-
+from lenses.lens_selection import ( render_group_selector_and_save )
+from css.css_panel import ( render_css_panel )
+from css.css_comparison import ( render_css_comparison )
 
 st.set_page_config(
     page_title="Decision Space Explorer",
@@ -77,10 +65,7 @@ show_ids = render_workspace_controls( dimensions )
 # FRAMING
 # ==================================================
 
-framed_df = apply_framing(
-    dataset
-)
-
+framed_df = apply_framing( dataset )
 
 # ==================================================
 # WORKING DATASET
