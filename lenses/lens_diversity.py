@@ -1,82 +1,84 @@
-def _build_partition_model(
-    method,
-    k
+## --------------------------------------------------------------------------------------
+## lens_diversity.py
+## --------------------------------------------------------------------------------------
+
+import pandas as pd
+import streamlit as st
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
+
+try:
+    from sklearn_extra.cluster import KMedoids
+except Exception:
+    KMedoids = None
+
+try:
+    from sklearn.cluster import HDBSCAN
+except Exception:
+    HDBSCAN = None
+
+
+# =====================================================
+# UI
+# =====================================================
+
+def render_params(
+    dataset,
+    working_df
 ):
 
-    if method == "K-Medoids":
-
-        if KMedoids is not None:
-
-            return KMedoids(
-                n_clusters=k,
-                method="pam",
-                random_state=123
-            )
-
-        return KMeans(
-            n_clusters=k,
-            random_state=123,
-            n_init=10
-        )
-
-    if method == "K-Means":
-
-        return KMeans(
-            n_clusters=k,
-            random_state=123,
-            n_init=10
-        )
-
-    if method == "Agglomerative":
-
-        return AgglomerativeClustering(
-            n_clusters=k
-        )
-
-    return KMeans(
-        n_clusters=k,
-        random_state=123,
-        n_init=10
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
     )
 
+    params = {}
 
-def _compute_auto_k(
-    x_scaled,
-    method,
-    max_k=10
-):
-
-    n = len(
-        x_scaled
+    max_n = max(
+        len(working_df),
+        1
     )
 
-    if n < 3:
+    if len(dimensions) < 2:
 
-        return 1, None
+        st.info(
+            "At least two dimensions are required for clustering."
+        )
 
-    best_k = 2
-    best_score = -1
+        params["method"] = "K-Medoids"
+        params["cluster_metrics"] = []
 
-    upper_k = min(
-        max_k,
-        n - 1
+        return params
+
+    params["method"] = st.selectbox(
+        "Clustering Method",
+        [
+            "K-Medoids",
+            "K-Means",
+            "Agglomerative",
+            "HDBSCAN"
+        ],
+        key="div_method"
     )
 
-    for k in range(
-        2,
-        upper_k + 1
-    ):
+    default_cluster_metrics = dimensions[
+        :min(
+            2,
+            len(dimensions)
+        )
+    ]
 
-        try:
+    params["cluster_metrics"] = st.multiselect(
+        "Metrics for Clustering",
+        dimensions,
+        default=default_cluster_metrics,
+        key="div_cluster_metrics"
+    )
 
-            model = _build_partition_model(
-                method,
-                k
-            )
-
-            labels = model.fit_predict(
-                x_scaled
-            )
 
     if params["method"] in [
         "K-Medoids",
@@ -232,6 +234,8 @@ def _prepare_matrix(
 
     return x_scaled
 
+
+
 def _build_partition_model(
     method,
     k
@@ -311,6 +315,7 @@ def _compute_auto_k(
             labels = model.fit_predict(
                 x_scaled
             )
+
 
             unique_labels = set(
                 labels
@@ -398,10 +403,6 @@ def _fit_hdbscan(
     method_used = "HDBSCAN"
 
     return labels, method_used
-
-
-
-
 
 
 def _add_cluster_labels(
@@ -496,6 +497,9 @@ def _add_cluster_labels(
 
     return result
 
+
+
+
 # =====================================================
 # APPLY
 # =====================================================
@@ -541,6 +545,10 @@ def apply(
         result,
         cluster_metrics
     )
+
+    # ==================================================
+    # K-MEDOIDS / K-MEANS / AGGLOMERATIVE
+    # ==================================================
 
     if method in [
         "K-Medoids",
@@ -605,7 +613,11 @@ def apply(
             ] = silhouette
 
         return result
-    
+
+    # ==================================================
+    # HDBSCAN
+    # ==================================================
+
     if method == "HDBSCAN":
 
         n = len(
@@ -706,7 +718,6 @@ def apply(
         return result
 
     return result
-
 
 
 # =====================================================
@@ -822,3 +833,5 @@ def render_feedback(
             st.caption(
                 f"Noise solutions: {int(noise_count)}"
             )
+
+            
