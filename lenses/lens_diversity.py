@@ -1,84 +1,82 @@
-## --------------------------------------------------------------------------------------
-## lens_diversity.py
-## --------------------------------------------------------------------------------------
-
-import pandas as pd
-import streamlit as st
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import silhouette_score
-from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
-
-try:
-    from sklearn_extra.cluster import KMedoids
-except Exception:
-    KMedoids = None
-
-try:
-    from sklearn.cluster import HDBSCAN
-except Exception:
-    HDBSCAN = None
-
-
-# =====================================================
-# UI
-# =====================================================
-
-def render_params(
-    dataset,
-    working_df
+def _build_partition_model(
+    method,
+    k
 ):
 
-    dimensions = (
-        dataset["metrics"]
-        +
-        dataset["selected_indicators"]
-    )
+    if method == "K-Medoids":
 
-    params = {}
+        if KMedoids is not None:
 
-    max_n = max(
-        len(working_df),
-        1
-    )
+            return KMedoids(
+                n_clusters=k,
+                method="pam",
+                random_state=123
+            )
 
-    if len(dimensions) < 2:
-
-        st.info(
-            "At least two dimensions are required "
-            "for clustering."
+        return KMeans(
+            n_clusters=k,
+            random_state=123,
+            n_init=10
         )
 
-        params["method"] = "K-Medoids"
-        params["cluster_metrics"] = []
+    if method == "K-Means":
 
-        return params
-
-    params["method"] = st.selectbox(
-        "Clustering Method",
-        [
-            "K-Medoids",
-            "K-Means",
-            "Agglomerative",
-            "HDBSCAN"
-        ],
-        key="div_method"
-    )
-
-    default_cluster_metrics = dimensions[
-        :min(
-            2,
-            len(dimensions)
+        return KMeans(
+            n_clusters=k,
+            random_state=123,
+            n_init=10
         )
-    ]
 
-    params["cluster_metrics"] = st.multiselect(
-        "Metrics for Clustering",
-        dimensions,
-        default=default_cluster_metrics,
-        key="div_cluster_metrics"
+    if method == "Agglomerative":
+
+        return AgglomerativeClustering(
+            n_clusters=k
+        )
+
+    return KMeans(
+        n_clusters=k,
+        random_state=123,
+        n_init=10
     )
+
+
+def _compute_auto_k(
+    x_scaled,
+    method,
+    max_k=10
+):
+
+    n = len(
+        x_scaled
+    )
+
+    if n < 3:
+
+        return 1, None
+
+    best_k = 2
+    best_score = -1
+
+    upper_k = min(
+        max_k,
+        n - 1
+    )
+
+    for k in range(
+        2,
+        upper_k + 1
+    ):
+
+        try:
+
+            model = _build_partition_model(
+                method,
+                k
+            )
+
+            labels = model.fit_predict(
+                x_scaled
+            )
 
     if params["method"] in [
         "K-Medoids",
@@ -150,6 +148,7 @@ def render_params(
                 key="div_hdbscan_granularity"
             )
 
+
         else:
 
             default_min_cluster_size = max(
@@ -187,6 +186,7 @@ def render_params(
     )
 
     return params
+
 
 # =====================================================
 # HELPERS
@@ -232,7 +232,6 @@ def _prepare_matrix(
 
     return x_scaled
 
-
 def _build_partition_model(
     method,
     k
@@ -274,130 +273,6 @@ def _build_partition_model(
         n_init=10
     )
 
-def _compute_auto_k(
-    x_scaled,
-    method,
-    max_k=10
-):
-
-    n = len(
-        x_scaled
-    )
-
-    if n < 3:
-
-        return 1, None
-
-    best_k = 2
-    best_score = -1
-
-    upper_k = min(
-        max_k,
-        n - 1
-    )
-
-    for k in range(
-        2,
-        upper_k + 1
-    ):
-
-        try:
-
-            model = _build_partition_model(
-                method,
-                k
-            )
-
-            labels = model.fit_predict(
-                x_scaled
-            )
-
-            unique_labels = set(
-                labels
-            )
-
-            if (
-                len(unique_labels) > 1
-                and
-                len(unique_labels) < n
-            ):
-
-                score = silhouette_score(
-                    x_scaled,
-                    labels
-                )
-
-                if score > best_score:
-
-                    best_score = score
-                    best_k = k
-
-        except Exception:
-
-            pass
-
-    return best_k, best_score
-
-
-def _fit_partition_clustering(
-    x_scaled,
-    method,
-    k
-):
-
-    model = _build_partition_model(
-        method,
-        k
-    )
-
-    labels = model.fit_predict(
-        x_scaled
-    )
-
-    if (
-        method == "K-Medoids"
-        and
-        KMedoids is None
-    ):
-
-        method_used = "K-Means fallback"
-
-    else:
-
-        method_used = method
-
-    return labels, method_used
-
-
-def _fit_hdbscan(
-    x_scaled,
-    min_cluster_size
-):
-
-    if HDBSCAN is None:
-
-        labels = [
-            0
-            for _ in range(
-                len(x_scaled)
-            )
-        ]
-
-        method_used = "HDBSCAN unavailable"
-
-        return labels, method_used
-
-    model = HDBSCAN(
-        min_cluster_size=min_cluster_size
-    )
-
-    labels = model.fit_predict(
-        x_scaled
-    )
-
-    method_used = "HDBSCAN"
-
-    return labels, method_used
 
 def _compute_auto_k(
     x_scaled,
@@ -523,6 +398,149 @@ def _fit_hdbscan(
     method_used = "HDBSCAN"
 
     return labels, method_used
+
+
+
+
+
+
+def _add_cluster_labels(
+    result,
+    labels,
+    method_used,
+    metrics_used
+):
+
+    result = result.copy()
+
+    result[
+        "cluster"
+    ] = labels
+
+    result[
+        "cluster_str"
+    ] = result[
+        "cluster"
+    ].astype(
+        str
+    )
+
+    result[
+        "cluster_str"
+    ] = result[
+        "cluster_str"
+    ].replace(
+        "-1",
+        "Noise"
+    )
+
+    cluster_sizes = (
+        result
+        .groupby(
+            "cluster_str"
+        )["id"]
+        .transform(
+            "size"
+        )
+    )
+
+    result[
+        "group_label"
+    ] = (
+        "Cluster "
+        +
+        result["cluster_str"]
+        +
+        " (n="
+        +
+        cluster_sizes.astype(
+            str
+        )
+        +
+        ")"
+    )
+
+    n_clusters = (
+        result["cluster"]
+        .dropna()
+        .astype(int)
+        .loc[
+            lambda values: values != -1
+        ]
+        .nunique()
+    )
+
+    noise_count = (
+        result["cluster"]
+        .eq(-1)
+        .sum()
+    )
+
+    result[
+        "diversity_method"
+    ] = method_used
+
+    result[
+        "diversity_metrics"
+    ] = ", ".join(
+        metrics_used
+    )
+
+    result[
+        "diversity_n_clusters"
+    ] = n_clusters
+
+    result[
+        "diversity_noise_count"
+    ] = noise_count
+
+    return result
+
+# =====================================================
+# APPLY
+# =====================================================
+
+def apply(
+    df,
+    params,
+    dataset
+):
+
+    result = df.copy()
+
+    dimensions = (
+        dataset["metrics"]
+        +
+        dataset["selected_indicators"]
+    )
+
+    method = params.get(
+        "method",
+        "K-Medoids"
+    )
+
+    cluster_metrics = params.get(
+        "cluster_metrics",
+        dimensions
+    )
+
+    cluster_metrics = _valid_numeric_metrics(
+        result,
+        cluster_metrics
+    )
+
+    if len(cluster_metrics) < 2:
+
+        return result
+
+    if len(result) < 2:
+
+        return result
+
+    x_scaled = _prepare_matrix(
+        result,
+        cluster_metrics
+    )
 
     if method in [
         "K-Medoids",
@@ -587,7 +605,7 @@ def _fit_hdbscan(
             ] = silhouette
 
         return result
-
+    
     if method == "HDBSCAN":
 
         n = len(
@@ -688,6 +706,7 @@ def _fit_hdbscan(
         return result
 
     return result
+
 
 
 # =====================================================
@@ -803,214 +822,3 @@ def render_feedback(
             st.caption(
                 f"Noise solutions: {int(noise_count)}"
             )
-
-# =====================================================
-# APPLY
-# =====================================================
-
-def apply(
-    df,
-    params,
-    dataset
-):
-
-    result = df.copy()
-
-    dimensions = (
-        dataset["metrics"]
-        +
-        dataset["selected_indicators"]
-    )
-
-    method = params.get(
-        "method",
-        "K-Medoids"
-    )
-
-    cluster_metrics = params.get(
-        "cluster_metrics",
-        dimensions
-    )
-
-    cluster_metrics = _valid_numeric_metrics(
-        result,
-        cluster_metrics
-    )
-
-    if len(cluster_metrics) < 2:
-
-        return result
-
-    if len(result) < 2:
-
-        return result
-
-    x_scaled = _prepare_matrix(
-        result,
-        cluster_metrics
-    )
-
-    if method in [
-        "K-Medoids",
-        "K-Means",
-        "Agglomerative"
-    ]:
-
-        k_mode = params.get(
-            "k_mode",
-            "Auto"
-        )
-
-        if k_mode == "Manual":
-
-            k = params.get(
-                "k",
-                2
-            )
-
-            k = max(
-                2,
-                min(
-                    k,
-                    len(result)
-                )
-            )
-
-            silhouette = None
-
-        else:
-
-            k, silhouette = _compute_auto_k(
-                x_scaled,
-                method
-            )
-
-            if k < 2:
-
-                return result
-
-        labels, method_used = _fit_partition_clustering(
-            x_scaled,
-            method,
-            k
-        )
-
-        result = _add_cluster_labels(
-            result,
-            labels,
-            method_used,
-            cluster_metrics
-        )
-
-        result[
-            "diversity_k"
-        ] = k
-
-        if silhouette is not None:
-
-            result[
-                "diversity_silhouette"
-            ] = silhouette
-
-        return result
-
-    if method == "HDBSCAN":
-
-        n = len(
-            result
-        )
-
-        size_mode = params.get(
-            "cluster_size_mode",
-            "Auto"
-        )
-
-        if size_mode == "Manual":
-
-            min_cluster_size = params.get(
-                "min_cluster_size",
-                max(
-                    2,
-                    int(
-                        0.1 * n
-                    )
-                )
-            )
-
-        else:
-
-            granularity = params.get(
-                "granularity",
-                "Medium (~10%)"
-            )
-
-            if granularity == "Small (~5%)":
-
-                min_cluster_size = max(
-                    2,
-                    int(
-                        0.05 * n
-                    )
-                )
-
-            elif granularity == "Large (~20%)":
-
-                min_cluster_size = max(
-                    2,
-                    int(
-                        0.20 * n
-                    )
-                )
-
-            else:
-
-                min_cluster_size = max(
-                    2,
-                    int(
-                        0.10 * n
-                    )
-                )
-
-        labels, method_used = _fit_hdbscan(
-            x_scaled,
-            min_cluster_size
-        )
-
-        result = _add_cluster_labels(
-            result,
-            labels,
-            method_used,
-            cluster_metrics
-        )
-
-        result[
-            "diversity_min_cluster_size"
-        ] = min_cluster_size
-
-        exclude_noise = params.get(
-            "exclude_noise",
-            True
-        )
-
-        if exclude_noise:
-
-            filtered_result = result[
-                result["cluster"] != -1
-            ].copy()
-
-            if filtered_result.empty:
-
-                result[
-                    "diversity_warning"
-                ] = (
-                    "All solutions were classified as noise. "
-                    "Noise exclusion was not applied."
-                )
-
-                return result
-
-            return filtered_result
-
-        return result
-
-    return result
