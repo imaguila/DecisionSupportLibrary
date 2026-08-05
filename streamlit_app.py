@@ -81,7 +81,7 @@ if st.session_state.get( "pending_lens_reset", False ):
     st.session_state["pending_lens_reset" ] = False
 
 # ==================================================
-# LENSES / SOI IDENTIFICATION
+# LENSES / SOI IDENTIFICATION 
 
 (
     active_lens,
