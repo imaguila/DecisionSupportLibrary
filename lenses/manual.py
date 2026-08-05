@@ -1,73 +1,44 @@
 """
-Manual Selection Lens Module.
-
-Enables explicit filtering and isolation of specific candidate solutions 
-from the solution space based on user-selected unique identifiers.
+Manual Selection Lens (lenses/manual.py)
 """
 
-import logging
-from typing import Any, Dict, List, Optional, Sequence
-
+from typing import Any, Dict, Optional
 import pandas as pd
+import streamlit as st
 
-from .base import BaseLens
-
-logger = logging.getLogger(__name__)
+from lenses.base import BaseLens
 
 
-class ManualSelectionLens(BaseLens):
-    """
-    Analytical lens for manual candidate solution selection.
+class ManualLens(BaseLens):
+    name = "manual"
+    category = "manual"
 
-    Isolates specific solutions by their unique identifiers without applying
-    algorithmic ranking or unsupervised clustering.
-    """
+    def render_params(
+        self, dataset: Dict[str, Any], working_df: pd.DataFrame
+    ) -> Dict[str, Any]:
+        """Renders multiselect widget for manual solution picking."""
+        all_ids = working_df["id"].tolist() if "id" in working_df.columns else []
 
-    def run(
+        selected_ids = st.multiselect(
+            "Select Candidate Solution IDs:",
+            options=all_ids,
+            default=all_ids[:5] if len(all_ids) >= 5 else all_ids,
+            key="manual_lens_ids_selector",
+        )
+        return {"selected_ids": selected_ids}
+
+    def apply(
         self,
         df: pd.DataFrame,
-        selected_ids: Optional[Sequence[Any]] = None,
-        id_col: str = "id",
-        group_name: str = "Manual Selection",
-        **kwargs: Any,
-    ) -> Dict[str, List[Any]]:
-        """
-        Filters input DataFrame to retain only user-selected IDs.
+        params: Dict[str, Any],
+        dataset: Optional[Dict[str, Any]] = None,
+    ) -> pd.DataFrame:
+        """Filters DataFrame to include only user-selected candidate IDs."""
+        selected_ids = params.get("selected_ids", [])
+        if not selected_ids:
+            return df.copy()
 
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Input working solution space DataFrame.
-        selected_ids : Optional[Sequence[Any]], optional
-            Collection of solution identifiers chosen for manual isolation.
-        id_col : str, default="id"
-            Column name containing unique solution identifiers.
-        group_name : str, default="Manual Selection"
-            Label used for the output grouping dictionary key.
+        if "id" in df.columns:
+            return df[df["id"].isin(selected_ids)].copy()
 
-        Returns
-        -------
-        Dict[str, List[Any]]
-            Mapping containing the active group label and matching solution IDs.
-        """
-        if df.empty or not selected_ids:
-            return {}
-
-        # Determine identifier source (explicit column vs index)
-        if id_col in df.columns:
-            available_ids = set(df[id_col])
-        else:
-            available_ids = set(df.index)
-
-        # Retain only valid IDs present in the dataset
-        valid_selected = [s_id for s_id in selected_ids if s_id in available_ids]
-
-        if not valid_selected:
-            logger.warning(
-                "[%s] None of the selected IDs exist in the active dataset.",
-                self.__class__.__name__,
-            )
-            return {}
-
-        label = f"{group_name} (N={len(valid_selected)})"
-        return {label: valid_selected}
+        return df.copy()
