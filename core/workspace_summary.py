@@ -182,9 +182,9 @@ def render_summary(df, dataset):
     with st.expander(f"📊 {label}", expanded=False):
         tab_overview, tab_current, tab_saved_soi = st.tabs(
             [
-                "**| Overview** |",
-                "**Current Set** |",
-                "**Saved SOIs** |"
+                "**| Overview |**",
+                "**| Current Set |**",
+                "**| Saved SOIs |**"
             ]
         )
 
