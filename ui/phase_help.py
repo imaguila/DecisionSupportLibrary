@@ -107,7 +107,7 @@ def render_phase_help_icon( phase_key ):
             f"title=\"{safe_help}\" "
             "style='"
             "cursor:help;"
-            "color: #f59e0b;"
+            "color: #2563eb;"
             "font-size:2rem;"
             "line-height:0.5;"
             "'>"
