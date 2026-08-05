@@ -13,8 +13,6 @@ PHASE_HELP = {
     "input": """
 Load the base decision space.
 
-You can start in two ways:
-
 **1. Domain Configuration**
 
 Use this option when you want to load a predefined case already configured in the library.
@@ -47,7 +45,7 @@ Examples of decision-variable prefixes:
 - `feature_`
 - `design_`
 
-After loading the data, select the optimization objectives that define the base decision space.
+After loading the data, refine the optimization objectives that define the base decision space.
 """,
 
     "enrichment": """

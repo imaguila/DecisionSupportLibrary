@@ -7,7 +7,6 @@ import pandas as pd
 
 from config import CASES
 from plugins import PLUGIN_REGISTRY
-
 from ui.phase_help import (
     render_phase_help_icon,
     render_help_icon
@@ -18,11 +17,7 @@ from ui.phase_help import (
 # DETECTION / INFERENCE
 # =====================================================
 
-def detect_decision_variables(
-    df,
-    prefix
-):
-
+def detect_decision_variables( df, prefix ):
     return [
         col
         for col in df.columns
@@ -31,17 +26,8 @@ def detect_decision_variables(
         )
     ]
 
-
-def infer_numeric_metrics(
-    df,
-    cfg
-):
-
-    var_prefix = cfg.get(
-        "var_prefix",
-        "x_"
-    )
-
+def infer_numeric_metrics( df, cfg ):
+    var_prefix = cfg.get( "var_prefix", "x_" )
     excluded = set(
         cfg.get(
             "exclude_cols",
@@ -72,19 +58,11 @@ def infer_numeric_metrics(
     metrics = []
 
     for col in df.columns:
-
-        if col.startswith(
-            var_prefix
-        ):
-
+        if col.startswith( var_prefix ):
             continue
-
         if col in excluded:
-
             continue
-
         if col in system_cols:
-
             continue
 
         if pd.api.types.is_numeric_dtype(
@@ -223,8 +201,6 @@ def load_uploaded_dataset(
 
 
 
-
-
 # =====================================================
 # MAIN INPUT PANEL
 # =====================================================
@@ -259,8 +235,8 @@ def render_input_panel():
         mode = st.radio(
             "Data Source",
             [
-                "Domain Configuration",
-                "Upload Enriched CSV"
+                "1. Domain Configuration",
+                "2. Upload Enriched CSV"
             ],
             horizontal=True,
             label_visibility="collapsed"
