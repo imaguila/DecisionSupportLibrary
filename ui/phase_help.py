@@ -180,7 +180,7 @@ def render_help_icon(
     )
 
     if st.button(
-        "-ⓘ-",
+        "ⓘ",
         key=button_key,
         help=help_text,
         use_container_width=True
