@@ -237,8 +237,8 @@ def render_input_panel():
 
         col_label, col_help = st.columns(
             [
-                0.88,
-                0.12
+                0.85,
+                0.15
             ],
             vertical_alignment="center"
         )

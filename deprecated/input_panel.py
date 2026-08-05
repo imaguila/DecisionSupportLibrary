@@ -58,12 +58,18 @@ def build_dataset( df, cfg ):
     }
     return dataset
 
+
 # =====================================================
 # MAIN PANEL
 # =====================================================
 
 def render_input_panel():
-    with st.sidebar.expander("🏷️ Input and Preparation", expanded=True):
+
+    with st.sidebar.expander(
+        "🏷️ Input and Preparation",
+        expanded=True
+    ):
+
         mode = st.radio(
             "Data Source",
             [
@@ -73,14 +79,18 @@ def render_input_panel():
             horizontal=True,
             help="💡Choose how the decision space is loaded."
         )
+
         if mode == "Domain Configuration":
+
             st.caption(
-                " → Predefined domain package: " \
+                " → Predefined domain package: "
                 " Dataset + objectives + config + plugin"
             )
+
         else:
+
             st.caption(
-                "→ Self-contained Pareto-front: " \
+                "→ Self-contained Pareto-front: "
                 " Standalone dataset + user-defined variable prefix."
             )
 
@@ -89,68 +99,148 @@ def render_input_panel():
         # ==========================================
 
         if mode == "Domain Configuration":
+
             dataset_names = [
                 "-- No Data --"
-            ] + list( CASES.keys() )
-
-            dataset_name = st.selectbox(
-                "Domain Configuration",
-                dataset_names,
-                help=(
-                    "💡Select a predefined domain package "
-                    "containing a Pareto front, objectives, "
-                    "indicators in config, and an optional enrichment plugin."
-                )
+            ] + list(
+                CASES.keys()
             )
+
+            col_dataset, col_help = st.columns(
+                [
+                    0.85,
+                    0.15
+                ],
+                vertical_alignment="bottom"
+            )
+
+            with col_dataset:
+
+                dataset_name = st.selectbox(
+                    "Domain Configuration",
+                    dataset_names,
+                    key="input_domain_configuration"
+                )
+
+            if dataset_name == "-- No Data --":
+
+                dataset_help = (
+                    "No domain configuration selected yet.\n\n"
+                    "Choose a predefined case to load its dataset, objectives, "
+                    "decision-variable prefix, and optional plugin."
+                )
+
+            else:
+
+                dataset_help = CASES[
+                    dataset_name
+                ].get(
+                    "help",
+                    (
+                        "No additional description is available for this "
+                        "domain configuration."
+                    )
+                )
+
+            with col_help:
+
+                render_help_icon(
+                    dataset_help,
+                    key="help_domain_configuration"
+                )
 
             # --------------------------------------------
             # Nothing selected yet
             # --------------------------------------------
+
             if dataset_name == "-- No Data --":
-                st.info( "Select data to continue." )
+
+                st.info(
+                    "Select data to continue."
+                )
+
                 return None
 
             # --------------------------------------------
             # Load selected configuration
             # --------------------------------------------
 
-            cfg = CASES[ dataset_name ]
-            df = pd.read_csv(  cfg["path_sol"] )
-            df.reset_index( drop=True, inplace=True )
-            df["id"] = range(1, len(df)+1)
-            return build_dataset( df,  cfg )
+            cfg = CASES[
+                dataset_name
+            ]
+
+            df = pd.read_csv(
+                cfg["path_sol"]
+            )
+
+            df.reset_index(
+                drop=True,
+                inplace=True
+            )
+
+            df[
+                "id"
+            ] = range(
+                1,
+                len(df) + 1
+            )
+
+            return build_dataset(
+                df,
+                cfg
+            )
 
         # ==========================================
         # UPLOAD CSV
         # ==========================================
 
         uploaded_file = st.file_uploader(
-            "Upload CSV",  type=["csv"]
+            "Upload CSV",
+            type=[
+                "csv"
+            ]
         )
+
         if uploaded_file:
-            var_prefix = (
-                st.text_input(
-                    "Decision-variable prefix",
-                    value="var_",
-                    help=(
-                        "Prefix used to identify "
-                        "decision variables "
-                        "(e.g. req_, var_, x_, "
-                        "feature_, design_)."
-                    )
+
+            var_prefix = st.text_input(
+                "Decision-variable prefix",
+                value="var_",
+                help=(
+                    "Prefix used to identify "
+                    "decision variables "
+                    "(e.g. req_, var_, x_, "
+                    "feature_, design_)."
                 )
             )
-            df = pd.read_csv( uploaded_file )
-            df.reset_index( drop=True, inplace=True )
-            df["id"] = range(1, len(df)+1)
+
+            df = pd.read_csv(
+                uploaded_file
+            )
+
+            df.reset_index(
+                drop=True,
+                inplace=True
+            )
+
+            df[
+                "id"
+            ] = range(
+                1,
+                len(df) + 1
+            )
+
             cfg = {
                 "plugin": None,
                 "metrics": [],
-                "var_prefix":
-                    var_prefix,
+                "var_prefix": var_prefix,
                 "exclude_cols": [],
-                "default_indicators":
-                    []
+                "default_indicators": []
             }
-            return build_dataset( df, cfg )
+
+            return build_dataset(
+                df,
+                cfg
+            )
+
     return None
