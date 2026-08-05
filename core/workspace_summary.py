@@ -114,7 +114,6 @@ def generate_markdown_report(df, dataset):
 def render_summary_metrics(df, dataset):
     c1, c2, c3, c4 = st.columns(4)
 
-    # Conteo seguro de variables de decisión
     var_prefix = dataset.get("config", {}).get("var_prefix", "x_")
     if "decision_variables" in dataset and isinstance(dataset["decision_variables"], list):
         num_vars = len(dataset["decision_variables"])
@@ -123,13 +122,10 @@ def render_summary_metrics(df, dataset):
 
     with c1:
         st.metric("Solutions", len(df))
-
     with c2:
         st.metric("Attributes", len(df.columns))
-
     with c3:
         st.metric("Decision Variables", num_vars)
-
     with c4:
         css_status = (
             "Active"
@@ -177,7 +173,6 @@ def render_export_section(df, dataset):
             use_container_width=True
         )
 
-
 def get_summary_label():
     if st.session_state.get("css_enabled", False):
         return "Dataset Summary / Current CSS"
@@ -213,15 +208,9 @@ def render_summary(df, dataset):
                 f"Decision-variable prefix: {dataset.get('config', {}).get('var_prefix', 'x_')}"
             )
             render_lens_summary(df)
-            
-            # Sección de exportación de informe y datos
             render_export_section(df, dataset)
-
         with tab_current:
             render_dataset_table(df, dataset)
-
         with tab_saved_soi:
-            # Se pasa 'df' para dar soporte al constructor manual de SOIs
-            #render_soi_tab(df)
             render_soi_tab()
             
