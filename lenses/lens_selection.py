@@ -16,6 +16,10 @@ def get_group_column(
     lens_df
 ):
 
+    if lens_df is None:
+
+        return None
+
     if "group_label" in lens_df.columns:
 
         return "group_label"
@@ -51,6 +55,10 @@ def filter_by_group(
     group_value
 ):
 
+    if lens_df is None:
+
+        return None
+
     if group_column is None:
 
         return lens_df.copy()
@@ -66,24 +74,39 @@ def filter_by_group(
     ].copy()
 
 
+def get_lens_label(
+    active_lens
+):
+
+    if active_lens == "None":
+
+        return "Exploratory"
+
+    return active_lens
+
+
 def reset_soi_name_if_needed(
     active_lens,
     group_value
 ):
 
+    lens_label = get_lens_label(
+        active_lens
+    )
+
     suffix = (
         group_value
         if group_value != "All groups"
-        else "All"
+        else "Current set"
     )
 
     default_name = (
-        f"{active_lens} - {suffix} "
+        f"{lens_label} - {suffix} "
         f"#{len(st.session_state.saved_sois) + 1}"
     )
 
     name_context = (
-        active_lens,
+        lens_label,
         group_value
     )
 
@@ -116,11 +139,11 @@ def render_group_selector_and_save(
 
         return lens_df
 
-    if active_lens == "None":
-
-        return lens_df
-
     with placeholder.container():
+
+        lens_label = get_lens_label(
+            active_lens
+        )
 
         group_column = get_group_column(
             lens_df
@@ -143,7 +166,7 @@ def render_group_selector_and_save(
 
             selector_key = (
                 f"soi_group_selector_"
-                f"{active_lens.replace(' ', '_')}"
+                f"{lens_label.replace(' ', '_')}"
             )
 
             if (
@@ -173,12 +196,24 @@ def render_group_selector_and_save(
             group_value
         )
 
+        if current_df is None:
+
+            return lens_df
+
         st.caption(
             f"Current SOI candidate size: "
             f"{len(current_df)} solutions"
         )
 
-        st.markdown("---")
+        if active_lens == "None":
+
+            st.caption(
+                "Source: exploratory current set."
+            )
+
+        st.markdown(
+            "---"
+        )
 
         reset_soi_name_if_needed(
             active_lens,
@@ -198,10 +233,10 @@ def render_group_selector_and_save(
 
             st.session_state.pending_save_soi = {
                 "name": soi_name,
-                "lens": active_lens,
+                "lens": lens_label,
                 "method": lens_params.get(
                     "method",
-                    None
+                    "Exploratory"
                 ),
                 "params": lens_params,
                 "ids": current_df["id"].tolist(),
@@ -210,5 +245,5 @@ def render_group_selector_and_save(
                 "source_size": len(lens_df),
                 "soi_size": len(current_df)
             }
-            
+
         return current_df
