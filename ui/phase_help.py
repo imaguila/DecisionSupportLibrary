@@ -114,9 +114,9 @@ def render_phase_help_icon(
             "cursor:help;"
             "color:#6b7280;"
             "font-size:0.9rem;"
-            "line-height:1;"
+            "line-height:0.5;"
             "'>"
-            "ⓘ--"
+            "ⓘ"
             "</span>"
             "</div>"
         ),

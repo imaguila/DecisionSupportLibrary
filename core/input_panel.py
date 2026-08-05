@@ -214,7 +214,7 @@ def render_input_panel():
         expanded=True
     ):
 
-        render_help_icon(
+        render_phase_help_icon(
             "input"
         )
 
