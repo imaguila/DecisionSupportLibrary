@@ -15,18 +15,10 @@ from ui.visualization import (
 # MAP STATE
 # =====================================================
 
-def ensure_valid_map_state(
-    current_map,
-    dimensions
-):
+def ensure_valid_map_state(  current_map, dimensions ):
 
-    if current_map.get(
-        "x"
-    ) not in dimensions:
-
-        current_map[
-            "x"
-        ] = dimensions[0]
+    if current_map.get( "x" ) not in dimensions:
+        current_map[ "x" ] = dimensions[0]
 
     y_options = [
         dimension
@@ -34,16 +26,10 @@ def ensure_valid_map_state(
         if dimension != current_map["x"]
     ]
 
-    if current_map.get(
-        "y"
-    ) not in y_options:
+    if current_map.get( "y" ) not in y_options:
+        current_map[ "y" ] = y_options[0]
 
-        current_map[
-            "y"
-        ] = y_options[0]
-
-    z_options = [
-        None
+    z_options = [ None
     ] + [
         dimension
         for dimension in dimensions
@@ -53,19 +39,10 @@ def ensure_valid_map_state(
         ]
     ]
 
-    if current_map.get(
-        "z"
-    ) not in z_options:
-
-        current_map[
-            "z"
-        ] = None
-
+    if current_map.get( "z" ) not in z_options:
+        current_map[ "z" ] = None
     if "color" not in current_map:
-
-        current_map[
-            "color"
-        ] = None
+        current_map[ "color" ] = None
 
     return current_map
 
@@ -74,27 +51,12 @@ def ensure_valid_map_state(
 # AXIS CONTROLS
 # =====================================================
 
-def render_axis_controls(
-    idx,
-    current_map,
-    dimensions,
-    map_mode
-):
-
+def render_axis_controls( idx, current_map, dimensions, map_mode):
     if map_mode == "🗺️ Scatter":
-
-        col1, col2, col3 = st.columns(
-            3
-        )
-
+        col1, col2, col3 = st.columns( 3 )
     else:
-
-        col1, col2, col3, col4 = st.columns(
-            4
-        )
-
+        col1, col2, col3, col4 = st.columns( 4 )
     with col1:
-
         current_x = (
             current_map["x"]
             if current_map["x"] in dimensions
@@ -196,8 +158,6 @@ def render_axis_controls(
         color = None
 
     return x, y, z, color
-
-
 
 
 

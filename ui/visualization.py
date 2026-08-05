@@ -271,39 +271,17 @@ def render_distribution(
 ):
 
     if metric not in df.columns:
-
-        st.warning(
-            "Selected metric is not available in the current dataset."
-        )
+        st.warning( "Selected metric is not available in the current dataset." )
 
         return
 
     if mode == "Violin":
-
-        fig = px.violin(
-            df,
-            y=metric,
-            box=True,
-            points="all"
-        )
+        fig = px.violin( df, y=metric, box=True, points="all" )
 
     else:
+        fig = px.box( df, y=metric, points="all" )
 
-        fig = px.box(
-            df,
-            y=metric,
-            points="all"
-        )
+    fig.update_layout( title=f"Distribution of {metric}", height=550,
+        showlegend=False,  template="plotly_white" )
 
-    fig.update_layout(
-        title=f"Distribution of {metric}",
-        height=550,
-        showlegend=False,
-        template="plotly_white"
-    )
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        key=key
-    )
+    st.plotly_chart( fig, use_container_width=True, key=key )

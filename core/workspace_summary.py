@@ -106,7 +106,6 @@ def generate_markdown_report(df, dataset):
     
     return "\n".join(report)
 
-
 # =====================================================
 # SUMMARY METRICS & EXPORTS
 # =====================================================
@@ -146,9 +145,6 @@ def render_lens_summary(df):
 
 
 def render_export_section(df, dataset):
-    """
-    Renderiza los botones de descarga del Informe Ejecutivo y del CSV actual.
-    """
     st.markdown("---")
     st.markdown("##### 📥 Export Options")
     col_report, col_csv = st.columns(2)

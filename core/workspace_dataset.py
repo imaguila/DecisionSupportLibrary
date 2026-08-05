@@ -39,7 +39,6 @@ def get_ordered_columns( df, dataset ):
 
     return ordered_cols
 
-
 def get_current_set_label():
     if st.session_state.get( "css_enabled", False ):
         return "Current CSS"
@@ -58,7 +57,6 @@ def render_dataset_table( df, dataset ):
         height=420,
         hide_index=True
     )
-
 
 def render_dataset_preview( df, dataset ):
     label = get_current_set_label()
