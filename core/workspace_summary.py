@@ -169,27 +169,17 @@ def get_summary_label():
 # MAIN RENDERER
 # =====================================================
 
-def render_summary(
-    df,
-    dataset
-):
-
+def render_summary(df, dataset):
     if df is None:
-
         st.error(
             "Dataset summary cannot be rendered "
             "because the current dataframe is empty."
         )
-
         return
 
     label = get_summary_label()
 
-    with st.expander(
-        f"📊 {label}",
-        expanded=False
-    ):
-
+    with st.expander(f"📊 {label}", expanded=False):
         tab_overview, tab_current, tab_saved_soi = st.tabs(
             [
                 "Overview",
@@ -199,32 +189,18 @@ def render_summary(
         )
 
         with tab_overview:
-
-            render_summary_metrics(
-                df,
-                dataset
-            )
+            render_summary_metrics(df, dataset)
 
             st.caption(
                 f"Decision-variable prefix: "
                 f"{dataset['config'].get('var_prefix')}"
             )
 
-            render_lens_summary(
-                df
-            )
-        
-   #         render_export_button(
-   #             df
-   #         )
+            render_lens_summary(df)
 
         with tab_current:
+            render_dataset_table(df, dataset)
 
-            render_dataset_table(
-                df,
-                dataset
-            )
-
-        with tab_overview:
+        with tab_saved_soi:
             render_soi_tab()
         
