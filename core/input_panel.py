@@ -227,7 +227,6 @@ def load_uploaded_dataset(
 # =====================================================
 # MAIN INPUT PANEL
 # =====================================================
-
 def render_input_panel():
 
     with st.sidebar.expander(
@@ -270,8 +269,11 @@ def render_input_panel():
 
             return render_domain_configuration_input()
 
-        return render_uploaded_csv_input()
-    
+        if mode == "Upload Enriched CSV":
+
+            return render_uploaded_csv_input()
+
+    return None
 
 
 
