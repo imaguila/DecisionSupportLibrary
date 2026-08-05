@@ -111,7 +111,7 @@ def render_phase_help_icon( phase_key ):
             "font-size:0.9rem;"
             "line-height:0.5;"
             "'>"
-            "info"
+            "⟳ ⮣ ↻ ➲"
             "</span>"
             "</div>"
         ),
