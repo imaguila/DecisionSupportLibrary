@@ -6,14 +6,10 @@
 import pandas as pd
 import streamlit as st
 
-
 # =====================================================
 # UI
-# =====================================================
-def render_params(
-    dataset,
-    working_df
-):
+
+def render_params( dataset, working_df ):
 
     dimensions = (
         dataset["metrics"]
@@ -21,21 +17,13 @@ def render_params(
         dataset["selected_indicators"]
     )
 
-    indicators = dataset[
-        "selected_indicators"
-    ]
+    indicators = dataset[ "selected_indicators"]
 
     params = {}
 
-    max_n = max(
-        len(working_df),
-        1
-    )
+    max_n = max( len(working_df), 1)
 
-    default_n = min(
-        5,
-        max_n
-    )
+    default_n = min( 5,  max_n)
 
     if len(dimensions) == 0:
 
@@ -140,11 +128,7 @@ def render_params(
 # HELPERS
 # =====================================================
 
-def _sanitize_criteria(
-    df,
-    maximize,
-    minimize
-):
+def _sanitize_criteria( df, maximize, minimize ):
 
     maximize = [
         metric
@@ -161,11 +145,7 @@ def _sanitize_criteria(
         )
     ]
 
-    criteria = (
-        maximize
-        +
-        minimize
-    )
+    criteria = (  maximize +  minimize )
 
     return maximize, minimize, criteria
 

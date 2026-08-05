@@ -12,10 +12,6 @@ from core.workspace_maps import (
     render_maps
 )
 
-from core.workspace_dataset import (
-    render_dataset_preview
-)
-
 from soi.soi_registry import (
     render_soi_registry
 )
@@ -45,6 +41,7 @@ def render_no_map_message():
         "At least two dimensions are required "
         "to render decision-space maps."
     )
+
 
 def render_workspace(
     df,
