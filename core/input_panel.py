@@ -9,7 +9,8 @@ from config import CASES
 from plugins import PLUGIN_REGISTRY
 
 from ui.phase_help import (
-    render_phase_help_icon
+    render_phase_help_icon,
+    render_help_icon
 )
 
 
@@ -267,135 +268,10 @@ def render_input_panel():
 
         if mode == "Domain Configuration":
 
-            dataset_names = [
-                "-- No Data --"
-            ] + list(
-                CASES.keys()
-            )
+            return render_domain_configuration_input()
 
-            col_dataset, col_dataset_help = st.columns(
-                [
-                    0.85,
-                    0.15
-                ],
-                vertical_alignment="bottom"
-            )
-
-            with col_dataset:
-
-                dataset_name = st.selectbox(
-                    "Domain Configuration",
-                    dataset_names,
-                    key="input_domain_configuration"
-                )
-
-            if dataset_name == "-- No Data --":
-
-                dataset_help = (
-                    "No domain configuration selected yet.\n\n"
-                    "Choose a predefined case to load its dataset, objectives, "
-                    "decision-variable prefix, and optional plugin."
-                )
-
-            else:
-
-                dataset_help = CASES[
-                    dataset_name
-                ].get(
-                    "help",
-                    "No additional description is available for this domain configuration."
-                )
-
-            with col_dataset_help:
-
-                render_help_icon(
-                    dataset_help,
-                    key="help_domain_configuration"
-                )
-
-            if dataset_name == "-- No Data --":
-
-                st.info(
-                    "Select data to continue."
-                )
-
-                return None
-
-            cfg = CASES[
-                dataset_name
-            ]
-
-            try:
-
-                df = load_builtin_dataset(
-                    cfg
-                )
-
-            except Exception as exc:
-
-                st.error(
-                    f"Unable to load dataset: {cfg.get('path_sol')}"
-                )
-
-                st.exception(
-                    exc
-                )
-
-                return None
-
-            return build_dataset(
-                df,
-                cfg
-            )
-
-        uploaded_file = st.file_uploader(
-            "Upload CSV",
-            type=[
-                "csv"
-            ]
-        )
-
-        if uploaded_file is None:
-
-            return None
-
-        var_prefix = st.text_input(
-            "Decision-variable prefix",
-            value="var_"
-        )
-
-        try:
-
-            df = load_uploaded_dataset(
-                uploaded_file
-            )
-
-        except Exception as exc:
-
-            st.error(
-                "Unable to load uploaded CSV."
-            )
-
-            st.exception(
-                exc
-            )
-
-            return None
-
-        cfg = {
-            "plugin": None,
-            "metrics": [],
-            "var_prefix": var_prefix,
-            "exclude_cols": [],
-            "default_indicators": [],
-            "help": "Uploaded enriched CSV."
-        }
-
-        return build_dataset(
-            df,
-            cfg
-        )
-
+        return render_uploaded_csv_input()
+    
 # =====================================================
 # DOMAIN CONFIGURATION INPUT
 # =====================================================

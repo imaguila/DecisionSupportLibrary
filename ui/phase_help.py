@@ -196,7 +196,7 @@ def get_help_text(
 
 
 # =====================================================
-# HELP POPOVER
+# GENERIC HELP POPOVER
 # =====================================================
 
 def render_help_icon(
@@ -217,6 +217,11 @@ def render_help_icon(
             help_text
         )
 
+
+# =====================================================
+# PHASE HELP POPOVER
+# =====================================================
+
 def render_phase_help_icon(
     phase_key,
     key=None,
@@ -231,10 +236,8 @@ def render_phase_help_icon(
 
         return
 
-    with st.popover(
-        label
-    ):
-
-        st.markdown(
-            help_text
-        )
+    render_help_icon(
+        help_text,
+        key=key,
+        label=label
+    )
