@@ -14,6 +14,10 @@ from ui.phase_help import (
 )
 
 
+# =====================================================
+# HEADER
+# =====================================================
+
 def render_lens_header(
     active_lens
 ):
@@ -42,6 +46,10 @@ def render_lens_header(
             unsafe_allow_html=True
         )
 
+
+# =====================================================
+# ACTIVE LENS PARAMS
+# =====================================================
 
 def render_active_lens_params(
     active_lens,
@@ -82,21 +90,36 @@ def render_active_lens_params(
     )
 
 
+# =====================================================
+# MAIN LENS PANEL
+# =====================================================
+
 def render_lens_panel(
     dataset,
     working_df
 ):
 
-    params = {}
+    if "active_lens" not in st.session_state:
 
-#    with st.sidebar.expander(
-#        "🧭 Solution of interest",
-#        expanded=False
-#    ):
+        st.session_state[
+            "active_lens"
+        ] = "None"
 
+    active_lens = st.session_state.get(
+        "active_lens",
+        "None"
+    )
+
+    params = st.session_state.get(
+        "last_lens_params",
+        {}
+    )
+
+    feedback_placeholder = st.sidebar.empty()
+    selection_placeholder = st.sidebar.empty()
 
     panel = sidebar_phase_container(
-        "🧭 Solution of interest",
+        "🧭 Solution of Interest",
         "soi",
         key="soi_phase_panel",
         expanded=False
@@ -111,31 +134,24 @@ def render_lens_panel(
                 get_lens_names(),
                 key="active_lens"
             )
-            
 
+            render_lens_header(
+                active_lens
+            )
 
+            params = render_active_lens_params(
+                active_lens,
+                dataset,
+                working_df
+            )
 
+            st.session_state[
+                "last_lens_params"
+            ] = params
 
+            feedback_placeholder = st.empty()
 
-        active_lens = st.selectbox(
-            "Select an analytical lens",
-            get_lens_names(),
-            key="active_lens"
-        )
-
-        render_lens_header(
-            active_lens
-        )
-
-        params = render_active_lens_params(
-            active_lens,
-            dataset,
-            working_df
-        )
-
-        feedback_placeholder = st.empty()
-
-        selection_placeholder = st.empty()
+            selection_placeholder = st.empty()
 
     return (
         active_lens,
