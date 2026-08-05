@@ -243,8 +243,8 @@ def render_input_panel():
 
             col_dataset, col_help = st.columns(
                 [
-                    0.88,
-                    0.12
+                    0.9,
+                    0.1
                 ],
                 vertical_alignment="bottom"
             )
