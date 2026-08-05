@@ -6,43 +6,31 @@
 
 [Streamlit App](awerqwer)
 
-
-
-DecisionSupportLibrary/
-│
-├── streamlit_app.py
-├── config.py
-│
+decisionsupportlibrary/
 ├── core/
-│   ├── input_panel.py
-│   ├── enrichment.py
-│   ├── framing.py
-│   ├── workspace_controls.py
-│   ├── workspace.py
-│   ├── workspace_summary.py
-│   ├── workspace_maps.py
-│   └── workspace_dataset.py
-│
-├── lenses/
-│   ├── lenses.py              # UI común de selección de lens
-│   ├── lens_engine.py         # aplica la lens activa
-│   ├── lens_feedback.py       # pinta feedback de cada lens
-│   ├── lens_registry.py       # registro central de lenses
+│   ├── analytics/            # 🧠 Lógica matemática/estadística pura (Pandas/Numpy)
+│   │   ├── correlation.py
+│   │   ├── similarity.py
+│   │   └── baseline.py
+│   ├── domain/               # 📦 Modelos de dominio y estado
+│   │   ├── models.py         # ParetoDataset, Solution, SOI dataclasses
+│   │   ├── state.py          # Centralización de st.session_state
+│   │   └── soi_registry.py   # Registro y persistencia de SOIs (MOVIDO AQUÍ)
+│   ├── exports/              # 📄 Generadores de informes/exportaciones
+│   │   └── report_generator.py
+│   └── workspace.py          # Coordinador principal de vistas
+├── lenses/                   # 🔍 Lentes analíticas (Plugins)
+│   ├── base_lens.py          # Clase base / Protocol para crear lentes
+│   ├── lens_registry.py
 │   ├── lens_preference.py
-│   ├── lens_diversity.py
-│   ├── lens_efficiency.py
-│   └── lens_indicator.py      # antes lens_domain.py
-│
-├── plugins/
-│   ├── __init__.py
-│   ├── nrp_plugin.py
-│   └── aerospace_plugin.py
-│
-├── soi/
-│   └── soi_registry.py
-│
-└── ui/
-    └── visualization.py
+│   └── lens_diversity.py
+├── ui/                       # 🎨 Componentes visuales reutilizables
+│   ├── css_comparison.py
+│   ├── workspace_summary.py
+│   └── phase_help.py
+└── streamlit_app.py
+
+
 
 
 ##  Overview
