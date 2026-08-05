@@ -20,7 +20,15 @@ class ManualSelectionLens(BaseLens):
         self, dataset: Dict[str, Any], working_df: pd.DataFrame
     ) -> Dict[str, Any]:
         """Renders multiselect widget for manual solution picking."""
-        all_ids = working_df["id"].tolist() if "id" in working_df.columns else []
+        if working_df is None or working_df.empty:
+            st.info("No solutions available to select.")
+            return {"selected_ids": []}
+
+        all_ids = (
+            working_df["id"].tolist()
+            if "id" in working_df.columns
+            else working_df.index.tolist()
+        )
 
         selected_ids = st.multiselect(
             "Select Candidate Solution IDs:",

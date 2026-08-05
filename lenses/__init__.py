@@ -51,8 +51,6 @@ def list_lenses() -> List[str]:
 def get_lens(name: str) -> Optional[BaseLens]:
     """
     Safely retrieves a lens instance by name.
-    
-    Handles both class types and pre-instantiated objects seamlessly.
     """
     if not name:
         return None
@@ -64,7 +62,7 @@ def get_lens(name: str) -> Optional[BaseLens]:
         logger.warning("Lens '%s' not found in registry.", key)
         return None
 
-    # If it's a class type, instantiate it; if it's already an instance, return as-is
+    # Handle class types vs pre-instantiated objects safely
     if isinstance(lens_item, type):
         try:
             return lens_item()
