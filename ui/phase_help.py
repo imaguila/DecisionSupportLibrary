@@ -46,10 +46,13 @@ Examples of decision-variable prefixes:
 - `design_`
 
 After loading the data, refine the Objective Column (optimization objectives) that define the base decision space.
+
+> **User Purpose:** Load the base Pareto-optimal alternatives to start transforming them into an interpretable decision space.
+
 """,
 
     "enrichment": """
-Add derived indicators to the original dataset.
+The goal of this stage is to **expand the descriptive layer of the solutions** by adding domain-specific quality and semantic indicators.
 
 Available indicators are provided by the active domain plugin. The app checks
 which indicators can be computed from the currently selected base objectives.
@@ -70,21 +73,19 @@ such as:
 - efficiency
 - domain-specific measures
 
-Selected indicators can later be used in maps, lenses, SOI generation,
-CSS selection, and detailed comparison.
+> **User Purpose:** Uncover implicit properties in solutions to project, filter, and compare the decision space under richer analytical perspectives.
+
+
 """,
 
     "framing": """
-Filter the decision space according to the current analytical context.
+The goal of this stage is to **restrict the global decision space to current operational conditions**.
 
-Framing reduces the active dataset before applying:
+Use constraints in this section to delimit the active set by applying:
+- Maximum effort (budget) thresholds.
+- Risk limits or minimum productivity/scope requirements.
 
-- analytical lenses
-- SOI generation
-- CSS selection
-- detailed comparison
-
-Use this phase to restrict the decision space to the region that is currently relevant.
+> **User Purpose:** Reduce analytical complexity by isolating only those solutions that are viable under the current strategic context before applying analytical lenses.
 """,
 
     "workspace_controls": """
@@ -92,7 +93,11 @@ Create and manage decision-space maps.
 
 Maps visualize the current decision set, SOI, or CSS using selected objectives and indicators.
 
-Use this phase to decide which dimensions should be shown in each map.
+The goal of Maps is to **project and visualize alternatives across multiple dimensions simultaneously**.
+
+Configure the axes (X, Y) and marker size to inspect how objectives and derived indicators behave across the active solution set.
+
+> **User Purpose:** Detect visual patterns, trade-offs, and spatial distributions without committing to a single ranking upfront.
 """,
 
     "soi": """
@@ -104,8 +109,17 @@ A SOI is a candidate subset of solutions. It can come from:
 - a saved SOI
 - a consensus of saved SOIs
 - the exploratory current set
+The goal of this stage is to **identify Solutions of Interest (SOIs)**: sub-sets with strategic coherence identified under a specific analytical perspective (Lens).
 
-Examples of SOIs include:
+Rather than evaluating isolated solutions, apply different Analytical Lenses:
+- **Preference (MCDA):** Discover top-N alternatives based on TOPSIS or Weighted Sum.
+- **Diversity:** Group structurally representative solutions using clustering (K-Medoids, HDBSCAN).
+- **Efficiency:** Identify solutions offering the best benefit-cost trade-offs.
+- **Dominance:** Highlight alternatives that repeatedly excel across multiple quality indicators.
+
+> **User Purpose:** Extract latent strategic insights and patterns from the decision space using intermediate analytical units (SOIs).
+
+Examples of Lens include:
 
 - a cluster from Diversity
 - a Top-N set from Preference

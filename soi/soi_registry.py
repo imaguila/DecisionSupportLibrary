@@ -398,7 +398,6 @@ def render_trace_tooltip(
 # =====================================================
 
 def render_loaded_soi_status():
-
     if not has_loaded_soi():
 
         return
@@ -571,3 +570,25 @@ def render_soi_registry():
                 soi,
                 idx
             )
+
+
+def render_soi_tab():
+    ensure_soi_state()
+    if not st.session_state.saved_sois:
+
+            st.info(
+                "No saved SOIs."
+            )
+
+            return
+
+    render_loaded_soi_status()
+
+    for idx, soi in enumerate(
+            st.session_state.saved_sois
+    ):
+
+        render_saved_soi_row(
+                soi,
+                idx
+        )

@@ -7,6 +7,9 @@ import streamlit as st
 from core.workspace_dataset import (
     render_dataset_table
 )
+from soi.soi_registry import(
+    render_soi_tab
+)
 
 
 # =====================================================
@@ -136,19 +139,18 @@ def render_lens_summary(
     )
 
 
-def render_export_button(
-    df
-):
+#def render_export_button(
+#    df ):
 
-    st.download_button(
-        label="⬇️ Export Current Set",
-        data=df.to_csv(
-            index=False
-        ),
-        file_name="current_set.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
+#    st.download_button(
+#        label="⬇️ Export Current Set",
+#        data=df.to_csv(
+#            index=False
+#        ),
+#        file_name="current_set.csv",
+#        mime="text/csv",
+#        use_container_width=True
+#    )
 
 
 def get_summary_label():
@@ -188,10 +190,11 @@ def render_summary(
         expanded=False
     ):
 
-        tab_overview, tab_current = st.tabs(
+        tab_overview, tab_current, tab_saved_soi = st.tabs(
             [
                 "Overview",
-                "Current Set"
+                "Current Set",
+                "Saved SOIs"
             ]
         )
 
@@ -210,10 +213,10 @@ def render_summary(
             render_lens_summary(
                 df
             )
-
-            render_export_button(
-                df
-            )
+        
+   #         render_export_button(
+   #             df
+   #         )
 
         with tab_current:
 
@@ -222,3 +225,6 @@ def render_summary(
                 dataset
             )
 
+        with tab_overview:
+            render_soi_tab()
+        
