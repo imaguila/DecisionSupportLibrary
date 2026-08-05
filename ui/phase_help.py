@@ -116,7 +116,7 @@ def render_phase_help_icon(
             "font-size:0.9rem;"
             "line-height:1;"
             "'>"
-            "ⓘ"
+            "ⓘ--"
             "</span>"
             "</div>"
         ),
