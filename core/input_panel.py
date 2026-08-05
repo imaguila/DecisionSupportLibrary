@@ -245,7 +245,8 @@ def render_input_panel():
                 [
                     0.88,
                     0.12
-                ]
+                ],
+                vertical_alignment="bottom"
             )
 
             with col_dataset:
@@ -260,8 +261,8 @@ def render_input_panel():
 
                 dataset_help = (
                     "No domain configuration selected yet. "
-                    "Choose a predefined case to load its dataset, "
-                    "objectives, decision-variable prefix, and optional plugin."
+                    "Choose a predefined case to load its dataset, objectives, "
+                    "decision-variable prefix, and optional plugin."
                 )
 
             else:
