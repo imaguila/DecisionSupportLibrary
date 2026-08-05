@@ -2,7 +2,6 @@
 ## input_panel.py
 ## --------------------------------------------------------------------------------------
 
-
 import streamlit as st
 import pandas as pd
 
@@ -10,10 +9,13 @@ from config import CASES
 from plugins import PLUGIN_REGISTRY
 
 from ui.phase_help import (
-    render_phase_help_icon,
-    render_help_icon
+    render_phase_help_icon
 )
 
+
+# =====================================================
+# DETECTION / INFERENCE
+# =====================================================
 
 def detect_decision_variables(
     df,
@@ -73,23 +75,32 @@ def infer_numeric_metrics(
         if col.startswith(
             var_prefix
         ):
+
             continue
 
         if col in excluded:
+
             continue
 
         if col in system_cols:
+
             continue
 
         if pd.api.types.is_numeric_dtype(
             df[col]
         ):
+
             metrics.append(
                 col
             )
 
     return metrics
 
+
+
+# =====================================================
+# PLUGIN / DATASET BUILDING
+# =====================================================
 
 def build_plugin(
     cfg
@@ -143,11 +154,7 @@ def build_dataset(
     selected_metrics = st.multiselect(
         "Optimization Objectives",
         all_metrics,
-        default=all_metrics,
-        help=(
-            "Select the objective columns that define "
-            "the base decision space."
-        )
+        default=all_metrics
     )
 
     decision_variables = detect_decision_variables(
@@ -167,6 +174,12 @@ def build_dataset(
         "decision_variables": decision_variables
     }
 
+
+
+
+# =====================================================
+# LOADERS
+# =====================================================
 
 def load_builtin_dataset(
     cfg
@@ -207,6 +220,14 @@ def load_uploaded_dataset(
 
     return df
 
+
+
+
+
+# =====================================================
+# MAIN INPUT PANEL
+# =====================================================
+
 def render_input_panel():
 
     with st.sidebar.expander(
@@ -214,9 +235,26 @@ def render_input_panel():
         expanded=True
     ):
 
-        render_phase_help_icon(
-            "input"
+        col_label, col_help = st.columns(
+            [
+                0.88,
+                0.12
+            ],
+            vertical_alignment="center"
         )
+
+        with col_label:
+
+            st.markdown(
+                "**Data Source**"
+            )
+
+        with col_help:
+
+            render_phase_help_icon(
+                "input",
+                key="help_input_phase"
+            )
 
         mode = st.radio(
             "Data Source",
@@ -225,150 +263,123 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ],
             horizontal=True,
-            help="Choose how the decision space is loaded."
+            label_visibility="collapsed"
         )
 
         if mode == "Domain Configuration":
 
-            st.caption(
-                "Predefined package: dataset, objectives, "
-                "configuration and optional plugin."
-            )
+            return render_domain_configuration_input()
 
-            dataset_names = [
-                "-- No Data --"
-            ] + list(
-                CASES.keys()
-            )
+        return render_uploaded_csv_input()
+    
 
-            col_dataset, col_help = st.columns(
-                [
-                    0.85,
-                    0.15
-                ],
-                vertical_alignment="bottom"
-            )
 
-            with col_dataset:
 
-                dataset_name = st.selectbox(
-                    "Domain Configuration",
-                    dataset_names,
-                    key="input_domain_configuration"
-                )
 
-            if dataset_name == "-- No Data --":
+# =====================================================
+# DOMAIN CONFIGURATION INPUT
+# =====================================================
 
-                dataset_help = (
-                    "No domain configuration selected yet. "
-                    "Choose a predefined case to load its dataset, objectives, "
-                    "decision-variable prefix, and optional plugin."
-                )
+def render_domain_configuration_input():
 
-            else:
+    dataset_names = [
+        "-- No Data --"
+    ] + list(
+        CASES.keys()
+    )
 
-                dataset_help = CASES[
-                    dataset_name
-                ].get(
-                    "help",
-                    "No additional description is available for this domain configuration."
-                )
+    dataset_name = st.selectbox(
+        "Domain Configuration",
+        dataset_names,
+        key="input_domain_configuration"
+    )
 
-            with col_help:
+    if dataset_name == "-- No Data --":
 
-                render_help_icon(
-                    dataset_help,
-                    key="help_domain_configuration"
-                )
-
-            if dataset_name == "-- No Data --":
-
-                st.info(
-                    "Select data to continue."
-                )
-
-                return None
-
-            cfg = CASES[
-                dataset_name
-            ]
-
-            try:
-
-                df = load_builtin_dataset(
-                    cfg
-                )
-
-            except Exception as exc:
-
-                st.error(
-                    f"Unable to load dataset: {cfg.get('path_sol')}"
-                )
-
-                st.exception(
-                    exc
-                )
-
-                return None
-
-            return build_dataset(
-                df,
-                cfg
-            )
-
-        st.caption(
-            "Self-contained Pareto front: standalone CSV "
-            "with user-defined variable prefix."
+        st.info(
+            "Select data to continue."
         )
 
-        uploaded_file = st.file_uploader(
-            "Upload CSV",
-            type=[
-                "csv"
-            ]
-        )
+        return None
 
-        if uploaded_file is None:
+    cfg = CASES[
+        dataset_name
+    ]
 
-            return None
+    try:
 
-        var_prefix = st.text_input(
-            "Decision-variable prefix",
-            value="var_",
-            help=(
-                "Prefix used to identify decision variables, "
-                "for example req_, var_, x_, feature_ or design_."
-            )
-        )
-
-        try:
-
-            df = load_uploaded_dataset(
-                uploaded_file
-            )
-
-        except Exception as exc:
-
-            st.error(
-                "Unable to load uploaded CSV."
-            )
-
-            st.exception(
-                exc
-            )
-
-            return None
-
-        cfg = {
-            "plugin": None,
-            "metrics": [],
-            "var_prefix": var_prefix,
-            "exclude_cols": [],
-            "default_indicators": [],
-            "help": "Uploaded enriched CSV."
-        }
-
-        return build_dataset(
-            df,
+        df = load_builtin_dataset(
             cfg
         )
+
+    except Exception as exc:
+
+        st.error(
+            f"Unable to load dataset: {cfg.get('path_sol')}"
+        )
+
+        st.exception(
+            exc
+        )
+
+        return None
+
+    return build_dataset(
+        df,
+        cfg
+    )
+
+
+# =====================================================
+# UPLOADED CSV INPUT
+# =====================================================
+
+def render_uploaded_csv_input():
+
+    uploaded_file = st.file_uploader(
+        "Upload CSV",
+        type=[
+            "csv"
+        ]
+    )
+
+    if uploaded_file is None:
+
+        return None
+
+    var_prefix = st.text_input(
+        "Decision-variable prefix",
+        value="var_"
+    )
+
+    try:
+
+        df = load_uploaded_dataset(
+            uploaded_file
+        )
+
+    except Exception as exc:
+
+        st.error(
+            "Unable to load uploaded CSV."
+        )
+
+        st.exception(
+            exc
+        )
+
+        return None
+
+    cfg = {
+        "plugin": None,
+        "metrics": [],
+        "var_prefix": var_prefix,
+        "exclude_cols": [],
+        "default_indicators": [],
+        "help": "Uploaded enriched CSV."
+    }
+
+    return build_dataset(
+        df,
+        cfg
+    )

@@ -2,7 +2,6 @@
 ## ui/phase_help.py
 ## --------------------------------------------------------------------------------------
 
-import html
 import streamlit as st
 
 
@@ -11,68 +10,165 @@ import streamlit as st
 # =====================================================
 
 PHASE_HELP = {
-    "input": (
-        "Load the base decision space. This phase established the base decision space\n\n"
-        "Two starting alternatives:\n"
-        "• Domain Configuration: load a predefined case with dataset, objectives, "
-        "decision-variable prefix, and optional plugin.\n"
-        "• Upload Enriched CSV: upload a standalone CSV and define the prefix used "
-        "to identify decision variables.\n\n"
-        "After loading, select the optimization objectives."
-    ),
+    "input": """
+Load the base decision space.
 
-    "enrichment": (
-        "Add derived indicators to the original dataset. "
-        "These indicators enrich the decision space with additional views "
-        "such as productivity, scope, quality, efficiency, or domain-specific measures."
-    ),
+You can start in two ways:
 
-    "framing": (
-        "Filter the decision space according to the current analytical context. "
-        "Framing reduces the dataset before applying lenses, SOI generation, "
-        "CSS selection, or detailed comparison."
-    ),
+**1. Domain Configuration**
 
-    "workspace_controls": (
-        "Create and manage decision-space maps. "
-        "Maps visualize the current decision set, SOI, or CSS using selected "
-        "objectives and indicators."
-    ),
+Use this option when you want to load a predefined case already configured in the library.
 
-    "soi": (
-        "Generate or load a Solution of Interest. "
-        "A SOI is a candidate subset produced by an analytical lens, "
-        "a saved subset, a consensus of saved SOIs, or the exploratory current set."
-    ),
+A domain configuration usually provides:
 
-    "saved_sois": (
-        "Review, load, or delete saved Solutions of Interest. "
-        "Saved SOIs store solution IDs and traceability metadata such as lens, "
-        "method, group, parameters, and creation context."
-    ),
+- the solution dataset
+- the default optimization objectives
+- the decision-variable prefix
+- optional plugin logic
+- optional default indicators
 
-    "css": (
-        "Lock the current decision set as a Candidate Solution Set, "
-        "or manually select specific solutions for detailed visual comparison. "
-        "The CSS is the final subset studied in detail."
-    ),
+This is the recommended option when the decision problem has a known structure.
 
-    "summary": (
-        "Summarize the current decision set or CSS. "
-        "This section shows size, attributes, decision variables, derived columns, "
-        "export options, and the current data table."
-    ),
+**2. Upload Enriched CSV**
 
-    "maps": (
-        "Explore the current decision set or CSS visually. "
-        "Maps reveal structure, trade-offs, clusters, consensus groups, "
-        "preference scores, and highlighted candidates."
-    ),
+Use this option when you already have a standalone CSV.
 
-    "comparison": (
-        "Compare selected candidate solutions in detail using radar profiles "
-        "for objectives and indicators, plus decision-variable composition views."
-    )
+The uploaded CSV should contain:
+
+- one row per solution
+- numeric objective or indicator columns
+- decision-variable columns sharing a common prefix
+
+Examples of decision-variable prefixes:
+
+- `x_`
+- `var_`
+- `req_`
+- `feature_`
+- `design_`
+
+After loading the data, select the optimization objectives that define the base decision space.
+""",
+
+    "enrichment": """
+Add derived indicators to the original dataset.
+
+Indicators enrich the decision space with additional analytical views, such as:
+
+- productivity
+- scope
+- quality
+- efficiency
+- domain-specific measures
+
+These indicators can later be used in maps, lenses, SOI generation, CSS selection, and detailed comparison.
+""",
+
+    "framing": """
+Filter the decision space according to the current analytical context.
+
+Framing reduces the active dataset before applying:
+
+- analytical lenses
+- SOI generation
+- CSS selection
+- detailed comparison
+
+Use this phase to restrict the decision space to the region that is currently relevant.
+""",
+
+    "workspace_controls": """
+Create and manage decision-space maps.
+
+Maps visualize the current decision set, SOI, or CSS using selected objectives and indicators.
+
+Use this phase to decide which dimensions should be shown in each map.
+""",
+
+    "soi": """
+Generate or load a Solution of Interest.
+
+A SOI is a candidate subset of solutions. It can come from:
+
+- an analytical lens
+- a saved SOI
+- a consensus of saved SOIs
+- the exploratory current set
+
+Examples of SOIs include:
+
+- a cluster from Diversity
+- a Top-N set from Preference
+- an efficient subset
+- a non-dominated subset
+- a manually saved current set
+""",
+
+    "saved_sois": """
+Review, load, or delete saved Solutions of Interest.
+
+Saved SOIs store:
+
+- solution IDs
+- source lens
+- method
+- selected group
+- parameters
+- creation context
+
+Use saved SOIs to return to previous interesting subsets or combine them later.
+""",
+
+    "css": """
+Define the Candidate Solution Set.
+
+The CSS is the final subset that will be studied in detail.
+
+You can build it from:
+
+- the current decision set
+- the current SOI
+- a manual selection of specific solutions
+
+Once a CSS is active, it can be used for detailed visual comparison.
+""",
+
+    "summary": """
+Summarize the current decision set or CSS.
+
+This section shows:
+
+- number of solutions
+- number of attributes
+- number of decision variables
+- CSS status
+- derived columns
+- export options
+- the current data table
+""",
+
+    "maps": """
+Explore the current decision set or CSS visually.
+
+Maps help reveal:
+
+- trade-offs
+- clusters
+- consensus groups
+- preference scores
+- efficiency scores
+- highlighted candidates
+""",
+
+    "comparison": """
+Compare selected candidate solutions in detail.
+
+The detailed comparison includes:
+
+- radar profiles for objectives and indicators
+- decision-variable composition matrix
+- decision-variable distribution inside the CSS
+"""
 }
 
 
@@ -90,46 +186,42 @@ def get_phase_help(
     )
 
 
+def get_help_text(
+    phase_key
+):
+
+    return get_phase_help(
+        phase_key
+    )
+
+
 # =====================================================
-# INLINE HELP ICON
+# HELP POPOVER
 # =====================================================
 
-def render_phase_help_icon( phase_key ):
-
-    help_text = get_phase_help(phase_key)
+def render_help_icon(
+    help_text,
+    key=None,
+    label="ⓘ"
+):
 
     if not help_text:
+
         return
 
-    safe_help = html.escape(
-        help_text
-    )
+    with st.popover(
+        label
+    ):
 
-    st.markdown(
-        (
-            "<div style='text-align:right;'>"
-            "<span "
-            f"title=\"{safe_help}\" "
-            "style='"
-            "cursor:help;"
-            "color: #2563eb;"
-            "font-size:2rem;"
-            "line-height:0.5;"
-            "'>"
-            "✦"
-            "</span>"
-            "</div>"
-        ),
-        unsafe_allow_html=True
-    )
+        st.markdown(
+            help_text
+        )
 
 
-# =====================================================
-# COMPACT HELP ROW
-# =====================================================
-
-def render_phase_help_row(
-    phase_key
+def render_phase_help_icon(
+    phase_key,
+    key=None,
+    label="ⓘ"
 ):
 
     help_text = get_phase_help(
@@ -140,50 +232,8 @@ def render_phase_help_row(
 
         return
 
-    safe_help = html.escape(
-        help_text
+    render_help_icon(
+        help_text,
+        key=key,
+        label=label
     )
-
-    st.markdown(
-        (
-            "<span "
-            f"title=\"{safe_help}\" "
-            "style='"
-            "cursor:help;"
-            "color:#6b7280;"
-            "font-size:0.85rem;"
-            "'>"
-            "ⓘ Phase help"
-            "</span>"
-        ),
-        unsafe_allow_html=True
-    )
-
-
-# =====================================================
-# GENERIC TOOLTIP ICON
-# =====================================================
-
-def render_help_icon(
-    help_text,
-    key=None
-):
-
-    if not help_text:
-
-        return
-
-    button_key = (
-        key
-        if key is not None
-        else "generic_help_icon"
-    )
-
-    if st.button(
-        "ⓘ",
-        key=button_key,
-        help=help_text,
-        use_container_width=True
-    ):
-
-        pass
