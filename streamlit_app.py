@@ -1,17 +1,30 @@
 from datetime import datetime
 import streamlit as st
 
-from css.css_comparison import render_css_comparison
-from css.css_panel import render_css_panel
+# =====================================================
+# CORE & CSS IMPORTS
+# =====================================================
 from core.enrichment import render_enrichment
 from core.framing import apply_framing
 from core.input_panel import render_input_panel
 from core.workspace import render_workspace
 from core.workspace_controls import render_workspace_controls
-from ui.lens_engine import apply_lens
+
+from css.css_comparison import render_css_comparison
+from css.css_panel import render_css_panel
+
+# =====================================================
+# LENSES (Lógica y Motor sin dependencias de Streamlit)
+# =====================================================
+from lenses.engine import apply_lens
+
+# =====================================================
+# UI COMPONENTS (Capa de Presentación Streamlit)
+# =====================================================
 from ui.lens_feedback import render_lens_feedback
+from ui.lens_panel import render_lens_panel
 from ui.lens_selection import render_group_selector_and_save
-from lenses.lenses import render_lens_panel
+
 
 # --------------------------------------------------------------------------------------
 # Page Configuration & Global Styling
