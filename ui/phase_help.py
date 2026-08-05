@@ -112,7 +112,7 @@ def render_phase_help_icon(
             "style='"
             "cursor:help;"
             "color:#6b7280;"
-            "font-size:0.9rem;"
+            "font-size:2rem;"
             "line-height:0.5;"
             "'>"
             "help"
