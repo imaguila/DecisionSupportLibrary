@@ -242,7 +242,7 @@ def render_input_panel():
             label_visibility="collapsed"
         )
 
-        if mode == "Domain Configuration":
+        if mode == "1. Domain Configuration":
 
             return render_domain_configuration_input()
 
