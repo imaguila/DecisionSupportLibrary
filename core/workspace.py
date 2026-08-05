@@ -6,7 +6,6 @@ import streamlit as st
 
 from core.workspace_summary import ( render_summary )
 from core.workspace_maps import ( render_maps )
-from soi.soi_registry import ( render_soi_tab )
 
 def get_workspace_dimensions( dataset ):
     return ( dataset["metrics"] + dataset["selected_indicators"] )
@@ -37,6 +36,3 @@ def render_workspace( df, dataset, show_ids ):
     else:
         render_maps( df,  dataset, dimensions, show_ids )
 
-    # ====================== SAVED SOIS ============================
-
-    render_soi_registry()
