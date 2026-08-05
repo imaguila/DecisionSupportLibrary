@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 
-# Usamos la nueva interfaz unificada
+# Import the new unified interface
 from lenses import get_lens
 
 logger = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ def render_lens_feedback(
     if not active_lens or active_lens.strip().lower() == "none":
         return
 
-    # Obtener la instancia de la lente desde el catálogo actual
+    # Retrieve the lens instance from the current catalog
     lens_instance = get_lens(active_lens)
 
     if lens_instance is None:
@@ -49,16 +49,16 @@ def render_lens_feedback(
 
     try:
         with placeholder.container():
-            # Si la lente implementa su propio método de renderizado de métricas/feedback
+            # Check if the lens implements its own feedback rendering method
             if hasattr(lens_instance, "render_feedback") and callable(
                 getattr(lens_instance, "render_feedback")
             ):
                 lens_instance.render_feedback(lens_df)
             else:
-                # Feedback genérico por defecto
-                st.caption(f"📊 Resumen de Lente: **{active_lens.title()}**")
-                st.metric("Soluciones resultantes", len(lens_df))
+                # Default generic feedback
+                st.caption(f"📊 Lens Summary: **{active_lens.title()}**")
+                st.metric("Resulting Solutions", len(lens_df))
 
     except Exception as e:
         logger.error("Error rendering feedback for lens '%s': %s", active_lens, str(e))
-        placeholder.error(f"Error al mostrar métricas de '{active_lens}': {str(e)}")
+        placeholder.error(f"Failed to display metrics for '{active_lens}': {str(e)}")
