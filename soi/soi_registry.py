@@ -476,33 +476,42 @@ def render_loaded_soi_status():
 # =====================================================
 # RENDER SAVED SOI ROW
 # =====================================================
-
 def render_saved_soi_row(
     soi,
     idx
 ):
 
-    col1, col2, col3 = st.columns(
+    col_info, col_help, col_load, col_delete = st.columns(
         [
-            0.66,
-            0.17,
-            0.17
+            0.68,
+            0.08,
+            0.14,
+            0.10
         ]
     )
 
-    with col1:
+    with col_info:
 
         st.caption(
-            build_soi_main_label(
-                soi
-            )
+            f"• {build_soi_main_label(soi)}"
         )
 
-        render_trace_tooltip(
+    with col_help:
+
+        tooltip = build_tooltip_text(
             soi
         )
 
-    with col2:
+        if st.button(
+            "ⓘ",
+            key=f"info_soi_{idx}",
+            help=tooltip,
+            use_container_width=True
+        ):
+
+            pass
+
+    with col_load:
 
         if st.button(
             "Load",
@@ -516,7 +525,7 @@ def render_saved_soi_row(
 
             st.rerun()
 
-    with col3:
+    with col_delete:
 
         if st.button(
             "🗑️",
