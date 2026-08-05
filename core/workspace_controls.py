@@ -5,8 +5,7 @@
 import streamlit as st
 
 
-def render_workspace_controls(
-    dimensions
+def render_workspace_controls( dimensions
 ):
 
     with st.sidebar.expander(

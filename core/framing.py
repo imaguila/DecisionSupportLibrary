@@ -4,6 +4,7 @@
 
 import streamlit as st
 import pandas as pd
+from ui.phase_help import ( render_phase_help_icon )
 
 def get_framing_dimensions( dataset ):
     return (
@@ -59,6 +60,13 @@ def apply_framing( dataset ):
 
     with st.sidebar.expander(
         "🎛️ Context Framing", expanded=False ):
+
+        col_label, col_help = st.columns(  [ 0.85, 0.15 ],
+            vertical_alignment="center"
+        )
+        
+        with col_help:
+            render_phase_help_icon( "framing",  key="help_input_phase" )
 
         for metric in dimensions:
             if not is_valid_numeric_dimension( df, metric ):
