@@ -98,7 +98,6 @@ def render_phase_help_icon(
     )
 
     if not help_text:
-
         return
 
     safe_help = html.escape(
