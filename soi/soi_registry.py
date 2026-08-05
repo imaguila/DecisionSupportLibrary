@@ -547,29 +547,29 @@ def render_soi_registry():
 
     ensure_soi_state()
 
-    with st.expander(
-        "📚 Saved SOIs",
-        expanded=False
-    ):
+#    with st.expander(
+#        "📚 Saved SOIs",
+#        expanded=False
+#    ):
 
-        if not st.session_state.saved_sois:
+#        if not st.session_state.saved_sois:
 
-            st.info(
-                "No saved SOIs."
-            )
+#            st.info(
+#                "No saved SOIs."
+#            )
 
-            return
+#            return
 
-        render_loaded_soi_status()
+#        render_loaded_soi_status()
 
-        for idx, soi in enumerate(
-            st.session_state.saved_sois
-        ):
+#        for idx, soi in enumerate(
+#            st.session_state.saved_sois
+#        ):
 
-            render_saved_soi_row(
-                soi,
-                idx
-            )
+#            render_saved_soi_row(
+#                soi,
+#                idx
+#            )
 
 
 def render_soi_tab():
