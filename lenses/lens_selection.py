@@ -136,11 +136,9 @@ def render_group_selector_and_save(
     ensure_soi_state()
 
     if lens_df is None:
-
         return lens_df
 
     with placeholder.container():
-
         lens_label = get_lens_label(
             active_lens
         )
@@ -150,7 +148,7 @@ def render_group_selector_and_save(
         )
 
         group_value = "All groups"
-
+        
         if group_column is not None:
 
             group_options = get_group_options(

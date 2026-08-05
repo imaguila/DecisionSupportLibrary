@@ -15,7 +15,6 @@ def render_lens_feedback(
 ):
 
     if placeholder is None:
-
         return
 
     if lens_df is None:
