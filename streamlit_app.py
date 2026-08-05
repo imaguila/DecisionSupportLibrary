@@ -14,12 +14,12 @@ from css.css_comparison import render_css_comparison
 from css.css_panel import render_css_panel
 
 # =====================================================
-# LENSES (Lógica y Motor sin dependencias de Streamlit)
+# LENSES 
 # =====================================================
 from lenses.engine import apply_lens
 
 # =====================================================
-# UI COMPONENTS (Capa de Presentación Streamlit)
+# UI COMPONENTS 
 # =====================================================
 from ui.lens_feedback import render_lens_feedback
 from ui.lens_panel import render_lens_panel
