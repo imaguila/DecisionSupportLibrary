@@ -58,7 +58,6 @@ def render_active_lens_params(
 ):
 
     if active_lens == "None":
-
         return {}
 
     lens_module = get_lens_module(

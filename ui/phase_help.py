@@ -299,3 +299,29 @@ def main_phase_container(
     return st.container(
         border=True
     )
+
+# =====================================================
+# BACKWARD COMPATIBILITY
+# =====================================================
+
+def render_phase_title(
+    title,
+    phase_key,
+    sidebar=False
+):
+
+    if sidebar:
+
+        return sidebar_phase_container(
+            title,
+            phase_key,
+            key=f"{phase_key}_phase_title",
+            expanded=False
+        )
+
+    return main_phase_container(
+        title,
+        phase_key,
+        key=f"{phase_key}_phase_title",
+        expanded=False
+    )
