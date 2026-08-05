@@ -348,19 +348,21 @@ def render_css_comparison(css_df, dataset):
         default_ids = [sid for sid in default_ids if sid in css_ids]
 
         compare_ids = st.multiselect(
-            "Pick solutions to compare",
+            "Pick solutions to compare & highlight",
             css_ids,
             default=default_ids,
             key="css_compare_ids"
         )
 
+        st.session_state.css_highlight_ids = compare_ids
+
         if len(compare_ids) < 2:
             st.info("Select at least 2 solutions to compare.")
             return
 
+
         compare_df = css_df[css_df["id"].isin(compare_ids)].copy()
 
-        # REFACTOR 4: Nueva estructura de pestañas limpia y escalable
         tab_metrics, tab_vars, tab_sim = st.tabs([
             "📊 Metrics & Trade-offs", 
             "📋 Decision Variables",
@@ -382,4 +384,3 @@ def render_css_comparison(css_df, dataset):
         with tab_sim:
             render_solution_similarity_matrix(compare_df, dataset)
 
-            
