@@ -89,13 +89,9 @@ def get_phase_help(
 # INLINE HELP ICON
 # =====================================================
 
-def render_phase_help_icon(
-    phase_key
-):
+def render_phase_help_icon( phase_key ):
 
-    help_text = get_phase_help(
-        phase_key
-    )
+    help_text = get_phase_help(phase_key)
 
     if not help_text:
         return
@@ -112,10 +108,10 @@ def render_phase_help_icon(
             "style='"
             "cursor:help;"
             "color:#6b7280;"
-            "font-size:2rem;"
+            "font-size:0.9rem;"
             "line-height:0.5;"
             "'>"
-            "help"
+            "info"
             "</span>"
             "</div>"
         ),
