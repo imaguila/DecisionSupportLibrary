@@ -2,6 +2,7 @@
 ## soi/soi_registry.py
 ## --------------------------------------------------------------------------------------
 
+import html
 import streamlit as st
 
 
@@ -128,7 +129,272 @@ def delete_soi(
 
 
 # =====================================================
-# RENDER HELPERS
+# LABEL HELPERS
+# =====================================================
+
+def normalize_method_label(
+    soi
+):
+
+    method = soi.get(
+        "method"
+    )
+
+    if method is None or method == "None":
+
+        lens = soi.get(
+            "lens",
+            "Unknown"
+        )
+
+        if lens == "Exploratory":
+
+            return "Exploratory"
+
+        return None
+
+    return method
+
+
+def is_informative_group(
+    group
+):
+
+    return (
+        group is not None
+        and group != ""
+        and group != "All groups"
+    )
+
+
+def build_soi_main_label(
+    soi
+):
+
+    name = soi.get(
+        "name",
+        "Unnamed SOI"
+    )
+
+    size = len(
+        soi.get(
+            "ids",
+            []
+        )
+    )
+
+    lens = soi.get(
+        "lens",
+        "Unknown"
+    )
+
+    method = normalize_method_label(
+        soi
+    )
+
+    if method:
+
+        return (
+            f"{name} "
+            f"[{size}] · "
+            f"{lens} / {method}"
+        )
+
+    return (
+        f"{name} "
+        f"[{size}] · "
+        f"{lens}"
+    )
+
+
+def build_compact_trace_label(
+    soi
+):
+
+    parts = []
+
+    group = soi.get(
+        "group"
+    )
+
+    if is_informative_group(
+        group
+    ):
+
+        parts.append(
+            f"Group: {group}"
+        )
+
+    source_size = soi.get(
+        "source_size"
+    )
+
+    soi_size = soi.get(
+        "soi_size",
+        len(
+            soi.get(
+                "ids",
+                []
+            )
+        )
+    )
+
+    if source_size is not None:
+
+        parts.append(
+            f"{soi_size}/{source_size} solutions"
+        )
+
+    else:
+
+        parts.append(
+            f"{soi_size} solutions"
+        )
+
+    created_at = soi.get(
+        "created_at"
+    )
+
+    if created_at:
+
+        parts.append(
+            created_at
+        )
+
+    return " · ".join(
+        parts
+    )
+
+
+def build_tooltip_text(
+    soi
+):
+
+    lens = soi.get(
+        "lens",
+        "Unknown"
+    )
+
+    method = normalize_method_label(
+        soi
+    )
+
+    group = soi.get(
+        "group"
+    )
+
+    source_size = soi.get(
+        "source_size"
+    )
+
+    soi_size = soi.get(
+        "soi_size",
+        len(
+            soi.get(
+                "ids",
+                []
+            )
+        )
+    )
+
+    created_at = soi.get(
+        "created_at"
+    )
+
+    params = soi.get(
+        "params",
+        {}
+    )
+
+    lines = [
+        f"Lens: {lens}",
+        f"Method: {method if method else 'N/A'}",
+        f"SOI size: {soi_size}"
+    ]
+
+    if source_size is not None:
+
+        lines.append(
+            f"Source size: {source_size}"
+        )
+
+    if is_informative_group(
+        group
+    ):
+
+        lines.append(
+            f"Group: {group}"
+        )
+
+    if created_at:
+
+        lines.append(
+            f"Created: {created_at}"
+        )
+
+    if params:
+
+        compact_params = ", ".join(
+            [
+                f"{key}={value}"
+                for key, value in params.items()
+                if key not in [
+                    "selected_sois",
+                    "params"
+                ]
+            ]
+        )
+
+        if compact_params:
+
+            lines.append(
+                f"Params: {compact_params}"
+            )
+
+    return "\n".join(
+        lines
+    )
+
+
+def render_trace_tooltip(
+    soi
+):
+
+    compact_label = build_compact_trace_label(
+        soi
+    )
+
+    tooltip = build_tooltip_text(
+        soi
+    )
+
+    safe_label = html.escape(
+        compact_label
+    )
+
+    safe_tooltip = html.escape(
+        tooltip
+    )
+
+    st.markdown(
+        (
+            "<span "
+            f"title=\"{safe_tooltip}\" "
+            "style=\""
+            "font-size:0.82rem;"
+            "color:#6b7280;"
+            "line-height:1.2;"
+            "cursor:help;"
+            "\">"
+            f"ⓘ {safe_label}"
+            "</span>"
+        ),
+        unsafe_allow_html=True
+    )
+
+
+# =====================================================
+# RENDER LOADED SOI
 # =====================================================
 
 def render_loaded_soi_status():
@@ -162,24 +428,34 @@ def render_loaded_soi_status():
             "group"
         )
 
-        if lens or method:
+        label_parts = []
 
-            label = lens or "Unknown lens"
+        if lens:
 
-            if method:
-
-                label = (
-                    f"{label} / {method}"
-                )
-
-            st.caption(
-                label
+            label_parts.append(
+                lens
             )
 
-        if group:
+        if method:
+
+            label_parts.append(
+                method
+            )
+
+        if is_informative_group(
+            group
+        ):
+
+            label_parts.append(
+                group
+            )
+
+        if label_parts:
 
             st.caption(
-                f"Group: {group}"
+                " · ".join(
+                    label_parts
+                )
             )
 
     if st.button(
@@ -197,93 +473,6 @@ def render_loaded_soi_status():
     )
 
 
-def build_soi_main_label(
-    soi
-):
-
-    name = soi.get(
-        "name",
-        "Unnamed SOI"
-    )
-
-    size = len(
-        soi.get(
-            "ids",
-            []
-        )
-    )
-
-    lens = soi.get(
-        "lens",
-        "Unknown"
-    )
-
-    method = soi.get(
-        "method"
-    )
-
-    if method:
-
-        return (
-            f"{name} "
-            f"[{size}] · "
-            f"{lens} / {method}"
-        )
-
-    return (
-        f"{name} "
-        f"[{size}] · "
-        f"{lens}"
-    )
-
-
-def render_soi_details(
-    soi,
-    idx
-):
-
-    with st.expander(
-        "Details",
-        expanded=False
-    ):
-
-        st.write(
-            {
-                "lens": soi.get(
-                    "lens"
-                ),
-                "method": soi.get(
-                    "method"
-                ),
-                "group": soi.get(
-                    "group"
-                ),
-                "group_column": soi.get(
-                    "group_column"
-                ),
-                "source_size": soi.get(
-                    "source_size"
-                ),
-                "soi_size": soi.get(
-                    "soi_size",
-                    len(
-                        soi.get(
-                            "ids",
-                            []
-                        )
-                    )
-                ),
-                "created_at": soi.get(
-                    "created_at"
-                ),
-                "params": soi.get(
-                    "params",
-                    {}
-                )
-            }
-        )
-
-
 # =====================================================
 # RENDER SAVED SOI ROW
 # =====================================================
@@ -295,9 +484,9 @@ def render_saved_soi_row(
 
     col1, col2, col3 = st.columns(
         [
-            0.62,
-            0.19,
-            0.19
+            0.66,
+            0.17,
+            0.17
         ]
     )
 
@@ -309,29 +498,8 @@ def render_saved_soi_row(
             )
         )
 
-        group_label = soi.get(
-            "group"
-        )
-
-        if group_label:
-
-            st.caption(
-                f"Group: {group_label}"
-            )
-
-        created_at = soi.get(
-            "created_at"
-        )
-
-        if created_at:
-
-            st.caption(
-                f"Created: {created_at}"
-            )
-
-        render_soi_details(
-            soi,
-            idx
+        render_trace_tooltip(
+            soi
         )
 
     with col2:

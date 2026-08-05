@@ -154,17 +154,14 @@ if "pending_save_soi" in st.session_state:
     del st.session_state[  "pending_save_soi" ]
 
 
-# ==================================================
-# CANDIDATE SOLUTION SET
-
+# ==================== CANDIDATE SOLUTION SET ===================
+ 
 css_df = render_css_panel( current_df,  dataset )
 
-# ==================================================
-# WORKSPACE
-
+# ==================== WORKSPACE ==============================
+    
 render_workspace(  css_df, dataset, show_ids )
 
-# ==================================================
-# DETAILED COMPARISON
+# ==================== DETAILED COMPARISON =======================
 
 render_css_comparison( css_df, dataset )
