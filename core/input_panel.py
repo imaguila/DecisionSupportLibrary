@@ -8,32 +8,19 @@ import pandas as pd
 from config import CASES
 from plugins import PLUGIN_REGISTRY
 from ui.phase_help import (
-    render_phase_help_icon,
-    render_help_icon
+    render_phase_help_icon, render_help_icon
 )
-
 
 # =====================================================
 # DETECTION / INFERENCE
 # =====================================================
 
 def detect_decision_variables( df, prefix ):
-    return [
-        col
-        for col in df.columns
-        if col.startswith(
-            prefix
-        )
-    ]
+    return [ col for col in df.columns if col.startswith( prefix ) ]
 
 def infer_numeric_metrics( df, cfg ):
     var_prefix = cfg.get( "var_prefix", "x_" )
-    excluded = set(
-        cfg.get(
-            "exclude_cols",
-            []
-        )
-    )
+    excluded = set( cfg.get( "exclude_cols", [] ) )
 
     system_cols = {
         "id",
@@ -64,84 +51,39 @@ def infer_numeric_metrics( df, cfg ):
             continue
         if col in system_cols:
             continue
-
-        if pd.api.types.is_numeric_dtype(
-            df[col]
-        ):
-
-            metrics.append(
-                col
-            )
-
+        if pd.api.types.is_numeric_dtype( df[col] ):
+            metrics.append( col )
+            
     return metrics
 
+# ==================== PLUGIN / DATASET BUILDING ========================
 
-
-# =====================================================
-# PLUGIN / DATASET BUILDING
-# =====================================================
-
-def build_plugin(
-    cfg
-):
-
+def build_plugin( cfg ):
     plugin = None
-
-    plugin_name = cfg.get(
-        "plugin"
-    )
-
+    plugin_name = cfg.get(  "plugin"  )
     if plugin_name:
-
-        plugin_class = PLUGIN_REGISTRY.get(
-            plugin_name
-        )
-
+        plugin_class = PLUGIN_REGISTRY.get( plugin_name )
         if plugin_class is not None:
-
-            plugin = plugin_class(
-                var_prefix=cfg.get(
-                    "var_prefix",
-                    "x_"
-                )
-            )
-
+            plugin = plugin_class( var_prefix=cfg.get( "var_prefix",  "x_" ) )
     return plugin
 
+def build_dataset( df, cfg ):
+    plugin = build_plugin( cfg )
 
-def build_dataset(
-    df,
-    cfg
-):
-
-    plugin = build_plugin(
-        cfg
-    )
-
-    all_metrics = cfg.get(
-        "metrics",
-        []
-    )
+    all_metrics = cfg.get( "metrics", [] )
 
     if not all_metrics:
-
-        all_metrics = infer_numeric_metrics(
-            df,
-            cfg
-        )
+        all_metrics = infer_numeric_metrics( df, cfg )
 
     selected_metrics = st.multiselect(
-        "Optimization Objectives",
+        "Candidate Objectives",
         all_metrics,
         default=all_metrics
     )
 
     decision_variables = detect_decision_variables(
         df,
-        cfg.get(
-            "var_prefix",
-            "x_"
-        )
+        cfg.get( "var_prefix", "x_" )
     )
 
     return {
@@ -153,84 +95,40 @@ def build_dataset(
         "decision_variables": decision_variables
     }
 
+# =================== LOADERS ===================
 
+def load_builtin_dataset( cfg ):
+    df = pd.read_csv( cfg["path_sol"] )
+    df = df.reset_index( drop=True )
+    df["id"] = range( 1,  len(df) + 1 )
 
+    return df
 
-# =====================================================
-# LOADERS
-# =====================================================
-
-def load_builtin_dataset(
-    cfg
-):
-
-    df = pd.read_csv(
-        cfg["path_sol"]
-    )
-
-    df = df.reset_index(
-        drop=True
-    )
-
-    df["id"] = range(
-        1,
-        len(df) + 1
-    )
+def load_uploaded_dataset( uploaded_file ):
+    df = pd.read_csv( uploaded_file )
+    df = df.reset_index( drop=True )
+    df["id"] = range( 1, len(df) + 1 )
 
     return df
 
 
-def load_uploaded_dataset(
-    uploaded_file
-):
+# =================== MAIN INPUT PANEL ================
 
-    df = pd.read_csv(
-        uploaded_file
-    )
-
-    df = df.reset_index(
-        drop=True
-    )
-
-    df["id"] = range(
-        1,
-        len(df) + 1
-    )
-
-    return df
-
-
-
-# =====================================================
-# MAIN INPUT PANEL
-# =====================================================
 def render_input_panel():
 
     with st.sidebar.expander(
-        "🏷️ Input and Preparation",
-        expanded=True
+        "🏷️ Input and Preparation", expanded=True
     ):
 
-        col_label, col_help = st.columns(
-            [
-                0.85,
-                0.15
-            ],
+        col_label, col_help = st.columns(  [ 0.85, 0.15 ],
             vertical_alignment="center"
         )
 
         with col_label:
-
-            st.markdown(
-                "**Data Source**"
-            )
+            st.markdown( "**Data Source**" )
 
         with col_help:
-
-            render_phase_help_icon(
-                "input",
-                key="help_input_phase"
-            )
+            render_phase_help_icon( "input",  key="help_input_phase" )
 
         mode = st.radio(
             "Data Source",
@@ -243,14 +141,11 @@ def render_input_panel():
         )
 
         if mode == "1. Domain Configuration":
-
             return render_domain_configuration_input()
-
         return render_uploaded_csv_input()
     
-# =====================================================
-# DOMAIN CONFIGURATION INPUT
-# =====================================================
+# ======================== DOMAIN CONFIGURATION INPUT ==================
+
 def render_domain_configuration_input():
 
     dataset_names = [
@@ -383,7 +278,4 @@ def render_uploaded_csv_input():
         "help": "Uploaded enriched CSV."
     }
 
-    return build_dataset(
-        df,
-        cfg
-    )
+    return build_dataset(  df,  cfg )
