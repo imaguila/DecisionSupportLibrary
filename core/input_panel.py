@@ -9,6 +9,10 @@ import pandas as pd
 from config import CASES
 from plugins import PLUGIN_REGISTRY
 
+from ui.phase_help import (
+    render_phase_help_icon
+)
+
 
 def detect_decision_variables(
     df,
@@ -205,10 +209,17 @@ def load_uploaded_dataset(
 
 def render_input_panel():
 
+    col_title, col_help = st.sidebar.columns(
+        [   0.90, 0.10 ]
+    )
+    
     with st.sidebar.expander(
         "🏷️ Input and Preparation",
         expanded=True
     ):
+
+        render_phase_help_icon(
+            "input" )
 
         mode = st.radio(
             "Data Source",
