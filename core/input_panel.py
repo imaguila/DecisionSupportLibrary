@@ -10,7 +10,8 @@ from config import CASES
 from plugins import PLUGIN_REGISTRY
 
 from ui.phase_help import (
-    render_phase_help_icon
+    render_phase_help_icon,
+    render_help_icon
 )
 
 
@@ -206,20 +207,16 @@ def load_uploaded_dataset(
 
     return df
 
-
 def render_input_panel():
 
-    col_title, col_help = st.sidebar.columns(
-        [   0.90, 0.10 ]
-    )
-    
     with st.sidebar.expander(
         "🏷️ Input and Preparation",
         expanded=True
     ):
 
         render_phase_help_icon(
-            "input" )
+            "input"
+        )
 
         mode = st.radio(
             "Data Source",
@@ -244,10 +241,44 @@ def render_input_panel():
                 CASES.keys()
             )
 
-            dataset_name = st.selectbox(
-                "Domain Configuration",
-                dataset_names
+            col_dataset, col_help = st.columns(
+                [
+                    0.88,
+                    0.12
+                ]
             )
+
+            with col_dataset:
+
+                dataset_name = st.selectbox(
+                    "Domain Configuration",
+                    dataset_names,
+                    key="input_domain_configuration"
+                )
+
+            if dataset_name == "-- No Data --":
+
+                dataset_help = (
+                    "No domain configuration selected yet. "
+                    "Choose a predefined case to load its dataset, "
+                    "objectives, decision-variable prefix, and optional plugin."
+                )
+
+            else:
+
+                dataset_help = CASES[
+                    dataset_name
+                ].get(
+                    "help",
+                    "No additional description is available for this domain configuration."
+                )
+
+            with col_help:
+
+                render_help_icon(
+                    dataset_help,
+                    key="help_domain_configuration"
+                )
 
             if dataset_name == "-- No Data --":
 
@@ -278,14 +309,6 @@ def render_input_panel():
                 )
 
                 return None
-
-            if cfg.get(
-                "help"
-            ):
-
-                st.caption(
-                    cfg["help"]
-                )
 
             return build_dataset(
                 df,

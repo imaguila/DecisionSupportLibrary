@@ -158,3 +158,32 @@ def render_phase_help_row(
         ),
         unsafe_allow_html=True
     )
+
+
+# =====================================================
+# GENERIC TOOLTIP ICON
+# =====================================================
+
+def render_help_icon(
+    help_text,
+    key=None
+):
+
+    if not help_text:
+
+        return
+
+    button_key = (
+        key
+        if key is not None
+        else "generic_help_icon"
+    )
+
+    if st.button(
+        "ⓘ",
+        key=button_key,
+        help=help_text,
+        use_container_width=True
+    ):
+
+        pass

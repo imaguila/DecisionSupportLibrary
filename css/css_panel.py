@@ -4,8 +4,6 @@
 
 import streamlit as st
 
-
-
 def ensure_css_state():
 
     if "css_enabled" not in st.session_state:
