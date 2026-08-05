@@ -222,4 +222,6 @@ def render_summary(df, dataset):
 
         with tab_saved_soi:
             # Se pasa 'df' para dar soporte al constructor manual de SOIs
-            render_soi_tab(df)
+            #render_soi_tab(df)
+            render_soi_tab()
+            
