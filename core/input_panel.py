@@ -225,15 +225,15 @@ def render_input_panel():
                 "Upload Enriched CSV"
             ],
             horizontal=True,
-            help="Choose how the decision space is loaded."
+   #         help="Choose how the decision space is loaded."
         )
 
         if mode == "Domain Configuration":
 
-            st.caption(
-                "Predefined package: dataset, objectives, "
-                "configuration and optional plugin."
-            )
+    #        st.caption(
+    #            "Predefined package: dataset, objectives, "
+    #            "configuration and optional plugin."
+    #        )
 
             dataset_names = [
                 "-- No Data --"
