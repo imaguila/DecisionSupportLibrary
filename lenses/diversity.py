@@ -17,7 +17,9 @@ from sklearn.preprocessing import StandardScaler
 # Optional dependencies with safe fallback
 try:
     from sklearn_extra.cluster import KMedoids
-except ImportError:
+except (ImportError, ValueError, Exception) as e:
+    import logging
+    logging.warning("Could not load KMedoids from sklearn_extra: %s", e)
     KMedoids = None
 
 try:
