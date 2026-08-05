@@ -63,6 +63,7 @@ PHASE_HELP = {
     )
 }
 
+
 # =====================================================
 # HELP ACCESS
 # =====================================================
@@ -76,6 +77,10 @@ def get_phase_help(
         ""
     )
 
+
+# =====================================================
+# PANEL STATE
+# =====================================================
 
 def get_panel_state_key(
     key
@@ -113,6 +118,7 @@ def toggle_panel_state(
     ] = not st.session_state[
         state_key
     ]
+
 
 # =====================================================
 # SIDEBAR PHASE PANEL
@@ -207,6 +213,7 @@ def sidebar_phase_container(
         border=True
     )
 
+
 # =====================================================
 # MAIN AREA PHASE PANEL
 # =====================================================
@@ -299,6 +306,7 @@ def main_phase_container(
     return st.container(
         border=True
     )
+
 
 # =====================================================
 # BACKWARD COMPATIBILITY
