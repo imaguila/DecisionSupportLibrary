@@ -51,17 +51,14 @@ def render_framing_summary( original_df, filtered_df ):
 
     st.caption( f"{ratio:.0%} of the decision space is visible." )
 
-def apply_framing(
-    dataset
-):
+def apply_framing( dataset ):
 
     df = dataset[ "df" ].copy()
     filtered_df = df.copy()
     dimensions = get_framing_dimensions( dataset )
 
     with st.sidebar.expander(
-        "🎛️ Context Framing", expanded=False
-    ):
+        "🎛️ Context Framing", expanded=False ):
 
         for metric in dimensions:
             if not is_valid_numeric_dimension( df, metric ):
@@ -70,52 +67,25 @@ def apply_framing(
             max_v = float( df[metric].max() )
 
             if min_v == max_v:
-
                 continue
 
             selected_range = st.slider(
                 metric,
                 min_value=min_v,
                 max_value=max_v,
-                value=(
-                    min_v,
-                    max_v
-                ),
-                step=(
-                    max_v
-                    -
-                    min_v
-                ) / 1000,
+                value=( min_v,  max_v ),
+                step=(  max_v -  min_v  ) / 1000,
                 key=f"framing_{metric}"
             )
 
             unchanged = (
-                abs(
-                    selected_range[0]
-                    -
-                    min_v
-                ) < 1e-6
+                abs( selected_range[0] - min_v ) < 1e-6
                 and
-                abs(
-                    selected_range[1]
-                    -
-                    max_v
-                ) < 1e-6
+                abs( selected_range[1] - max_v ) < 1e-6
             )
-
             if unchanged:
-
                 continue
-
-            filtered_df = apply_dimension_filter(
-                filtered_df,
-                metric,
-                selected_range
-            )
-
-        render_framing_summary(
-            df,
-            filtered_df
-        )
+            filtered_df = apply_dimension_filter(  filtered_df,  metric,  selected_range )
+        render_framing_summary( df, filtered_df )
 
     return filtered_df

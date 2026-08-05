@@ -48,15 +48,11 @@ def render_enrichment( dataset ):
             )
         )
 
-    dataset[
-        "df"
-    ] = plugin.compute_indicators(
-        dataset[
-            "df"
-        ],
+    dataset[ "df"] = plugin.compute_indicators(
+        dataset[ "df" ],
         selected_indicators
     )
-
+    
     dataset[ "selected_indicators" ] = selected_indicators
 
     return dataset
