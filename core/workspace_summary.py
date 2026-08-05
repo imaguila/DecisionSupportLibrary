@@ -171,8 +171,8 @@ def render_export_section(df, dataset):
 
 def get_summary_label():
     if st.session_state.get("css_enabled", False):
-        return "Dataset Summary / Current CSS"
-    return "Dataset Summary / Current Set"
+        return "Summary / Current CSS / Saved SOIs"
+    return "Summary / Current Set / Saved SOIs"
 
 
 # =====================================================

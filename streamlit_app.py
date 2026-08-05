@@ -117,12 +117,8 @@ render_lens_feedback( feedback_placeholder,  active_lens, lens_df )
 # ==================================================
 # GROUP SELECTION / CURRENT SOI CANDIDATE SET
 
-current_df = render_group_selector_and_save(
-    selection_placeholder,
-    active_lens,
-    lens_df,
-    lens_params
-)
+current_df = render_group_selector_and_save( selection_placeholder, active_lens,
+    lens_df, lens_params )
 
 if current_df is None:
     current_df = lens_df.copy()
@@ -157,7 +153,7 @@ if "pending_save_soi" in st.session_state:
 
 
 # ==================== CANDIDATE SOLUTION SET ===================
- 
+
 css_df = render_css_panel( current_df,  dataset )
 
 # ==================== WORKSPACE ==============================

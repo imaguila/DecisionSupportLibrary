@@ -35,4 +35,3 @@ def render_workspace( df, dataset, show_ids ):
         render_no_map_message()
     else:
         render_maps( df,  dataset, dimensions, show_ids )
-
