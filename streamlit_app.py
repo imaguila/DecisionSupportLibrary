@@ -8,9 +8,9 @@ from core.framing import apply_framing
 from core.input_panel import render_input_panel
 from core.workspace import render_workspace
 from core.workspace_controls import render_workspace_controls
-from lenses.lens_engine import apply_lens
-from lenses.lens_feedback import render_lens_feedback
-from lenses.lens_selection import render_group_selector_and_save
+from ui.lens_engine import apply_lens
+from ui.lens_feedback import render_lens_feedback
+from ui.lens_selection import render_group_selector_and_save
 from lenses.lenses import render_lens_panel
 
 # --------------------------------------------------------------------------------------

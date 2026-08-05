@@ -7057,9 +7057,9 @@ from core.framing import apply_framing
 from core.workspace_controls import render_workspace_controls
 from core.workspace import render_workspace
 from lenses.lenses import render_lens_panel
-from lenses.lens_engine import apply_lens
-from lenses.lens_feedback import render_lens_feedback
-from lenses.lens_selection import ( render_group_selector_and_save )
+from ui.lens_engine import apply_lens
+from ui.lens_feedback import render_lens_feedback
+from ui.lens_selection import ( render_group_selector_and_save )
 from css.css_panel import ( render_css_panel )
 from css.css_comparison import ( render_css_comparison )
 
