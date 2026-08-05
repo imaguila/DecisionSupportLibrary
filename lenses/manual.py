@@ -2,14 +2,17 @@
 Manual Selection Lens (lenses/manual.py)
 """
 
+import logging
 from typing import Any, Dict, Optional
 import pandas as pd
 import streamlit as st
 
 from lenses.base import BaseLens
 
+logger = logging.getLogger(__name__)
 
-class ManualLens(BaseLens):
+
+class ManualSelectionLens(BaseLens):
     name = "manual"
     category = "manual"
 
@@ -42,3 +45,7 @@ class ManualLens(BaseLens):
             return df[df["id"].isin(selected_ids)].copy()
 
         return df.copy()
+
+
+# Alias for backward compatibility
+ManualLens = ManualSelectionLens
