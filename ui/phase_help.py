@@ -115,7 +115,7 @@ def render_phase_help_icon(
             "color:#6b7280;"
             "font-size:0.9rem;"
             "line-height:1;"
-            "'>"
+            #"'>"
             "ⓘ"
             "</span>"
             "</div>"
