@@ -1,10 +1,9 @@
 """
-Lenses Package Initializer.
-
-Exports the global lens registry mapping unique string keys to concrete lens classes.
+Lenses Package Initialization (lenses/__init__.py)
 """
 
-from typing import Any, Dict, List, Optional, Type
+import logging
+from typing import Dict, List, Optional, Type, Union
 
 from .base import BaseLens
 from .consensus import ConsensusLens
@@ -24,71 +23,53 @@ from .preference import (
     WeightedSumLens,
 )
 
-# =====================================================
-# GLOBAL LENS REGISTRY
-# =====================================================
+logger = logging.getLogger(__name__)
 
-LENS_REGISTRY: Dict[str, Type[BaseLens]] = {
-    # Consensus Meta-Lens
-    "consensus": ConsensusLens,
-    # Indicator Lens
+# Registry mapping lens keys to either Lens classes or instantiated objects
+LENS_REGISTRY: Dict[str, Union[Type[BaseLens], BaseLens]] = {
+    "none": BaseLens,
     "indicator": IndicatorLens,
-    # Efficiency Lens
     "efficiency": EfficiencyLens,
-    # Manual Selection Lens
     "manual": ManualSelectionLens,
-    # Diversity Lenses
-    "kmedoids": KMedoidsLens,
     "kmeans": KMeansLens,
+    "kmedoids": KMedoidsLens,
     "agglomerative": AgglomerativeLens,
     "hdbscan": HDBSCANLens,
-    # Preference / MCDM Lenses
     "weighted_sum": WeightedSumLens,
     "topsis": TOPSISLens,
     "vikor": VIKORLens,
     "reference_point": ReferencePointLens,
+    "consensus": ConsensusLens,
 }
-
-__all__ = [
-    "BaseLens",
-    "ConsensusLens",
-    "IndicatorLens",
-    "EfficiencyLens",
-    "ManualSelectionLens",
-    "KMedoidsLens",
-    "KMeansLens",
-    "AgglomerativeLens",
-    "HDBSCANLens",
-    "WeightedSumLens",
-    "TOPSISLens",
-    "VIKORLens",
-    "ReferencePointLens",
-    "LENS_REGISTRY",
-    "get_lens",
-    "list_lenses",
-]
 
 
 def list_lenses() -> List[str]:
-    """Retrieves all registered analytical lens identifier keys."""
-    return list(LENS_REGISTRY.keys())
+    """Returns list of registered lens keys excluding 'none'."""
+    return [k for k in LENS_REGISTRY.keys() if k != "none"]
 
 
-def get_lens(lens_name: str) -> Optional[BaseLens]:
+def get_lens(name: str) -> Optional[BaseLens]:
     """
-    Instantiates and returns an analytical lens by key name.
-
-    Parameters
-    ----------
-    lens_name : str
-        Identifier key string (e.g., 'consensus', 'efficiency', 'kmeans', 'topsis').
-
-    Returns
-    -------
-    Optional[BaseLens]
-        An instance of the requested lens class, or None if unrecognized.
+    Safely retrieves a lens instance by name.
+    
+    Handles both class types and pre-instantiated objects seamlessly.
     """
-    lens_cls = LENS_REGISTRY.get(lens_name.lower())
-    if lens_cls is None:
+    if not name:
         return None
-    return lens_cls()
+
+    key = str(name).lower().strip()
+    lens_item = LENS_REGISTRY.get(key)
+
+    if lens_item is None:
+        logger.warning("Lens '%s' not found in registry.", key)
+        return None
+
+    # If it's a class type, instantiate it; if it's already an instance, return as-is
+    if isinstance(lens_item, type):
+        try:
+            return lens_item()
+        except Exception as e:
+            logger.error("Failed to instantiate lens class '%s': %s", key, e)
+            return None
+
+    return lens_item
