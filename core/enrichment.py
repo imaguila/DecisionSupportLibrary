@@ -5,7 +5,6 @@
 import streamlit as st
 from ui.phase_help import ( render_phase_help_icon )
 
-
 def get_available_indicators( plugin, selected_metrics ):
     available_indicators = []
     requirements = plugin.requirements()

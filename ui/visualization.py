@@ -6,15 +6,11 @@ import plotly.express as px
 import streamlit as st
 import pandas as pd
 
-
 # =====================================================
 # COLOR SELECTION
 # =====================================================
 
-def infer_lens_color_column(
-    df,
-    user_color=None
-):
+def infer_lens_color_column( df, user_color=None ):
 
     # --------------------------------------------------
     # Priority order:
@@ -27,43 +23,32 @@ def infer_lens_color_column(
     # --------------------------------------------------
 
     if "group_label" in df.columns:
-
         return "group_label"
 
     if "cluster_str" in df.columns:
-
         return "cluster_str"
 
     if "preference_score" in df.columns:
-
         return "preference_score"
 
     if "efficiency_score" in df.columns:
-
         return "efficiency_score"
 
     if "consensus_score" in df.columns:
-
         return "consensus_score"
 
     if "domain_match_count" in df.columns:
-
         return "domain_match_count"
 
     return user_color
 
 
-def is_discrete_color(
-    df,
-    color_column
-):
+def is_discrete_color( df, color_column ):
 
     if color_column is None:
-
         return False
 
     if color_column not in df.columns:
-
         return False
 
     if color_column in [
@@ -76,24 +61,15 @@ def is_discrete_color(
 
         return True
 
-    if pd.api.types.is_object_dtype(
-        df[color_column]
-    ):
-
+    if pd.api.types.is_object_dtype( df[color_column] ):
         return True
 
     return False
 
 
-def build_hover_columns(
-    df
-):
+def build_hover_columns( df ):
 
-    excluded_prefixes = (
-        "req_",
-        "var_",
-        "x_"
-    )
+    excluded_prefixes = ( "req_", "var_", "x_" )
 
     excluded_cols = {
         "label",
@@ -106,18 +82,12 @@ def build_hover_columns(
     for col in df.columns:
 
         if col in excluded_cols:
-
             continue
 
-        if col.startswith(
-            excluded_prefixes
-        ):
-
+        if col.startswith( excluded_prefixes ):
             continue
 
-        hover_cols.append(
-            col
-        )
+        hover_cols.append( col)
 
     return hover_cols
 
@@ -139,11 +109,7 @@ def render_scatter(
     df = df.copy()
 
     if x not in df.columns or y not in df.columns:
-
-        st.warning(
-            "Selected axes are not available in the current dataset."
-        )
-
+        st.warning( "Selected axes are not available in the current dataset." )
         return
 
     text_column = None
@@ -151,11 +117,9 @@ def render_scatter(
     if show_ids:
 
         if "id" in df.columns:
-
             text_column = "id"
 
         elif "ID" in df.columns:
-
             text_column = "ID"
 
     plot_color = infer_lens_color_column(

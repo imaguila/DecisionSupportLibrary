@@ -173,8 +173,7 @@ def render_summary(df, dataset):
     if df is None:
         st.error(
             "Dataset summary cannot be rendered "
-            "because the current dataframe is empty."
-        )
+            "because the current dataframe is empty." )
         return
 
     label = get_summary_label()
@@ -190,17 +189,12 @@ def render_summary(df, dataset):
 
         with tab_overview:
             render_summary_metrics(df, dataset)
-
             st.caption(
                 f"Decision-variable prefix: "
-                f"{dataset['config'].get('var_prefix')}"
-            )
-
+                f"{dataset['config'].get('var_prefix')}" )
             render_lens_summary(df)
-
         with tab_current:
             render_dataset_table(df, dataset)
-
         with tab_saved_soi:
             render_soi_tab()
         
