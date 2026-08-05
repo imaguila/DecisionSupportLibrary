@@ -46,7 +46,6 @@ def render_no_map_message():
         "to render decision-space maps."
     )
 
-
 def render_workspace(
     df,
     dataset,
@@ -64,7 +63,7 @@ def render_workspace(
     )
 
     # ==================================================
-    # SUMMARY
+    # SUMMARY + CURRENT SET
     # ==================================================
 
     render_summary(
@@ -74,11 +73,14 @@ def render_workspace(
 
     # ==================================================
     # MAPS
+    # ==================================================
 
     if len(dimensions) < 2:
+
         render_no_map_message()
 
     else:
+
         render_maps(
             df,
             dataset,
@@ -88,13 +90,6 @@ def render_workspace(
 
     # ==================================================
     # SAVED SOIS
+    # ==================================================
 
     render_soi_registry()
-
-    # ==================================================
-    # CURRENT DATASET
-
-    render_dataset_preview(
-        df,
-        dataset
-    )

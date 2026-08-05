@@ -4,40 +4,136 @@
 
 import streamlit as st
 
-def render_summary( df, dataset ):
+from core.workspace_dataset import (
+    render_dataset_table
+)
 
-    if df is None:
-        st.error(
-            "Dataset summary cannot be rendered "
-            "because the current dataframe is empty."
+
+def get_lens_columns(
+    df
+):
+
+    lens_prefixes = [
+        "preference_",
+        "efficiency_",
+        "diversity_",
+        "domain_",
+        "indicator_",
+        "consensus_"
+    ]
+
+    lens_columns = [
+        col
+        for col in df.columns
+        if any(
+            col.startswith(
+                prefix
+            )
+            for prefix in lens_prefixes
         )
+    ]
+
+    structural_columns = [
+        col
+        for col in [
+            "cluster",
+            "cluster_str",
+            "group_label",
+            "group_base",
+            "highlight"
+        ]
+        if col in df.columns
+    ]
+
+    return (
+        structural_columns
+        +
+        lens_columns
+    )
+
+
+def render_summary_metrics(
+    df,
+    dataset
+):
+
+    c1, c2, c3, c4 = st.columns(
+        4
+    )
+
+    with c1:
+
+        st.metric(
+            "Solutions",
+            len(df)
+        )
+
+    with c2:
+
+        st.metric(
+            "Attributes",
+            len(df.columns)
+        )
+
+    with c3:
+
+        st.metric(
+            "Decision Variables",
+            len(
+                dataset[
+                    "decision_variables"
+                ]
+            )
+        )
+
+    with c4:
+
+        css_status = (
+            "Active"
+            if st.session_state.get(
+                "css_enabled",
+                False
+            )
+            else "Inactive"
+        )
+
+        st.metric(
+            "CSS",
+            css_status
+        )
+
+
+def render_lens_summary(
+    df
+):
+
+    lens_columns = get_lens_columns(
+        df
+    )
+
+    if len(lens_columns) == 0:
+
         return
 
-    with st.expander(
-        "📊 Dataset Summary", expanded=False  ):
-
-        c1, c2, c3 = st.columns( 3 )
-        with c1:
-            st.metric( "Solutions", len(df) )
-        with c2:
-            st.metric( "Attributes",  len(df.columns) )
-        with c3:
-            st.metric(
-                "Decision Variables",
-                len( dataset[ "decision_variables" ] )
-            )
-
-        st.caption(
-            f"Decision-variable prefix: "
-            f"{dataset['config'].get('var_prefix')}"
+    st.caption(
+        "Derived columns: "
+        +
+        ", ".join(
+            lens_columns
         )
+    )
 
-        st.download_button(
-            label="⬇️ Export Current Subset",
-            data=df.to_csv(
-                index=False
-            ),
-            file_name="current_subset.csv",
-            mime="text/csv",
-            use_container_width=True
+
+def render_export_button(
+    df
+):
+
+    st.download_button(
+        label="⬇️ Export Current Set",
+        data=df.to_csv(
+            index=False
+        ),
+        file_name="current_set.csv",
+        mime="text/csv",
+        use_container_width=True
         )

@@ -73,26 +73,57 @@ def get_ordered_columns(
     return ordered_cols
 
 
+def get_current_set_label():
+
+    if st.session_state.get(
+        "css_enabled",
+        False
+    ):
+
+        return "Current CSS"
+
+    return "Current Decision Set"
+
+
+def render_dataset_table(
+    df,
+    dataset
+):
+
+    label = get_current_set_label()
+
+    st.markdown(
+        f"#### 📋 {label}"
+    )
+
+    ordered_cols = get_ordered_columns(
+        df,
+        dataset
+    )
+
+    st.dataframe(
+        df[ordered_cols],
+        use_container_width=True,
+        height=420,
+        hide_index=True
+    )
+
+
 def render_dataset_preview(
     df,
     dataset
 ):
 
+    label = get_current_set_label()
+
     with st.expander(
-        f"📋 Current Dataset "
+        f"📋 {label} "
         f"(prefix: "
         f"{dataset['config'].get('var_prefix')})",
         expanded=False
     ):
 
-        ordered_cols = get_ordered_columns(
+        render_dataset_table(
             df,
             dataset
-        )
-
-        st.dataframe(
-            df[ordered_cols],
-            use_container_width=True,
-            height=500,
-            hide_index=True
         )
