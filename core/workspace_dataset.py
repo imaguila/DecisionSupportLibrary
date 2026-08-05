@@ -32,12 +32,10 @@ def get_ordered_columns( df, dataset ):
 
     ordered_cols = (
         ["id"] + objective_cols + indicator_cols +
-        other_cols + decision_cols
-    )
+        other_cols + decision_cols )
 
     ordered_cols = [ col for col in ordered_cols
-        if col in df.columns
-    ]
+        if col in df.columns ]
 
     return ordered_cols
 
