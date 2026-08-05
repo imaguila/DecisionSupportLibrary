@@ -13,7 +13,6 @@ import streamlit as st
 def ensure_soi_state():
 
     if "saved_sois" not in st.session_state:
-
         st.session_state.saved_sois = []
 
 
@@ -542,7 +541,6 @@ def render_saved_soi_row(
 # =====================================================
 # MAIN RENDERER
 # =====================================================
-
 
 
 def render_soi_tab():
