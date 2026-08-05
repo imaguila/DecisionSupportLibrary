@@ -121,6 +121,10 @@ def render_lens_summary(
 
     if len(lens_columns) == 0:
 
+        st.caption(
+            "No derived lens columns in the current set."
+        )
+
         return
 
     st.caption(
@@ -184,29 +188,37 @@ def render_summary(
         expanded=False
     ):
 
-        render_summary_metrics(
-            df,
-            dataset
+        tab_overview, tab_current = st.tabs(
+            [
+                "Overview",
+                "Current Set"
+            ]
         )
 
-        st.caption(
-            f"Decision-variable prefix: "
-            f"{dataset['config'].get('var_prefix')}"
-        )
+        with tab_overview:
 
-        render_lens_summary(
-            df
-        )
+            render_summary_metrics(
+                df,
+                dataset
+            )
 
-        render_export_button(
-            df
-        )
+            st.caption(
+                f"Decision-variable prefix: "
+                f"{dataset['config'].get('var_prefix')}"
+            )
 
-        st.markdown(
-            "---"
-        )
+            render_lens_summary(
+                df
+            )
 
-        render_dataset_table(
-            df,
-            dataset
-        )
+            render_export_button(
+                df
+            )
+
+        with tab_current:
+
+            render_dataset_table(
+                df,
+                dataset
+            )
+
