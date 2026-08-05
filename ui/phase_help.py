@@ -217,7 +217,6 @@ def render_help_icon(
             help_text
         )
 
-
 def render_phase_help_icon(
     phase_key,
     key=None,
@@ -232,8 +231,10 @@ def render_phase_help_icon(
 
         return
 
-    render_help_icon(
-        help_text,
-        key=key,
-        label=label
-    )
+    with st.popover(
+        label
+    ):
+
+        st.markdown(
+            help_text
+        )
