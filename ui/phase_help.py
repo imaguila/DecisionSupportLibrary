@@ -45,13 +45,24 @@ Examples of decision-variable prefixes:
 - `feature_`
 - `design_`
 
-After loading the data, refine the optimization objectives that define the base decision space.
+After loading the data, refine the Objective Column (optimization objectives) that define the base decision space.
 """,
 
     "enrichment": """
 Add derived indicators to the original dataset.
 
-Indicators enrich the decision space with additional analytical views, such as:
+Available indicators are provided by the active domain plugin. The app checks
+which indicators can be computed from the currently selected base objectives.
+
+Only compatible indicators are shown. An indicator is compatible when all
+required input columns are available in the current dataset.
+
+Each indicator must also have its calculation logic defined in the plugin.
+If the plugin does not define how an indicator is computed, the app cannot
+generate that indicator.
+
+Derived indicators enrich the decision space with additional analytical views,
+such as:
 
 - productivity
 - scope
@@ -59,7 +70,8 @@ Indicators enrich the decision space with additional analytical views, such as:
 - efficiency
 - domain-specific measures
 
-These indicators can later be used in maps, lenses, SOI generation, CSS selection, and detailed comparison.
+Selected indicators can later be used in maps, lenses, SOI generation,
+CSS selection, and detailed comparison.
 """,
 
     "framing": """
