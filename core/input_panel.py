@@ -224,7 +224,7 @@ def render_input_panel():
                 "Domain Configuration",
                 "Upload Enriched CSV"
             ],
-            horizontal=True,
+            horizontal=True#,
    #         help="Choose how the decision space is loaded."
         )
 
