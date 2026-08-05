@@ -327,6 +327,55 @@ def render_decision_variable_distribution(css_df, dataset):
     st.plotly_chart(fig, use_container_width=True)
 
 # =====================================================
+# VARIABLE TO METRIC MAPPING (X vs Y Correlation)
+# =====================================================
+
+def render_variable_metric_correlation(compare_df, dataset):
+    var_cols = get_decision_variable_columns(compare_df, dataset)
+    metric_cols = get_numeric_dimensions(compare_df, dataset)
+
+    if not var_cols or not metric_cols:
+        st.info("Both decision variables and numeric metrics are required to compute mapping.")
+        return
+
+    if len(compare_df) < 2:
+        st.info("Select at least 2 solutions to calculate correlation.")
+        return
+
+    # Creamos la sub-matriz X (variables) e Y (métricas)
+    combined_df = compare_df[var_cols + metric_cols]
+    
+    # Matriz de correlación
+    corr_matrix = combined_df.corr()
+    
+    # Extraemos solo las filas X vs columnas Y
+    xy_corr = corr_matrix.loc[var_cols, metric_cols].dropna(how="all").fillna(0.0)
+
+    if xy_corr.empty:
+        st.info("Could not calculate variance/correlation for the selected subset.")
+        return
+
+    fig = px.imshow(
+        xy_corr,
+        labels=dict(x="Metrics / Objectives (Y)", y="Decision Variables (X)", color="Correlation"),
+        color_continuous_scale="RdBu",
+        zmin=-1.0,
+        zmax=1.0,
+        aspect="auto"
+    )
+
+    fig.update_layout(
+        template="plotly_white",
+        height=max(400, len(var_cols) * 20),
+        xaxis=dict(tickangle=-45)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+
+
+
+# =====================================================
 # MAIN CSS COMPARISON
 # =====================================================
 
@@ -363,10 +412,11 @@ def render_css_comparison(css_df, dataset):
 
         compare_df = css_df[css_df["id"].isin(compare_ids)].copy()
 
-        tab_metrics, tab_vars, tab_sim = st.tabs([
+        tab_metrics, tab_vars, tab_sim, tab_mapping = st.tabs([
             "📊 Metrics & Trade-offs", 
             "📋 Decision Variables",
-            "🔀 Structural Similarity"
+            "🔀 Structural Similarity",
+            "🔗 X → Y Mapping"  
         ])
 
         with tab_metrics:
@@ -375,12 +425,11 @@ def render_css_comparison(css_df, dataset):
             render_parallel_coordinates(compare_df, dataset)
             st.divider()
             render_baseline_difference_chart(compare_df, dataset)
-
         with tab_vars:
             render_decision_variable_matrix(compare_df, dataset)
             st.divider()
             render_decision_variable_distribution(css_df, dataset)
-            
         with tab_sim:
             render_solution_similarity_matrix(compare_df, dataset)
-
+        with tab_mapping:
+            render_variable_metric_correlation(compare_df, dataset)
