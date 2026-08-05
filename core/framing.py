@@ -5,86 +5,35 @@
 import streamlit as st
 import pandas as pd
 
-
-def get_framing_dimensions(
-    dataset
-):
-
+def get_framing_dimensions( dataset ):
     return (
-        dataset[
-            "metrics"
-        ]
+        dataset[ "metrics" ]
         +
-        dataset[
-            "selected_indicators"
-        ]
+        dataset[ "selected_indicators" ]
     )
 
-
-def is_valid_numeric_dimension(
-    df,
-    column
-):
-
+def is_valid_numeric_dimension( df, column ):
     if column not in df.columns:
-
         return False
-
-    if not pd.api.types.is_numeric_dtype(
-        df[column]
-    ):
-
+    if not pd.api.types.is_numeric_dtype( df[column] ):
         return False
-
     return True
 
-
-def apply_dimension_filter(
-    filtered_df,
-    metric,
-    selected_range
-):
-
+def apply_dimension_filter( filtered_df, metric, selected_range ):
     return filtered_df[
-        (
-            filtered_df[metric]
-            >=
-            selected_range[0]
-        )
+        ( filtered_df[metric] >= selected_range[0] )
         &
-        (
-            filtered_df[metric]
-            <=
-            selected_range[1]
-        )
+        ( filtered_df[metric] <= selected_range[1] )
     ]
 
+def render_framing_summary( original_df, filtered_df ):
+    total_solutions = len( original_df )
+    remaining_solutions = len( filtered_df )
 
-def render_framing_summary(
-    original_df,
-    filtered_df
-):
-
-    total_solutions = len(
-        original_df
+    ratio = ( remaining_solutions /
+        max( total_solutions, 1 )
     )
-
-    remaining_solutions = len(
-        filtered_df
-    )
-
-    ratio = (
-        remaining_solutions
-        /
-        max(
-            total_solutions,
-            1
-        )
-    )
-
-    st.progress(
-        ratio
-    )
+    st.progress( ratio )
 
     st.markdown(
         f"""
@@ -100,46 +49,25 @@ def render_framing_summary(
         unsafe_allow_html=True
     )
 
-    st.caption(
-        f"{ratio:.0%} of the decision space is visible."
-    )
-
+    st.caption( f"{ratio:.0%} of the decision space is visible." )
 
 def apply_framing(
     dataset
 ):
 
-    df = dataset[
-        "df"
-    ].copy()
-
+    df = dataset[ "df" ].copy()
     filtered_df = df.copy()
-
-    dimensions = get_framing_dimensions(
-        dataset
-    )
+    dimensions = get_framing_dimensions( dataset )
 
     with st.sidebar.expander(
-        "🎛️ Context Framing",
-        expanded=False
+        "🎛️ Context Framing", expanded=False
     ):
 
         for metric in dimensions:
-
-            if not is_valid_numeric_dimension(
-                df,
-                metric
-            ):
-
+            if not is_valid_numeric_dimension( df, metric ):
                 continue
-
-            min_v = float(
-                df[metric].min()
-            )
-
-            max_v = float(
-                df[metric].max()
-            )
+            min_v = float( df[metric].min() )
+            max_v = float( df[metric].max() )
 
             if min_v == max_v:
 

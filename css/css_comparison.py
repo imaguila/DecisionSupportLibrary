@@ -410,9 +410,8 @@ def render_decision_variable_distribution(
         use_container_width=True
     )
 
-    # =====================================================
-# MAIN CSS COMPARISON
 # =====================================================
+# MAIN CSS COMPARISON
 
 def render_css_comparison(
     css_df,
@@ -426,92 +425,92 @@ def render_css_comparison(
 
         return
 
-    st.markdown(
-        "## 🆚 Detailed comparison"
-    )
+    with st.expander(
+        "🆚 Detailed comparison",
+        expanded=True
+    ):
 
-    if css_df is None or css_df.empty:
+        if css_df is None or css_df.empty:
 
-        st.info(
-            "No Candidate Solution Set is available for comparison."
+            st.info(
+                "No Candidate Solution Set is available for comparison."
+            )
+
+            return
+
+        if "id" not in css_df.columns:
+
+            st.warning(
+                "The current CSS does not contain an 'id' column."
+            )
+
+            return
+
+        css_ids = (
+            css_df["id"]
+            .dropna()
+            .astype(int)
+            .tolist()
         )
 
-        return
-
-    if "id" not in css_df.columns:
-
-        st.warning(
-            "The current CSS does not contain an 'id' column."
+        default_ids = st.session_state.get(
+            "css_highlight_ids",
+            []
         )
 
-        return
-
-    css_ids = (
-        css_df["id"]
-        .dropna()
-        .astype(int)
-        .tolist()
-    )
-
-    default_ids = st.session_state.get(
-        "css_highlight_ids",
-        []
-    )
-
-    default_ids = [
-        solution_id
-        for solution_id in default_ids
-        if solution_id in css_ids
-    ]
-
-    compare_ids = st.multiselect(
-        "Pick solutions to compare",
-        css_ids,
-        default=default_ids,
-        key="css_compare_ids"
-    )
-
-    if len(compare_ids) < 2:
-
-        st.info(
-            "Select at least 2 solutions to compare."
-        )
-
-        return
-
-    compare_df = css_df[
-        css_df["id"].isin(
-            compare_ids
-        )
-    ].copy()
-
-    tab1, tab2, tab3 = st.tabs(
-        [
-            "📊 Objectives and indicators",
-            "📋 Decision-variable matrix",
-            "📈 Decision-variable distribution"
+        default_ids = [
+            solution_id
+            for solution_id in default_ids
+            if solution_id in css_ids
         ]
-    )
 
-    with tab1:
-
-        render_tradeoff_radar(
-            compare_df,
-            css_df,
-            dataset
+        compare_ids = st.multiselect(
+            "Pick solutions to compare",
+            css_ids,
+            default=default_ids,
+            key="css_compare_ids"
         )
 
-    with tab2:
+        if len(compare_ids) < 2:
 
-        render_decision_variable_matrix(
-            compare_df,
-            dataset
+            st.info(
+                "Select at least 2 solutions to compare."
+            )
+
+            return
+
+        compare_df = css_df[
+            css_df["id"].isin(
+                compare_ids
+            )
+        ].copy()
+
+        tab1, tab2, tab3 = st.tabs(
+            [
+                "📊 Objectives and indicators",
+                "📋 Decision-variable matrix",
+                "📈 Decision-variable distribution"
+            ]
         )
 
-    with tab3:
+        with tab1:
 
-        render_decision_variable_distribution(
-            css_df,
-            dataset
-        )
-        
+            render_tradeoff_radar(
+                compare_df,
+                css_df,
+                dataset
+            )
+
+        with tab2:
+
+            render_decision_variable_matrix(
+                compare_df,
+                dataset
+            )
+
+        with tab3:
+
+            render_decision_variable_distribution(
+                css_df,
+                dataset
+            )

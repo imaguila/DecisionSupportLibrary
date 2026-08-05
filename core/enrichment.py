@@ -4,70 +4,32 @@
 
 import streamlit as st
 
-
-def get_available_indicators(
-    plugin,
-    selected_metrics
-):
-
+def get_available_indicators( plugin, selected_metrics ):
     available_indicators = []
-
     requirements = plugin.requirements()
-
     for indicator, reqs in requirements.items():
-
-        if all(
-            metric in selected_metrics
-            for metric in reqs
-        ):
-
-            available_indicators.append(
-                indicator
-            )
-
+        if all( metric in selected_metrics for metric in reqs ):
+            available_indicators.append( indicator )
     return available_indicators
 
-
-def render_enrichment(
-    dataset
-):
-
-    plugin = dataset[
-        "plugin"
-    ]
-
+def render_enrichment( dataset ):
+    plugin = dataset[ "plugin" ]
     if plugin is None:
-
-        dataset[
-            "selected_indicators"
-        ] = []
-
+        dataset[ "selected_indicators" ] = []
         return dataset
 
-    selected_metrics = dataset[
-        "metrics"
-    ]
-
+    selected_metrics = dataset[ "metrics" ]
     available_indicators = get_available_indicators(
-        plugin,
-        selected_metrics
-    )
+        plugin, selected_metrics )
 
-    with st.sidebar.expander(
-        "⚙️ Data Enrichment",
-        expanded=False
-    ):
-
+    with st.sidebar.expander( "⚙️ Data Enrichment", expanded=False ):
         st.caption(
             f"Detected {len(available_indicators)} "
-            "compatible indicators."
-        )
+            "compatible indicators." )
 
         selected_indicators = st.multiselect(
             "Available indicators",
-            sorted(
-                available_indicators
-            ),
+            sorted( available_indicators ),
             default=[
                 indicator
                 for indicator in dataset[
@@ -95,8 +57,6 @@ def render_enrichment(
         selected_indicators
     )
 
-    dataset[
-        "selected_indicators"
-    ] = selected_indicators
+    dataset[ "selected_indicators" ] = selected_indicators
 
     return dataset

@@ -36,26 +36,21 @@ st.markdown(
 
 st.title(  "Decision Space Explorer" )
 
-
 # ==================================================
 # INPUT
-# ==================================================
 
 dataset = render_input_panel()
-
 if dataset is None:
     st.info( "Select a domain configuration to begin.")
     st.stop()
 
 # ==================================================
 # ENRICHMENT
-# ==================================================
 
 dataset = render_enrichment( dataset )
 
 # ==================================================
 # WORKSPACE CONTROLS
-# ==================================================
 
 dimensions = ( dataset["metrics"] + dataset["selected_indicators"] )
 
@@ -63,13 +58,11 @@ show_ids = render_workspace_controls( dimensions )
 
 # ==================================================
 # FRAMING
-# ==================================================
 
 framed_df = apply_framing( dataset )
 
 # ==================================================
 # WORKING DATASET
-# ==================================================
 
 working_df = framed_df.copy()
 
@@ -80,7 +73,6 @@ if "active_soi_ids" in st.session_state:
 
 # ==================================================
 # RESET LENS AFTER LOADING / CLEARING SOI
-# ==================================================
 
 if st.session_state.get( "pending_lens_reset", False ):
     st.session_state[ "active_lens" ] = "None"
@@ -88,7 +80,6 @@ if st.session_state.get( "pending_lens_reset", False ):
 
 # ==================================================
 # LENSES / SOI IDENTIFICATION
-# ==================================================
 
 (
     active_lens,
@@ -116,21 +107,13 @@ if lens_df is None:
 
     lens_df = working_df.copy()
 
-
 # ==================================================
 # LENS FEEDBACK
-# ==================================================
 
-render_lens_feedback(
-    feedback_placeholder,
-    active_lens,
-    lens_df
-)
-
+render_lens_feedback( feedback_placeholder,  active_lens, lens_df )
 
 # ==================================================
 # GROUP SELECTION / CURRENT SOI CANDIDATE SET
-# ==================================================
 
 current_df = render_group_selector_and_save(
     selection_placeholder,
@@ -140,94 +123,48 @@ current_df = render_group_selector_and_save(
 )
 
 if current_df is None:
-
     current_df = lens_df.copy()
-
 
 # ==================================================
 # SAVE CURRENT SOI
-# ==================================================
 
 if "pending_save_soi" in st.session_state:
-
     if "saved_sois" not in st.session_state:
-
         st.session_state.saved_sois = []
 
-    pending = (
-        st.session_state.pending_save_soi
-    )
-
+    pending = ( st.session_state.pending_save_soi )
     existing_names = [
         soi["name"]
         for soi in st.session_state.saved_sois
     ]
 
     if pending["name"] in existing_names:
-
-        st.sidebar.warning(
-            "A SOI with this name already exists."
-        )
-
+        st.sidebar.warning( "A SOI with this name already exists." )
     else:
-
         st.session_state.saved_sois.append(
             {
-                "name": pending["name"],
-                "lens": pending["lens"],
-                "params": pending.get(
-                    "params",
-                    {}
-                ),
-                "ids": pending.get(
-                    "ids",
-                    current_df["id"].tolist()
-                ),
-                "group": pending.get(
-                    "group",
-                    "All groups"
-                ),
-                "group_column": pending.get(
-                    "group_column"
-                )
+                "name": pending["name"],  "lens": pending["lens"],
+                "params": pending.get( "params", {} ),
+                "ids": pending.get( "ids", current_df["id"].tolist() ),
+                "group": pending.get( "group",  "All groups" ),
+                "group_column": pending.get( "group_column" )
             }
         )
-
-        st.sidebar.success(
-            f"Saved SOI: {pending['name']}"
-        )
-
-    del st.session_state[
-        "pending_save_soi"
-    ]
+        st.sidebar.success( f"Saved SOI: {pending['name']}" )
+    del st.session_state[  "pending_save_soi" ]
 
 
 # ==================================================
 # CANDIDATE SOLUTION SET
-# ==================================================
 
-css_df = render_css_panel(
-    current_df,
-    dataset
-)
-
+css_df = render_css_panel( current_df,  dataset )
 
 # ==================================================
 # WORKSPACE
-# ==================================================
 
-render_workspace(
-    css_df,
-    dataset,
-    show_ids
-)
-
+render_workspace(  css_df, dataset, show_ids )
 
 # ==================================================
 # DETAILED COMPARISON
-# ==================================================
 
-render_css_comparison(
-    css_df,
-    dataset
-)
+render_css_comparison( css_df, dataset )
