@@ -12,8 +12,13 @@ import streamlit as st
 
 PHASE_HELP = {
     "input": (
-        "Load or define the decision dataset and domain configuration. "
-        "This phase establishes the base decision space."
+        "Load the base decision space. This phase established the base decision space\n\n"
+        "Two starting alternatives:\n"
+        "• Domain Configuration: load a predefined case with dataset, objectives, "
+        "decision-variable prefix, and optional plugin.\n"
+        "• Upload Enriched CSV: upload a standalone CSV and define the prefix used "
+        "to identify decision variables.\n\n"
+        "After loading, select the optimization objectives."
     ),
 
     "enrichment": (
