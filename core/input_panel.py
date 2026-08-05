@@ -275,7 +275,6 @@ def render_input_panel():
 # =====================================================
 # DOMAIN CONFIGURATION INPUT
 # =====================================================
-
 def render_domain_configuration_input():
 
     dataset_names = [
@@ -284,11 +283,45 @@ def render_domain_configuration_input():
         CASES.keys()
     )
 
-    dataset_name = st.selectbox(
-        "Domain Configuration",
-        dataset_names,
-        key="input_domain_configuration"
+    col_dataset, col_help = st.columns(
+        [
+            0.85,
+            0.15
+        ],
+        vertical_alignment="bottom"
     )
+
+    with col_dataset:
+
+        dataset_name = st.selectbox(
+            "Domain Configuration",
+            dataset_names,
+            key="input_domain_configuration"
+        )
+
+    if dataset_name == "-- No Data --":
+
+        dataset_help = (
+            "No domain configuration selected yet.\n\n"
+            "Choose a predefined case to load its dataset, objectives, "
+            "decision-variable prefix, and optional plugin."
+        )
+
+    else:
+
+        dataset_help = CASES[
+            dataset_name
+        ].get(
+            "help",
+            "No additional description is available for this domain configuration."
+        )
+
+    with col_help:
+
+        render_help_icon(
+            dataset_help,
+            key="help_domain_configuration"
+        )
 
     if dataset_name == "-- No Data --":
 
@@ -324,7 +357,6 @@ def render_domain_configuration_input():
         df,
         cfg
     )
-
 
 # =====================================================
 # UPLOADED CSV INPUT
