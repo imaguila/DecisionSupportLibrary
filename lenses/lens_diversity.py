@@ -1,6 +1,6 @@
 ## --------------------------------------------------------------------------------------
 ## lens_diversity.py
-## --------------------------------------------------------------------------------------
+# ## --------------------------------------------------------------------------------------
 
 import pandas as pd
 import streamlit as st
@@ -280,26 +280,12 @@ def _valid_numeric_metrics(
     ]
 
 
-def _prepare_matrix(
-    df,
-    metrics
-):
+def _prepare_matrix( df,  metrics ):
 
-    x = df[
-        metrics
-    ].copy()
-
-    x = x.fillna(
-        x.median(
-            numeric_only=True
-        )
-    )
-
+    x = df[metrics].copy()
+    x = x.fillna(x.median(numeric_only=True)).fillna(0.0)
     scaler = StandardScaler()
-
-    x_scaled = scaler.fit_transform(
-        x
-    )
+    x_scaled = scaler.fit_transform(x)
 
     return x_scaled
 

@@ -212,17 +212,11 @@ class NRPPlugin:
                 # ----------------------------------
                 # Response
                 # ----------------------------------
-
                 elif indicator == "response":
-
                     result[indicator] = np.where(
                         result["time"] == 0,
                         0,
-                        result["time"]
-                        / np.maximum(
-                            result["effort"],
-                            EPS
-                        )
+                        result["effort"] / np.maximum(result["time"], EPS)
                     )
 
                 # ----------------------------------

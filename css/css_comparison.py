@@ -190,12 +190,11 @@ def render_baseline_difference_chart(compare_df, dataset):
             base_val = baseline_row[metric]
             curr_val = row[metric]
             
-            # REFACTOR 3: Prevención de división por cero
             if base_val != 0:
                 pct_change = ((curr_val - base_val) / abs(base_val)) * 100
             else:
-                pct_change = 0.0 # O manejar según tu preferencia si base es 0
-                
+                pct_change = np.nan  # O 100.0 si curr_val > 0 else 0.0
+            
             diff_data.append({
                 "Solution": f"ID {int(row['id'])}",
                 "Metric": metric,
@@ -228,11 +227,10 @@ def render_solution_similarity_matrix(compare_df, dataset):
         st.info("Requires decision variables and at least 2 solutions to compute similarity.")
         return
 
-    # REFACTOR 2: Usar correlación genérica en lugar de Jaccard binario
+
     matrix_df = compare_df.set_index("id")[var_cols]
     
-    # Transponemos para correlacionar filas (soluciones) en vez de columnas
-    sim_matrix = matrix_df.T.corr().fillna(1.0) 
+    sim_matrix = matrix_df.T.corr().fillna(0.0) 
     
     sim_matrix.index = [f"ID {int(i)}" for i in sim_matrix.index]
     sim_matrix.columns = [f"ID {int(c)}" for c in sim_matrix.columns]

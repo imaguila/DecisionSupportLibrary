@@ -100,14 +100,17 @@ def build_dataset( df, cfg ):
 def load_builtin_dataset( cfg ):
     df = pd.read_csv( cfg["path_sol"] )
     df = df.reset_index( drop=True )
-    df["id"] = range( 1,  len(df) + 1 )
+
+    if "id" not in df.columns:
+        df["id"] = range( 1,  len(df) + 1 )
 
     return df
 
 def load_uploaded_dataset( uploaded_file ):
     df = pd.read_csv( uploaded_file )
     df = df.reset_index( drop=True )
-    df["id"] = range( 1, len(df) + 1 )
+    if "id" not in df.columns:
+        df["id"] = range( 1,  len(df) + 1 )
 
     return df
 

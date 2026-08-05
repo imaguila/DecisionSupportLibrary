@@ -33,8 +33,11 @@ class ColumnClassifier:
         all_excluded = self.system_excludes | self.user_excludes | self.metrics
         
         indicators = []
+        has_prefix = bool(self.var_prefix)
         for col in df.columns:
-            if col in all_excluded or col.startswith(self.var_prefix):
+            if col in all_excluded:
+                continue
+            if has_prefix and col.startswith(self.var_prefix):
                 continue
             # If the column is numeric and passed all exclusion filters, treat it as a derived lens/indicator
             if pd.api.types.is_numeric_dtype(df[col]):
