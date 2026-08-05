@@ -10,9 +10,8 @@ from lenses.lens_registry import (
 )
 
 from ui.phase_help import (
-    render_phase_caption
+    sidebar_phase_container
 )
-
 
 
 def render_lens_header(
@@ -90,14 +89,34 @@ def render_lens_panel(
 
     params = {}
 
-    with st.sidebar.expander(
-        "🧭 Solution of interest",
-        expanded=False
-    ):
+#    with st.sidebar.expander(
+#        "🧭 Solution of interest",
+#        expanded=False
+#    ):
 
-        render_phase_caption(
-            "soi"
-        )
+
+    panel = sidebar_phase_container(
+        "🧭 Solution of interest",
+        "soi",
+        key="soi_phase_panel",
+        expanded=False
+    )
+
+    if panel is not None:
+
+        with panel:
+
+            active_lens = st.selectbox(
+                "Select an analytical lens",
+                get_lens_names(),
+                key="active_lens"
+            )
+            
+
+
+
+
+
         active_lens = st.selectbox(
             "Select an analytical lens",
             get_lens_names(),

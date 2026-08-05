@@ -4,6 +4,10 @@
 
 import streamlit as st
 
+from ui.phase_help import (
+    sidebar_phase_container
+)
+
 
 def ensure_css_state():
 
