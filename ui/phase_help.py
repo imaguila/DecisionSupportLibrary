@@ -231,7 +231,8 @@ def render_phase_help_icon(
     phase_key : str
         Key string identifying the target phase.
     key : Optional[str], optional
-        Optional widget key for Streamlit popover element, by default None.
+        Optional widget key for Streamlit popover element.
+        If None, a unique key is automatically generated using phase_key.
     label : str, default="ⓘ"
         Popover button label string.
     """
@@ -239,4 +240,8 @@ def render_phase_help_icon(
     if not help_text:
         return
 
-    render_help_icon(help_text, key=key, label=label)
+    # Automatically generate a unique key if none is explicitly provided
+    resolved_key = key if key is not None else f"help_phase_{phase_key}"
+
+    render_help_icon(help_text, key=resolved_key, label=label)
+    

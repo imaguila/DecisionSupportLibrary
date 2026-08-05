@@ -173,7 +173,7 @@ def apply_framing(dataset: Dict[str, Any]) -> pd.DataFrame:
             st.markdown("**Bounded Range Filters**")
 
         with col_help:
-            render_phase_help_icon("framing", key="help_input_phase")
+            render_phase_help_icon("framing", key="help_framing_phase")
 
         for metric in dimensions:
             if not is_valid_numeric_dimension(df, metric):
