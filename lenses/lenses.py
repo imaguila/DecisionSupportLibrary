@@ -9,6 +9,11 @@ from lenses.lens_registry import (
     get_lens_module
 )
 
+from ui.phase_help import (
+    render_phase_caption
+)
+
+
 
 def render_lens_header(
     active_lens
@@ -90,6 +95,9 @@ def render_lens_panel(
         expanded=False
     ):
 
+        render_phase_caption(
+            "soi"
+        )
         active_lens = st.selectbox(
             "Select an analytical lens",
             get_lens_names(),

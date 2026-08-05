@@ -17,6 +17,9 @@ from lenses.lens_selection import ( render_group_selector_and_save )
 from css.css_panel import ( render_css_panel )
 from css.css_comparison import ( render_css_comparison )
 
+from ui.phase_help import ( render_phase_title )
+
+
 st.set_page_config(
     page_title="Decision Space Explorer",
     layout="wide"
